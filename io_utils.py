@@ -39,3 +39,8 @@ def writeEdgesToFile(fname, B):
                 if B[i][j]>0:
                     f.write(str(i)+" "+str(j)+"\n")
 
+def removeIsolatedNodes(A):
+    rest_bool = np.array(np.sum(A, axis=0) != 0) | np.array(np.sum(A, axis=1) != 0)
+    rest_idx = [i for i in xrange(len(rest_bool)) if rest_bool[i]]
+    A = A[rest_idx, :]
+    A = A[:, rest_idx]
