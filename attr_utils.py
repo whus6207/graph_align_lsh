@@ -76,15 +76,15 @@ def getUndirAttribute(filename):
     OutDegV = snap.TIntPrV()
     snap.GetNodeOutDegV(UGraph, OutDegV)
     for item in OutDegV:
-        degree[item.GetVal1()-1] = item.GetVal2()
+        degree[item.GetVal1()] = item.GetVal2()
     attributes['Degree'] = degree
 
     # Farness Centrality, Node Eccentricity
     farCentr = np.zeros((UGraph.GetMxNId(),))
     nodeEcc = np.zeros((UGraph.GetMxNId(),))
     for NI in UGraph.Nodes():
-        farCentr[NI.GetId()-1] = snap.GetFarnessCentr(UGraph, NI.GetId())
-        nodeEcc[NI.GetId()-1] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
+        farCentr[NI.GetId()] = snap.GetFarnessCentr(UGraph, NI.GetId())
+        nodeEcc[NI.GetId()] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
     attributes['FarnessCentrality'] = farCentr
     attributes['NodeEccentricity'] = nodeEcc
 
@@ -94,7 +94,7 @@ def getUndirAttribute(filename):
     Edges = snap.TIntPrFltH()
     snap.GetBetweennessCentr(UGraph, Nodes, Edges, 1.0)
     for node in Nodes:
-        betCentr[node-1] = Nodes[node]
+        betCentr[node] = Nodes[node]
     attributes['NodeBetweennessCentrality'] = betCentr
 
     # PageRank
@@ -102,7 +102,7 @@ def getUndirAttribute(filename):
     PRankH = snap.TIntFltH()
     snap.GetPageRank(UGraph, PRankH)
     for item in PRankH:
-        pgRank[item-1] = PRankH[item]
+        pgRank[item] = PRankH[item]
     attributes['PageRank'] = pgRank
 
     return attributes
