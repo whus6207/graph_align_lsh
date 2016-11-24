@@ -30,7 +30,7 @@ def permuteNoiseMat(A, is_perm=False, has_noise=False):
         noise = np.random.choice([0, 1], size=(len(A),len(A)), p=[99.95/100, 0.05/100])
         B = (B + noise + noise.T)%2
     
-    return B
+    return B, P
 
 def writeEdgesToFile(fname, B):
     with open(fname, 'w') as f:
