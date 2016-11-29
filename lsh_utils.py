@@ -42,6 +42,14 @@ def cos_sim(v1, v2, scaling=None):
     v2 = np.multiply(v2, 1/scaling)
     return v1.dot(v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
 
+def KL_sim(v1, v2):
+    v1 = v1.astype(float) / np.mean(v1)
+    v2 = v2.astype(float) / np.mean(v2)
+    temp = np.log(v1 / v2)
+    temp[np.isinf(temp)] = 0
+    return np.sum(temp * v1, axis = 0)
+
+
 def computeMatchingMat(attributesA, attributesB, pair_count_dict):
     combineAB = selectAndCombine(attributesA, attributesB)
     matching_matrix = np.zeros((len(attributesA), len(attributesB)))
@@ -73,7 +81,7 @@ def combineBucketsBySum(buckets, combineAB, Afname):
             B_idx = ~A_idx
             colli_arr = np.array(collisions)
             
-            if sum(A_idx) == len(A_idx):
+            if sum(A_idx) == len(A_idx):    # Not all in A 
                 continue
                 
             for aid in colli_arr[A_idx]:
@@ -82,10 +90,23 @@ def combineBucketsBySum(buckets, combineAB, Afname):
 
     return pair_count_dict
 
+
 def plotBucketDistribution(bucket):
     plt.bar(range(len(bucket))
             , sorted([len(values) for key, values in bucket.items()])
             , align='center')
     plt.show()
 
+
+def Rank(matching_matrix, P = None):
+    if P is not None:
+        matching_matrix = matching_matrix.dot(P)
+    n, d = matching_matrix.shape
+    
+    ranking = np.zeros((n))
+    for i in range(n):      
+        #rank = n - matching_matrix[i, :].argsort().tolist().index(i)
+        rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
+        ranking[i] = 1.0 / rank
+    return ranking
 
