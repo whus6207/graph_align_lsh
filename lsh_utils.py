@@ -45,19 +45,19 @@ def cos_sim(v1, v2, scaling=None):
 def computeMatchingMat(attributesA, attributesB, pair_count_dict):
     combineAB = selectAndCombine(attributesA, attributesB)
     matching_matrix = np.zeros((len(attributesA), len(attributesB)))
-    scale = np.mean(combineAB[:,1:], axis=0)
+    scale = np.mean(combineAB[:,2:], axis=0)
                 
     for pair, count in pair_count_dict.items():
-        matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][1:], combineAB[pair[1]][1:],scaling=scale)*count
+        matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
         
     return matching_matrix
 
 def computeWholeSimMat(attributesA, attributesB):
     combineAB = selectAndCombine(attributesA, attributesB)
     sim_vec = []
-    scale = np.mean(combineAB[:,1:], axis=0)
+    scale = np.mean(combineAB[:,2:], axis=0)
     for j in range(len(attributesA)):
-        vec = [cos_sim(combineAB[j,1:], combineAB[len(attributesA)+i,1:], scale) for i in range(len(attributesB)) ]
+        vec = [cos_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
         sim_vec.append(vec)
 
     return np.array(sim_vec)
