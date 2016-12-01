@@ -125,7 +125,7 @@ def getDirAttribute(filename):
     InDegV = snap.TIntPrV()
     snap.GetNodeInDegV(Graph, InDegV)
     for item in InDegV:
-        degree[item.GetVal1()-1] = item.GetVal2()
+        degree[item.GetVal1()] = item.GetVal2()
     attributes['Degree'] += degree
     attributes['InDegree'] = degree
     
@@ -133,7 +133,7 @@ def getDirAttribute(filename):
     OutDegV = snap.TIntPrV()
     snap.GetNodeOutDegV(Graph, OutDegV)
     for item in OutDegV:
-        degree[item.GetVal1()-1] = item.GetVal2()
+        degree[item.GetVal1()] = item.GetVal2()
     attributes['Degree'] += degree
     attributes['OutDegree'] = degree
     
@@ -147,8 +147,8 @@ def getDirAttribute(filename):
     farCentr = np.zeros((Graph.GetNodes(),))
     nodeEcc = np.zeros((Graph.GetNodes(),))
     for NI in Graph.Nodes():
-        farCentr[NI.GetId()-1] = snap.GetFarnessCentr(Graph, NI.GetId(), True, True)
-        nodeEcc[NI.GetId()-1] = snap.GetNodeEcc(Graph, NI.GetId(), True)
+        farCentr[NI.GetId()] = snap.GetFarnessCentr(Graph, NI.GetId(), True, True)
+        nodeEcc[NI.GetId()] = snap.GetNodeEcc(Graph, NI.GetId(), True)
     attributes['FarnessCentrality'] = farCentr
     attributes['NodeEccentricity'] = nodeEcc
 
@@ -158,7 +158,7 @@ def getDirAttribute(filename):
     Edges = snap.TIntPrFltH()
     snap.GetBetweennessCentr(Graph, Nodes, Edges, 1.0, True)
     for node in Nodes:
-        betCentr[node-1] = Nodes[node]
+        betCentr[node] = Nodes[node]
     attributes['NodeBetweennessCentrality'] = betCentr
 
     # PageRank
@@ -166,7 +166,7 @@ def getDirAttribute(filename):
     PRankH = snap.TIntFltH()
     snap.GetPageRank(Graph, PRankH)
     for item in PRankH:
-        pgRank[item-1] = PRankH[item]
+        pgRank[item] = PRankH[item]
     attributes['PageRank'] = pgRank
 
     # Hubs, Authorities score 
@@ -176,9 +176,9 @@ def getDirAttribute(filename):
     NIdAuthH = snap.TIntFltH()
     snap.GetHits(Graph, NIdHubH, NIdAuthH)
     for item in NIdHubH:
-        hubs[item-1] = NIdHubH[item]
+        hubs[item] = NIdHubH[item]
     for item in NIdAuthH:
-        auth[item-1] = NIdAuthH[item]
+        auth[item] = NIdAuthH[item]
     attributes['HubsScore'] = hubs
     attributes['AuthoritiesScore'] = auth
 

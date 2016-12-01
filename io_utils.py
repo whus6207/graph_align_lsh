@@ -44,3 +44,4 @@ def removeIsolatedNodes(A):
     rest_idx = [i for i in xrange(len(rest_bool)) if rest_bool[i]]
     A = A[rest_idx, :]
     A = A[:, rest_idx]
+    return A
