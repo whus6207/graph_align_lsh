@@ -2,7 +2,7 @@ import snap
 import numpy as np
 import pandas as pd
 
-def getEgoAttr(UGraph, attributes):
+def getEgoAttr(UGraph, attributes, directed = True):
     egoDeg = np.zeros((UGraph.GetNodes(),))
     egoOutDeg = np.zeros((UGraph.GetNodes(),))
     egoInDeg = np.zeros((UGraph.GetNodes(),))
@@ -18,8 +18,11 @@ def getEgoAttr(UGraph, attributes):
             print thisNID, 'degree = 0!'
         InNodes = []
         OutNodes = []
-        for Id in NI.GetInEdges():
-            InNodes.append(Id)
+
+        if directed:
+            for Id in NI.GetInEdges():
+                InNodes.append(Id)
+
         for Id in NI.GetOutEdges():
             OutNodes.append(Id)
         EgoNodes = set(InNodes+OutNodes+[NI.GetId()])
@@ -31,12 +34,15 @@ def getEgoAttr(UGraph, attributes):
         egoconn = 0
         for Id in InNodes+OutNodes:
             ego_NI = UGraph.GetNI(Id)
-            for IID in ego_NI.GetInEdges():
-                neighIDsum += 1
-                if IID not in EgoNodes:
-                    egoID += 1
-                else:
-                    egoconn += 1
+
+            if directed:
+                for IID in ego_NI.GetInEdges():
+                    neighIDsum += 1
+                    if IID not in EgoNodes:
+                        egoID += 1
+                    else:
+                        egoconn += 1
+
             for OID in ego_NI.GetOutEdges():
                 neighODsum += 1
                 if OID not in EgoNodes:
@@ -54,20 +60,23 @@ def getEgoAttr(UGraph, attributes):
         egoConn[thisNID] = (egoconn+NIdegree)/float(NIdegree+1)
 
     attributes['EgonetDegree'] = egoDeg
-    attributes['EgonetInDegree'] = egoInDeg
-    attributes['EgonetOutDegree'] = egoOutDeg
     attributes['AvgNeighborDeg'] = avgNeighDeg
-    attributes['AvgNeighborInDeg'] = avgNeighInDeg
-    attributes['AvgNeighborOutDeg'] = avgNeighOutDeg
     attributes['EgonetConnectivity'] = egoConn
+
+    if directed:
+        attributes['EgonetInDegree'] = egoInDeg
+        attributes['EgonetOutDegree'] = egoOutDeg
+        attributes['AvgNeighborInDeg'] = avgNeighInDeg
+        attributes['AvgNeighborOutDeg'] = avgNeighOutDeg
 
 def getUndirAttribute(filename):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
     UGraph.Dump()
 
-    attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 7)), 
+    attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 10)), 
                               columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
-                                       'FarnessCentrality', 'PageRank', 'NodeEccentricity'])
+                                       'FarnessCentrality', 'PageRank', 'NodeEccentricity',
+                                       'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']])
 
     attributes['Graph'] = [filename] * UGraph.GetNodes()
     # Degree
@@ -78,6 +87,8 @@ def getUndirAttribute(filename):
     for item in OutDegV:
         degree[item.GetVal1()] = item.GetVal2()
     attributes['Degree'] = degree
+
+    getEgoAttr(UGraph, attributes, directed=False)
 
     # Farness Centrality, Node Eccentricity
     farCentr = np.zeros((UGraph.GetMxNId(),))
