@@ -50,13 +50,14 @@ def KL_sim(v1, v2):
     return np.sum(temp * v1, axis = 0)
 
 
-def computeMatchingMat(attributesA, attributesB, pair_count_dict):
+def computeMatchingMat(attributesA, attributesB, pair_count_dict, threshold=1):
     combineAB = selectAndCombine(attributesA, attributesB)
     matching_matrix = np.zeros((len(attributesA), len(attributesB)))
     scale = np.mean(combineAB[:,2:], axis=0)
                 
     for pair, count in pair_count_dict.items():
-        matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+        if count >= threshold:
+            matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
         
     return matching_matrix
 
