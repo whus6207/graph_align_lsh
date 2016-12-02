@@ -1,6 +1,7 @@
 import numpy as np
 from collections import defaultdict
-import matplotlib.pyplot as plt
+from scipy.stats import entropy
+#import matplotlib.pyplot as plt
 import random
 
 def generateCosineBuckets(attributes, cols):
@@ -43,11 +44,13 @@ def cos_sim(v1, v2, scaling=None):
     return v1.dot(v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
 
 def KL_sim(v1, v2):
-    v1 = v1.astype(float) / np.mean(v1)
-    v2 = v2.astype(float) / np.mean(v2)
-    temp = np.log(v1 / v2)
-    temp[np.isinf(temp)] = 0
-    return np.sum(temp * v1, axis = 0)
+    v1, bin1 = np.histogram(v1, 30)
+    v2, bin2 = np.histogram(v2, 30)
+    v1 = v1.astype(float)
+    v2 = v2.astype(float)
+    v1 = v1 / sum(v1)
+    v2 = v2 / sum(v2) 
+    return np.sum(np.where((v1 != 0) & (v2 !=0), v1 * np.log(v1 / v2), 0), axis = 0)
 
 
 def computeMatchingMat(attributesA, attributesB, pair_count_dict, threshold=1):
