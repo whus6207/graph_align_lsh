@@ -3,6 +3,7 @@ from collections import defaultdict
 from scipy.stats import entropy
 import matplotlib.pyplot as plt
 import random
+from munkres import Munkres
 
 def generateCosineBuckets(attributes, cols):
     randMatrix = np.random.random((attributes.shape[1], cols))
@@ -167,4 +168,12 @@ def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
         score.append(attributesB['Id'][matching_matrix[i].argsort()[-1]] == attributesA['Id'][i])
     return score
 
+def hungarianMatch(matching_matrix, P):
+    cost_mat = 100 - matching_matrix
+    m = Munkres()
+    indexes = m.compute(cost_mat)
+    hun_index = [tup[1] for tup in indexes]
+    P_index = P.argsort()[:,-1]
+    score = [ hun == p for hun, p in zip(hun_index,P_index)]
+    return score
 
