@@ -75,8 +75,8 @@ def getUndirAttribute(filename):
 
     attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 10)), 
                               columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
-                                       'FarnessCentrality', 'PageRank', 'NodeEccentricity',
-                                       'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']])
+                              'FarnessCentrality', 'PageRank', 'NodeEccentricity',
+                              'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
 
     attributes['Graph'] = [filename] * UGraph.GetNodes()
     # Degree

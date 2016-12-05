@@ -1,6 +1,6 @@
 import numpy as np
 
-def loadGraph(fname, graph_type='u'):
+def loadGraph(fname, graph_type='Undirected'):
     nodes = []
     with open(fname) as f:
         for line in f:
@@ -13,12 +13,12 @@ def loadGraph(fname, graph_type='u'):
 
     for i in range(0,len(nodes),2):
         A[nodes[i]][nodes[i+1]]=1
-        if graph_type == 'u':
+        if graph_type == 'Undirected':
             A[nodes[i+1]][nodes[i]]=1
     
     return A
 
-def permuteNoiseMat(A, is_perm=False, has_noise=False):
+def permuteNoiseMat(A, is_perm = False, has_noise = False):
     perm = np.random.permutation(len(A))
 
     P = np.identity(len(A))
