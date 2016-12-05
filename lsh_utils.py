@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 from scipy.stats import entropy
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import random
 
 def generateCosineBuckets(attributes, cols):
@@ -43,36 +43,60 @@ def cos_sim(v1, v2, scaling=None):
     v2 = np.multiply(v2, 1/scaling)
     return v1.dot(v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
 
-def KL_sim(v1, v2):
-    v1, bin1 = np.histogram(v1, 30)
-    v2, bin2 = np.histogram(v2, 30)
+def KL_sim(distribution1, distribution2):
+    v1, bin1 = np.histogram(distribution1, 30)
+    v2, bin2 = np.histogram(distribution2, 30)
     v1 = v1.astype(float)
     v2 = v2.astype(float)
     v1 = v1 / sum(v1)
     v2 = v2 / sum(v2) 
     return np.sum(np.where((v1 != 0) & (v2 !=0), v1 * np.log(v1 / v2), 0), axis = 0)
 
+def Euclidean_sim(v1,v2, scaling = None):
+    if scaling is None:
+        scaling = np.ones((len(v1, )))
+    assert (len(v1) == len(v2)), "Dimension is different"
+    v1 = np.multiply(v1, 1 / scaling)
+    v2 = np.multiply(v2, 1 / scaling)
+    eucDis = sum((v1 - v2) ** 2) ** 0.5
+    return 1/(1+eucDis)
 
-def computeMatchingMat(attributesA, attributesB, pair_count_dict, threshold=1):
+
+def computeEulideanMatchingMat(attributesA, attributesB, pair_count_dict):
+    matching_matrix = np.zeros((len(attributesA), len(attributesB)))
+    for i in range(len(a)):
+        for j in range(len(b)):
+            matching_matrix[i,j] = Euclidean_Sim(a[i],b[j])
+    return retMat
+
+def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType):
     combineAB = selectAndCombine(attributesA, attributesB)
     matching_matrix = np.zeros((len(attributesA), len(attributesB)))
-    scale = np.mean(combineAB[:,2:], axis=0)
-                
-    for pair, count in pair_count_dict.items():
-        if count >= threshold:
+    scale = np.mean(combineAB[:,2:], axis=0) # Still taking mean?
+    if LSHType == 'Cosine':               
+        for pair, count in pair_count_dict.items():
             matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+    elif LSHType == 'Euclidean':
+        for pair, count in pair_count_dict.items():
+            matching_matrix[pair[0]][pair[1]-len(attributesA)] = Euclidean_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
         
     return matching_matrix
 
-def computeWholeSimMat(attributesA, attributesB):
+def computeWholeSimMat(attributesA, attributesB, LSHType):
     combineAB = selectAndCombine(attributesA, attributesB)
     sim_vec = []
     scale = np.mean(combineAB[:,2:], axis=0)
-    for j in range(len(attributesA)):
-        vec = [cos_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
-        sim_vec.append(vec)
+    if LSHType == 'Cosine':
+        for j in range(len(attributesA)):
+            vec = [cos_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
+            sim_vec.append(vec)
+    elif LSHType == 'Euclidean':
+        for j in range(len(attributesA)):
+            vec = [Euclidean_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
+            sim_vec.append(vec)
 
     return np.array(sim_vec)
+
 
 def combineBucketsBySum(buckets, combineAB, Afname):
     pair_count_dict = defaultdict(int)
@@ -102,6 +126,27 @@ def plotBucketDistribution(bucket):
     plt.show()
 
 
+# plot bucket correctness
+def plotBucketCorrectness(d, n):
+    correct = {}
+    for v, k in d.items():
+        cnt = 0
+        for i in k:
+            if (i < n):
+                if (i + n in k):
+                    cnt += 2
+            else:
+                break
+        correct[v] = cnt
+    plt.clf
+    plt.figure()
+    plt.bar(range(len(d)), [len(v) for k,v in d.items()], alpha=0.5, label='bucket', color='blue')
+    plt.bar(range(len(correct)), [correct[k] for k,v in d.items()], alpha=0.5, label='correct', color='green')
+    plt.xlabel('bucket')
+    plt.ylabel('number')
+    plt.legend(loc='best')
+    plt.show()
+
 def Rank(matching_matrix, P = None):
     if P is not None:
         matching_matrix = matching_matrix.dot(P)
@@ -113,4 +158,13 @@ def Rank(matching_matrix, P = None):
         rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
         ranking[i] = 1.0 / rank
     return ranking
+
+def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
+    if P is not None:
+        matching_matrix = matching_matrix.dot(P)
+    score =[]
+    for i in range(matching_matrix.shape[0]):
+        score.append(attributesB['Id'][matching_matrix[i].argsort()[-1]] == attributesA['Id'][i])
+    return score
+
 
