@@ -163,14 +163,21 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 
 
 
-
+	print "=========================================================="
+	print "is_perm = " + str(is_perm) + ", has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
+	print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
 	print "matching score by ranking: %f" %(sum(Ranking)/len(Ranking))
-	print "matching score bty ranking upper bound: %f" %(sum(Best_ranking)/len(Best_ranking))
-
-	print "matching score by correct match: %f" % (sum(correctMatch) / len(correctMatch))
-	print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / len(Best_correctMatch))
+	print "matching score by ranking upper bound: %f" %(sum(Best_ranking)/len(Best_ranking))
+	score = hungarianMatch(sim_matrix, P)
+	upper_bound_score = sum(score)/float(len(score))
+	print "hungarian matching score upper bound: %f" %(upper_bound_score)
+	print "matching score by correct match: %f" % (sum(correctMatch) / float(len(correctMatch)))
+	print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / float(len(Best_correctMatch)))
 	if GraphType == 'Undirected':
 		print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]/2-matching_matrix.shape[0]))
+	else:
+		print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
+	
 
 	if plotAttribute == True:
 		
@@ -207,11 +214,20 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 		plotCorrectness(bucketAll, attributesA.shape[0])
 
 
+adaptiveLSH = [True, False]
+noise = [True, False]
+bandNumber = [2,4,8]
 
-experiment()
-
-
-
-
+for a in adaptiveLSH:
+	for n in noise:
+		for b in bandNumber:
+			experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
+			experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+			if a:
+				break
 
 
