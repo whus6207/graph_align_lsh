@@ -3,11 +3,12 @@ import numpy as np
 from attr_utils import *
 from io_utils import *
 from lsh_utils import *
+import pandas as pd
+import os.path
+import pickle
 
 
-
-
-def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
 	has_noise = False, plotAttribute = False, plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean'):
 	"""
 	Experiment on two graphs with multiple setting
@@ -43,12 +44,12 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 				f.write(str(attributesB.ix[index]))
 
 
-		attributes = ['Degree', 'NodeBetweennessCentrality', 'FarnessCentrality', 'PageRank', 
-		'NodeEccentricity', 'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
+		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 
 
 		if adaptiveLSH == True :
-			bandDeg = ['Degree','PageRank','NodeBetweennessCentrality','NodeEccentricity', 'FarnessCentrality']
+			bandDeg = ['Degree','PageRank','NodeBetweennessCentrality']
 			bandEdge = ['EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 				
 			if LSHType == 'Cosine':
@@ -56,8 +57,8 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 				bucketEdge = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandEdge), 20)
 
 			elif LSHType == 'Euclidean':
-				bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 20)
-				bucketEdge = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEdge), 20)
+				bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 2)
+				bucketEdge = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEdge), 2)
 
 			buckets = [bucketDeg, bucketEdge]
 			for i, bucket in enumerate(buckets):
@@ -80,7 +81,7 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 
 			elif LSHType == 'Euclidean':
 				for band in randomBand:
-					buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), 20))
+					buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), 2))
 
 			for i, bucket in enumerate(buckets):
 				with open(path + '/buckets-band-' + str(i+1), 'w') as f:
@@ -102,7 +103,7 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 				f.write(str(attributesB.ix[index]))
 
 		attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
-					  'FarnessCentrality', 'PageRank', 'HubsScore', 'AuthoritiesScore', 'NodeEccentricity',
+					  'PageRank', 'HubsScore', 'AuthoritiesScore',
 					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
 					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
 
@@ -110,7 +111,7 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 			bandDeg = ['Degree','InDegree','OutDegree']
 			bandEgo = ['EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
 					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
-			bandCentr = ['PageRank', 'NodeBetweennessCentrality','FarnessCentrality', 'NodeEccentricity', 
+			bandCentr = ['PageRank', 'NodeBetweennessCentrality', 
 						 'HubsScore', 'AuthoritiesScore']
 
 			if LSHType == 'Cosine':
@@ -120,9 +121,9 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 				bucketCentr = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandCentr), 20)
 
 			elif LSHType == 'Euclidean':
-				bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 20)
-				bucketEgo = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEgo), 20)
-				bucketCentr = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandCentr), 20)
+				bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 2)
+				bucketEgo = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEgo), 2)
+				bucketCentr = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandCentr), 2)
 
 			buckets = [bucketDeg, bucketEgo, bucketCentr]
 			for i, bucket in enumerate(buckets):
@@ -144,7 +145,7 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 
 			elif LSHType == 'Euclidean':
 				for band in randomBand:
-					buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), 20))
+					buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), 2))
 
 			for i, bucket in enumerate(buckets):
 				with open(path+'/buckets-band-'+str(i+1), 'w') as f:
@@ -153,7 +154,7 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 
 	combineAB = selectAndCombine(attributesA, attributesB)	 
 	pair_count_dict = combineBucketsBySum(buckets, combineAB, path+'/A.edges')
-	matching_matrix = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType)
+	matching_matrix = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold=1)
 	sim_matrix = computeWholeSimMat(attributesA, attributesB, LSHType)
 
 	Ranking = Rank(matching_matrix, P)
@@ -173,11 +174,16 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 	print "hungarian matching score upper bound: %f" %(upper_bound_score)
 	print "matching score by correct match: %f" % (sum(correctMatch) / float(len(correctMatch)))
 	print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / float(len(Best_correctMatch)))
-	if GraphType == 'Undirected':
-		print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]/2-matching_matrix.shape[0]))
-	else:
-		print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
-	
+	print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
+	df.append({'filename':filename, 'is_perm':is_perm, 'has_noise':has_noise, 'GraphType':GraphType\
+		, 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
+		, 'rank_score' : sum(Ranking)/len(Ranking)\
+		, 'rank_score_upper' : sum(Best_ranking)/len(Best_ranking)\
+		, 'correct_score' : (sum(correctMatch) / float(len(correctMatch)))\
+		, 'correct_score_upper' : (sum(Best_correctMatch) / float(len(Best_correctMatch)))\
+		, 'correct_score_hungarian' : upper_bound_score\
+		, 'pairs_computed' : (len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))\
+		}, ignore_index=True)
 
 	if plotAttribute == True:
 		
@@ -217,17 +223,39 @@ def experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm 
 adaptiveLSH = [True, False]
 noise = [True, False]
 bandNumber = [2,4,8]
+fname = 'exp_result.pkl'
+
+if os.path.isfile(fname):
+	with open(fname, 'rb') as f:
+		df = pickle.load(f)
+else:
+	df = pd.DataFrame(
+		columns=['filename', 'is_perm', 'has_noise', 'GraphType', 'bandNumber', 'adaptiveLSH', 'LSHType'\
+			, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
+			, 'pairs_computed'])
 
 for a in adaptiveLSH:
 	for n in noise:
 		for b in bandNumber:
-			experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+			experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
+				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+				GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
+			experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
+				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+				GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+
+			experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
 				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-			experiment(filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+			experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
 				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
 			if a:
 				break
 
 
+pickle.dump(df, open(fname,'wb'))
+# experiment(df, filename = 'facebook/0.edges', multipleGraph = False, is_perm = False, 
+# 			has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+#  			GraphType = 'Undirected', bandNumber = 4, adaptiveLSH = False, LSHType = 'Cosine')
+			

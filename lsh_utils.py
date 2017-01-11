@@ -70,16 +70,18 @@ def computeEulideanMatchingMat(attributesA, attributesB, pair_count_dict):
             matching_matrix[i,j] = Euclidean_Sim(a[i],b[j])
     return retMat
 
-def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType):
+def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
     combineAB = selectAndCombine(attributesA, attributesB)
     matching_matrix = np.zeros((len(attributesA), len(attributesB)))
     scale = np.mean(combineAB[:,2:], axis=0) # Still taking mean?
     if LSHType == 'Cosine':               
         for pair, count in pair_count_dict.items():
-            matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+            if count >= threshold:
+                matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
     elif LSHType == 'Euclidean':
         for pair, count in pair_count_dict.items():
-            matching_matrix[pair[0]][pair[1]-len(attributesA)] = Euclidean_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+            if count >= threshold:
+                matching_matrix[pair[0]][pair[1]-len(attributesA)] = Euclidean_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
         
     return matching_matrix
 
