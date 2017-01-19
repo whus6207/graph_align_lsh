@@ -175,7 +175,7 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 	print "matching score by correct match: %f" % (sum(correctMatch) / float(len(correctMatch)))
 	print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / float(len(Best_correctMatch)))
 	print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
-	df.append({'filename':filename, 'is_perm':is_perm, 'has_noise':has_noise, 'GraphType':GraphType\
+	df = df.append({'filename':filename, 'is_perm':is_perm, 'has_noise':has_noise, 'GraphType':GraphType\
 		, 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
 		, 'rank_score' : sum(Ranking)/len(Ranking)\
 		, 'rank_score_upper' : sum(Best_ranking)/len(Best_ranking)\
@@ -219,6 +219,8 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 
 		plotCorrectness(bucketAll, attributesA.shape[0])
 
+	return df
+
 
 adaptiveLSH = [True, False]
 noise = [True, False]
@@ -237,17 +239,17 @@ else:
 for a in adaptiveLSH:
 	for n in noise:
 		for b in bandNumber:
-			experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
+			df = experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
 				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 				GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-			experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
+			df = experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
 				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 				GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
 
-			experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+			df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
 				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-			experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+			df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
 				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
 			if a:
@@ -258,4 +260,7 @@ pickle.dump(df, open(fname,'wb'))
 # experiment(df, filename = 'facebook/0.edges', multipleGraph = False, is_perm = False, 
 # 			has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 #  			GraphType = 'Undirected', bandNumber = 4, adaptiveLSH = False, LSHType = 'Cosine')
-			
+
+# writer = pd.ExcelWriter('exp_result.xlsx')
+# df.to_excel(writer, sheet_name='Sheet1')
+# writer.save()
