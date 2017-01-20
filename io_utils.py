@@ -44,4 +44,14 @@ def removeIsolatedNodes(A):
     rest_idx = [i for i in xrange(len(rest_bool)) if rest_bool[i]]
     A = A[rest_idx, :]
     A = A[:, rest_idx]
-    return A
+    return A, rest_idx
+
+def loadNodeFeature(fname):
+    nodeFeaturesValue = []
+    nodeFeaturesName =[]
+    with open(fname) as f:
+        nodeFeaturesName = f.readline().strip().split()
+        for line in f:
+            v = line.strip().split()
+            nodeFeaturesValue.append([int(i) for i in v])
+    return nodeFeaturesValue, nodeFeaturesName

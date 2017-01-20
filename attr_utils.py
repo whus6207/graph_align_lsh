@@ -1,6 +1,7 @@
 import snap
 import numpy as np
 import pandas as pd
+import random
 
 def getEgoAttr(UGraph, attributes, directed = True):
     egoDeg = np.zeros((UGraph.GetNodes(),))
@@ -193,3 +194,17 @@ def getDirAttribute(filename):
     attributes['AuthoritiesScore'] = auth
 
     return attributes
+
+def addNodeAttribute(structAttributes, nodeAttributeNames = None, nodeAttributeValues = None, P = None):
+    if len(nodeAttributeNames) > 0 and len(nodeAttributeValues) > 0:
+        if P is not None:
+            nodeAttributeValues = P.dot(np.array(nodeAttributeValues))
+            nodeAttributes = pd.DataFrame(nodeAttributeValues.astype(int), columns = nodeAttributeNames)
+        else:
+            nodeAttributes = pd.DataFrame(nodeAttributeValues, columns = nodeAttributeNames)
+        structAttributes = pd.concat([structAttributes, nodeAttributes], axis = 1)
+    return structAttributes
+
+
+
+
