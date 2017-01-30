@@ -261,19 +261,23 @@ else:
 for a in adaptiveLSH:
     for n in noise:
         for b in bandNumber:
-            df = experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
-                has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-                GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-            df = experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
-                has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-                GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+            df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+                multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+                plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
+                adaptiveLSH = a, LSHType = 'Cosine')
+            df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+                multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+                plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
+                adaptiveLSH = a, LSHType = 'Euclidean')
 
-            df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-                has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-                GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-            df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-                has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-                GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+            df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+                multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+                plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
+                adaptiveLSH = a, LSHType = 'Cosine')
+            df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+                multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+                plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
+                adaptiveLSH = a, LSHType = 'Euclidean')
             if a:
                 break
 
