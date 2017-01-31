@@ -7,23 +7,8 @@ import pandas as pd
 import os.path
 import pickle
 
-
-def permuteNoiseMat(A, is_perm = False, has_noise = False, level = 0.05):
-    perm = np.random.permutation(len(A))
-
-    P = np.identity(len(A))
-    if is_perm:
-        P = P[perm]
-
-    B = P.dot(A).dot(P.T)
-    if has_noise:
-        noise = np.random.choice([0, 1], size=(len(A),len(A)), p=[(100-level)/100, level/100])
-        B = (B + noise + noise.T)%2
-    
-    return B, P
-
 def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-	has_noise = False, noise_level = 0, 
+	has_noise = False, noise_level = 0.05, 
 	plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 3, cos_num_plane = 20, euc_width = 2):

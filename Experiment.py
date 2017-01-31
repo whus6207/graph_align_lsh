@@ -8,9 +8,10 @@ import os.path
 import pickle
 
 
-def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-	has_noise = False, plotAttribute = False, plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 3):
+def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, multipleGraph = False, is_perm = False, 
+	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
+	loop_num = 3, cos_num_plane = 25, euc_width = 2):
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -18,18 +19,20 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 	path = 'metadata/' + str(GraphType)
 
 	A = loadGraph(filename, GraphType)
-	A = removeIsolatedNodes(A)
+	A, rest_idx = removeIsolatedNodes(A)
+
+	if nodeAttributeFile is not None:
+		nodeAttributesValue, nodeAttributesName = loadNodeFeature(nodeAttributeFile)
+		nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
+	else:
+		nodeAttributesValue, nodeAttributesName = [], []
 
 	if multipleGraph == True:
 		pass
 	else:
-		B, P = permuteNoiseMat(A,is_perm, has_noise)
+		B, P = permuteNoiseMat(A,is_perm, has_noise, noise_level)
 
 	# Write edges to file
-
-	writeEdgesToFile(path + '/A.edges', A)
-	writeEdgesToFile(path + '/B.edges', B)
-
 	rank_score = 0
 	rank_score_upper = 0
 	correct_score = 0
@@ -39,12 +42,14 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 	for i in range(loop_num):
 		if GraphType == 'Undirected':
 			attributesA = getUndirAttribute(path + '/A.edges')
+			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 
 			with open(path + '/attributesA', 'w') as f:
 				for index, row in attributesA.iterrows():
 					f.write(str(attributesA.ix[index]))
 
 			attributesB = getUndirAttribute(path + '/B.edges')
+			attributesB = addNodeAttribute(attributesB, nodeAttributesName, nodeAttributesValue, P)
 
 			with open(path + '/attributesB', 'w') as f:
 				for index, row in attributesB.iterrows():
@@ -53,21 +58,25 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 
 			attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
 			'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+			attributes += nodeAttributesName
 
 
 			if adaptiveLSH == True :
 				bandDeg = ['Degree','PageRank','NodeBetweennessCentrality']
 				bandEdge = ['EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+				bandNode = nodeAttributesName[:]
 					
 				if LSHType == 'Cosine':
-					bucketDeg = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 20)
-					bucketEdge = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandEdge), 20)
+					bucketDeg = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandDeg), cos_num_plane)
+					bucketEdge = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandEdge), cos_num_plane)
 
 				elif LSHType == 'Euclidean':
-					bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 2)
-					bucketEdge = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEdge), 2)
+					bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), euc_width)
+					bucketEdge = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEdge), euc_width)
 
-				buckets = [bucketDeg, bucketEdge]
+				bucketNode = generateNodeBuckets(LSHType, attributesA, attributesB, bandNode)
+				buckets = [bucket for bucket in [bucketDeg, bucketEdge, bucketNode] if len(bucket) > 0]
+
 				for i, bucket in enumerate(buckets):
 					with open(path + '/buckets-band-' + str(i+1), 'w') as f:
 						for k, v in bucket.items():
@@ -83,12 +92,12 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 
 				if LSHType == 'Cosine':
 					for band in randomBand:
-						buckets.append(generateCosineBuckets(selectAndCombine(attributesA, attributesB, band), 20))
+						buckets.append(generateCosineBuckets(selectAndCombine(attributesA, attributesB, band), cos_num_plane))
 
 
 				elif LSHType == 'Euclidean':
 					for band in randomBand:
-						buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), 2))
+						buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), euc_width))
 
 				for i, bucket in enumerate(buckets):
 					with open(path + '/buckets-band-' + str(i+1), 'w') as f:
@@ -98,12 +107,14 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 		
 		elif GraphType == 'Directed':
 			attributesA = getDirAttribute(path +'/A.edges')
+			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 
 			with open(path+'/attributesA', 'w') as f:
 				for index, row in attributesA.iterrows():
 					f.write(str(attributesA.ix[index]))
 
 			attributesB = getDirAttribute(path +'/B.edges')
+			attributesB = addNodeAttribute(attributesB, nodeAttributesName, nodeAttributesValue, P)
 
 			with open(path+'/attributesB', 'w') as f:
 				for index, row in attributesB.iterrows():
@@ -113,6 +124,7 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 						  'PageRank', 'HubsScore', 'AuthoritiesScore',
 						  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
 						  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
+			attributes += nodeAttributesName
 
 			if adaptiveLSH == True:
 				bandDeg = ['Degree','InDegree','OutDegree']
@@ -120,19 +132,22 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 						  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
 				bandCentr = ['PageRank', 'NodeBetweennessCentrality', 
 							 'HubsScore', 'AuthoritiesScore']
+				bandNode = nodeAttributesName[:]
 
 				if LSHType == 'Cosine':
 
-					bucketDeg = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 20)
-					bucketEgo = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandEgo), 20)
-					bucketCentr = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandCentr), 20)
+					bucketDeg = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandDeg), cos_num_plane)
+					bucketEgo = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandEgo), cos_num_plane)
+					bucketCentr = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandCentr), cos_num_plane)
 
 				elif LSHType == 'Euclidean':
-					bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), 2)
-					bucketEgo = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEgo), 2)
-					bucketCentr = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandCentr), 2)
+					bucketDeg = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandDeg), euc_width)
+					bucketEgo = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandEgo), euc_width)
+					bucketCentr = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandCentr), euc_width)
 
-				buckets = [bucketDeg, bucketEgo, bucketCentr]
+				bucketNode = generateNodeBuckets(LSHType, attributesA, attributesB, bandNode)
+				buckets = [bucket for bucket in [bucketDeg, bucketEgo, bucketCentr, bucketNode] if len(bucket) > 0]
+
 				for i, bucket in enumerate(buckets):
 					with open(path+'/buckets-band'+str(i+1), 'w') as f:
 						for k, v in bucket.items():
@@ -147,12 +162,12 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 
 				if LSHType == 'Cosine':
 					for band in randomBand:
-						buckets.append(generateCosineBuckets(selectAndCombine(attributesA, attributesB, band), 20))
+						buckets.append(generateCosineBuckets(selectAndCombine(attributesA, attributesB, band), cos_num_plane))
 
 
 				elif LSHType == 'Euclidean':
 					for band in randomBand:
-						buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), 2))
+						buckets.append(generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, band), euc_width))
 
 				for i, bucket in enumerate(buckets):
 					with open(path+'/buckets-band-'+str(i+1), 'w') as f:
@@ -178,8 +193,9 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 		pairs_computed += len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1])
 
 		print "=========================================================="
-		print "is_perm = " + str(is_perm) + ", has_noise = "+ str(has_noise)+", noise_level = "+ str(noise_level)+", GraphType = "+ GraphType
+		print "is_perm = " + str(is_perm) + ", has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
 		print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
+		print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)
 		print "matching score by ranking: %f" %(sum(Ranking)/len(Ranking))
 		print "matching score by ranking upper bound: %f" %(sum(Ranking)/len(Ranking))
 		print "matching score by correct match: %f" % (sum(correctMatch) / float(len(correctMatch)))
@@ -194,7 +210,8 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 	correct_score_hungarian /= loop_num
 	pairs_computed /= loop_num
 
-	df = df.append({'filename':filename, 'is_perm':is_perm, 'has_noise':has_noise, 'noise_level':noise_level\
+	df = df.append({'filename':filename, 'nodeAttributeFile': str(nodeAttributeFile), 'is_perm':is_perm\
+		, 'has_noise':has_noise, 'noise_level':noise_level\
 		, 'GraphType':GraphType, 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
 		, 'rank_score' : rank_score\
 		, 'rank_score_upper' : rank_score_upper\
@@ -244,42 +261,52 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 adaptiveLSH = [False]
 noise = [True]
 bandNumber = [2,4,8]
-fname = 'exp_result.pkl'
+fname = 'exp_result_attr.pkl'
 
 if os.path.isfile(fname):
 	with open(fname, 'rb') as f:
 		df = pickle.load(f)
 else:
 	df = pd.DataFrame(
-		columns=['filename', 'is_perm', 'has_noise', 'GraphType', 'bandNumber', 'adaptiveLSH', 'LSHType'\
+		columns=['filename','nodeAttributeFile', 'is_perm', 'has_noise', 'GraphType', 'bandNumber', 'adaptiveLSH', 'LSHType'\
 			, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 			, 'pairs_computed'])
+
 
 for a in adaptiveLSH:
 	for n in noise:
 		for b in bandNumber:
-			df = experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
-				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-				GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-			df = experiment(df, filename = 'metadata/A.edges', multipleGraph = False, is_perm = False, 
-				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-				GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+			df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+				multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+				plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
+				adaptiveLSH = a, LSHType = 'Cosine')
+			df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+				multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+				plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
+				adaptiveLSH = a, LSHType = 'Euclidean')
 
-			df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-			df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-				has_noise = n, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-				GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+			df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+				multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+				plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
+				adaptiveLSH = a, LSHType = 'Cosine')
+			df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+				multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
+				plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
+				adaptiveLSH = a, LSHType = 'Euclidean')
 			if a:
 				break
 
 
-pickle.dump(df, open(fname,'wb'))
-# experiment(df, filename = 'facebook/0.edges', multipleGraph = False, is_perm = False, 
-# 			has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-#  			GraphType = 'Undirected', bandNumber = 4, adaptiveLSH = False, LSHType = 'Cosine')
+#df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = 'phys.nodes', multipleGraph = False, is_perm = False, 
+#                has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+#                GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Cosine')
 
-writer = pd.ExcelWriter('exp_result.xlsx')
+pickle.dump(df, open(fname,'wb'))
+
+# experiment(df, filename = 'facebook/0.edges', multipleGraph = False, is_perm = False, 
+#           has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
+#           GraphType = 'Undirected', bandNumber = 4, adaptiveLSH = False, LSHType = 'Cosine')
+
+writer = pd.ExcelWriter('exp_result_attr.xlsx')
 df.to_excel(writer, sheet_name='Sheet1')
 writer.save()

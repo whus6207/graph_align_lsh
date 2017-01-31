@@ -18,7 +18,7 @@ def loadGraph(fname, graph_type='Undirected'):
     
     return A
 
-def permuteNoiseMat(A, is_perm = False, has_noise = False):
+def permuteNoiseMat(A, is_perm = False, has_noise = False, level = 0.05):
     perm = np.random.permutation(len(A))
 
     P = np.identity(len(A))
@@ -27,7 +27,7 @@ def permuteNoiseMat(A, is_perm = False, has_noise = False):
 
     B = P.dot(A).dot(P.T)
     if has_noise:
-        noise = np.random.choice([0, 1], size=(len(A),len(A)), p=[99.95/100, 0.05/100])
+        noise = np.random.choice([0, 1], size=(len(A),len(A)), p=[(100-level)/100, level/100])
         B = (B + noise + noise.T)%2
     
     return B, P
@@ -44,4 +44,14 @@ def removeIsolatedNodes(A):
     rest_idx = [i for i in xrange(len(rest_bool)) if rest_bool[i]]
     A = A[rest_idx, :]
     A = A[:, rest_idx]
-    return A
+    return A, rest_idx
+
+def loadNodeFeature(fname):
+    nodeFeaturesValue = []
+    nodeFeaturesName =[]
+    with open(fname) as f:
+        nodeFeaturesName = f.readline().strip().split()
+        for line in f:
+            v = line.strip().split()
+            nodeFeaturesValue.append([int(i) for i in v])
+    return nodeFeaturesValue, nodeFeaturesName

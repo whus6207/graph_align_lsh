@@ -31,6 +31,15 @@ def generateEuclideanBuckets(attributes, bin_wid):
         dic[hashVec[i]].append(i)
     return dic
 
+def generateNodeBuckets(LSHType, attributesA, attributesB, bandNode):
+    bucketNode = []
+    if len(bandNode) > 0:
+        if LSHType == 'Cosine':
+            bucketNode = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandNode), 20)
+        elif LSHType == 'Euclidean':
+            bucketNode = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandNode), 20)
+    return bucketNode
+
 def selectAndCombine(A, B, cols = None):
     if cols is not None:
         return np.vstack((A[cols].as_matrix(), B[cols].as_matrix()))
