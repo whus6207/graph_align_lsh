@@ -186,7 +186,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 		hung_score = hungarianMatch(sim_matrix, P)
 
 		rank_score += sum(Ranking)/len(Ranking)
-		rank_score_upper += sum(Ranking)/len(Ranking)
+		rank_score_upper += sum(Best_Ranking)/len(Best_Ranking)
 		correct_score += sum(correctMatch) / float(len(correctMatch))
 		correct_score_upper += sum(Best_correctMatch) / float(len(Best_correctMatch))
 		correct_score_hungarian += sum(hung_score)/float(len(hung_score))
@@ -197,7 +197,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 		print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
 		print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)
 		print "matching score by ranking: %f" %(sum(Ranking)/len(Ranking))
-		print "matching score by ranking upper bound: %f" %(sum(Ranking)/len(Ranking))
+		print "matching score by ranking upper bound: %f" %(sum(Best_Ranking)/len(Best_Ranking))
 		print "matching score by correct match: %f" % (sum(correctMatch) / float(len(correctMatch)))
 		print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / float(len(Best_correctMatch)))
 		print "hungarian matching score upper bound: %f" %(sum(hung_score)/float(len(hung_score)))
