@@ -214,7 +214,7 @@ import pickle
 adaptiveLSH = [False]
 noise = [True]
 bandNumber = [2,4,8]
-fname = 'exp_result_noise.pkl'
+fname = 'exp_result_noise_email.pkl'
 
 if os.path.isfile(fname):
 	with open(fname, 'rb') as f:
@@ -234,19 +234,21 @@ for a in adaptiveLSH:
 	for n in noise:
 		for b in bandNumber:
 			for l in noise_level:
-				df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+				df = experiment(df, filename = 'metadata/email.edges', multipleGraph = False, is_perm = False, 
 					has_noise = n, noise_level = l, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-					GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine')
-				df = experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
+					GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Cosine',
+					compute_sim = True, compute_hungarian = False, loop_num = 3)
+				df = experiment(df, filename = 'metadata/email.edges', multipleGraph = False, is_perm = False, 
 					has_noise = n, noise_level = l, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-					GraphType = 'Directed', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean')
+					GraphType = 'Undirected', bandNumber = b, adaptiveLSH = a, LSHType = 'Euclidean',
+					compute_sim = True, compute_hungarian = False, loop_num = 3)
 
 
 
 pickle.dump(df, open(fname,'wb'))
 
 # write to excel
-writer = pd.ExcelWriter('exp_result_noise.xlsx')
+writer = pd.ExcelWriter('exp_result_noise_email.xlsx')
 df.to_excel(writer, sheet_name='Sheet1')
 writer.save()
 
