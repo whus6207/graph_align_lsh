@@ -170,8 +170,9 @@ def Rank(matching_matrix, P = None):
     ranking = np.zeros((n))
     for i in range(n):      
         #rank = n - matching_matrix[i, :].argsort().tolist().index(i)
-        rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
-        ranking[i] = 1.0 / rank
+        if matching_matrix[i,i] != 0:
+            rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
+            ranking[i] = 1.0 / rank
     return ranking
 
 def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
