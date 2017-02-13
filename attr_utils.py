@@ -78,7 +78,7 @@ def getUndirAttribute(filename):
                                        'FarnessCentrality', 'PageRank', 'NodeEccentricity',
                                        'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
 
-    attributes['Graph'] = [filename] * UGraph.GetNodes()
+    attributes['Graph'] = [filename] * (UGraph.GetMxNId())#UGraph.GetNodes()
     # Degree
     attributes['Id'] = range(1, UGraph.GetMxNId()+1)
     degree = np.zeros((UGraph.GetMxNId(),))

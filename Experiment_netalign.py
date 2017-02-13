@@ -6,14 +6,12 @@ from lsh_utils import *
 import pandas as pd
 import os.path
 import pickle
+from netalign_utils import *
 
-
-def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,  
-	multipleGraph = False, largeGraph = False, is_perm = False, 
+def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, multipleGraph = False, is_perm = False, 
 	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = True,
-	threshold = 1):
+	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False):
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -23,10 +21,9 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 	A = loadGraph(filename, GraphType)
 	A, rest_idx = removeIsolatedNodes(A)
 
-
 	if nodeAttributeFile is not None:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(nodeAttributeFile)
-		#nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
+		nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
 	else:
 		nodeAttributesValue, nodeAttributesName = [], []
 
@@ -180,27 +177,23 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 						for k, v in bucket.items():
 							f.write(str(k) + str(v) + '\n')
 
-
 		combineAB = selectAndCombine(attributesA, attributesB)	 
 		pair_count_dict = combineBucketsBySum(buckets, combineAB, path+'/A.edges')
-		matching_matrix, this_pair_computed = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold)
+		matching_matrix = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold=1)
 		
 
 		Ranking = Rank(matching_matrix, P)
-
 		Best_Ranking = Ranking
 		if compute_sim:
 			Best_Ranking = Rank(sim_matrix, P)
+			Best_correctMatch = argmaxMatch(sim_matrix, attributesA, attributesB, P)
 		
 		correctMatch = argmaxMatch(matching_matrix, attributesA, attributesB, P)
 		Best_correctMatch = correctMatch
-		if compute_sim:
-			Best_correctMatch = argmaxMatch(sim_matrix, attributesA, attributesB, P)
 		hung_score = correctMatch
 		if compute_hungarian:
 			hung_score = hungarianMatch(sim_matrix, P)
 		
-
 
 		rank_score += sum(Ranking)/len(Ranking)
 		if compute_sim:
@@ -210,19 +203,17 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 			rank_score_upper += 0
 			correct_score_upper += 0
 		correct_score += sum(correctMatch) / float(len(correctMatch))
-
 		if compute_hungarian:
 			correct_score_hungarian += sum(hung_score)/float(len(hung_score))
 		else:
 			correct_score_hungarian += 0
-		pairs_computed += this_pair_computed/float(matching_matrix.shape[0]*matching_matrix.shape[1])
-
+		pairs_computed += len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1])
 
 		print "=========================================================="
 		print filename
 		print "is_perm = " + str(is_perm) + ", has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
 		print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
-		print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)+", threshold = "+str(threshold)
+		print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)
 		print "matching score by ranking: %f" %(sum(Ranking)/len(Ranking))
 		if compute_sim:
 			print "matching score by ranking upper bound: %f" %(sum(Best_Ranking)/len(Best_Ranking))
@@ -231,7 +222,9 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 			print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / float(len(Best_correctMatch)))
 		if compute_hungarian:
 			print "hungarian matching score upper bound: %f" %(sum(hung_score)/float(len(hung_score)))
-		print "percentage of pairs computed: %f" %(this_pair_computed/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
+		print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
+
+		print "netalign score: %f" %getNetalignScore(A, B, matching_matrix)
 
 	rank_score /= loop_num
 	rank_score_upper /= loop_num
@@ -243,7 +236,6 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 	df = df.append({'filename':filename, 'nodeAttributeFile': str(nodeAttributeFile), 'is_perm':is_perm\
 		, 'has_noise':has_noise, 'noise_level':noise_level\
 		, 'GraphType':GraphType, 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
-		, 'threshold':threshold\
 		, 'rank_score' : rank_score\
 		, 'rank_score_upper' : rank_score_upper\
 		, 'correct_score' : correct_score\
@@ -291,7 +283,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 if __name__ == '__main__':
 	adaptiveLSH = [False]
 	noise = [True]
-	bandNumber = [2,4,8]
+	bandNumber = [3]
 	fname = 'exp_result_attr.pkl'
 
 	if os.path.isfile(fname):
@@ -299,9 +291,7 @@ if __name__ == '__main__':
 			df = pickle.load(f)
 	else:
 		df = pd.DataFrame(
-
-			columns=['filename','nodeAttributeFile', 'is_perm', 'has_noise', 'GraphType'\
-				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
+			columns=['filename','nodeAttributeFile', 'is_perm', 'has_noise', 'GraphType', 'bandNumber', 'adaptiveLSH', 'LSHType'\
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'pairs_computed'])
 
@@ -309,22 +299,22 @@ if __name__ == '__main__':
 	for a in adaptiveLSH:
 		for n in noise:
 			for b in bandNumber:
-				df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+				df = experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
 					plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
 					adaptiveLSH = a, LSHType = 'Cosine')
-				df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+				df = experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
 					plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
 					adaptiveLSH = a, LSHType = 'Euclidean')
 
-				df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+				df = experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
-					plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
+					plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
 					adaptiveLSH = a, LSHType = 'Cosine')
-				df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+				df = experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
-					plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
+					plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
 					adaptiveLSH = a, LSHType = 'Euclidean')
 				if a:
 					break

@@ -83,16 +83,19 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
     combineAB = selectAndCombine(attributesA, attributesB)
     matching_matrix = np.zeros((len(attributesA), len(attributesB)))
     scale = np.mean(combineAB[:,2:], axis=0) # Still taking mean?
+    pair_computed = 0
     if LSHType == 'Cosine':               
         for pair, count in pair_count_dict.items():
             if count >= threshold:
+                pair_computed += 1
                 matching_matrix[pair[0]][pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
     elif LSHType == 'Euclidean':
         for pair, count in pair_count_dict.items():
             if count >= threshold:
+                pair_computed += 1
                 matching_matrix[pair[0]][pair[1]-len(attributesA)] = Euclidean_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
         
-    return matching_matrix
+    return matching_matrix, pair_computed
 
 def computeWholeSimMat(attributesA, attributesB, LSHType):
     combineAB = selectAndCombine(attributesA, attributesB)
@@ -167,8 +170,9 @@ def Rank(matching_matrix, P = None):
     ranking = np.zeros((n))
     for i in range(n):      
         #rank = n - matching_matrix[i, :].argsort().tolist().index(i)
-        rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
-        ranking[i] = 1.0 / rank
+        if matching_matrix[i,i] != 0:
+            rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
+            ranking[i] = 1.0 / rank
     return ranking
 
 def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
