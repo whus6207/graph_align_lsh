@@ -28,14 +28,6 @@ for a in adaptiveLSH:
 	for n in noise:
 		for b in bandNumber:
 			for l in noise_level:
-			# df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
-			# 	multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
-			# 	plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
-			# 	adaptiveLSH = a, LSHType = 'Cosine')
-			# df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
-			# 	multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
-			# 	plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
-			# 	adaptiveLSH = a, LSHType = 'Euclidean')
 				df = experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, noise_level = l,
 					plotAttribute = False, 

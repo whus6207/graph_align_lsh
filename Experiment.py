@@ -11,7 +11,8 @@ import pickle
 def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, multipleGraph = False, is_perm = False, 
 	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = True):
+	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = True,
+	threshold = 1):
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -179,17 +180,18 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 
 		combineAB = selectAndCombine(attributesA, attributesB)	 
 		pair_count_dict = combineBucketsBySum(buckets, combineAB, path+'/A.edges')
-		matching_matrix = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold=1)
+		matching_matrix, this_pair_computed = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold)
 		
 
 		Ranking = Rank(matching_matrix, P)
 		Best_Ranking = Ranking
 		if compute_sim:
 			Best_Ranking = Rank(sim_matrix, P)
-			Best_correctMatch = argmaxMatch(sim_matrix, attributesA, attributesB, P)
 		
 		correctMatch = argmaxMatch(matching_matrix, attributesA, attributesB, P)
 		Best_correctMatch = correctMatch
+		if compute_sim:
+			Best_correctMatch = argmaxMatch(sim_matrix, attributesA, attributesB, P)
 		hung_score = correctMatch
 		if compute_hungarian:
 			hung_score = hungarianMatch(sim_matrix, P)
@@ -207,13 +209,13 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 			correct_score_hungarian += sum(hung_score)/float(len(hung_score))
 		else:
 			correct_score_hungarian += 0
-		pairs_computed += len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1])
+		pairs_computed += this_pair_computed/float(matching_matrix.shape[0]*matching_matrix.shape[1])
 
 		print "=========================================================="
 		print filename
 		print "is_perm = " + str(is_perm) + ", has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
 		print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
-		print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)
+		print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)+", threshold = "+str(threshold)
 		print "matching score by ranking: %f" %(sum(Ranking)/len(Ranking))
 		if compute_sim:
 			print "matching score by ranking upper bound: %f" %(sum(Best_Ranking)/len(Best_Ranking))
@@ -222,7 +224,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 			print "matching score by correct match upper bound %f" % (sum(Best_correctMatch) / float(len(Best_correctMatch)))
 		if compute_hungarian:
 			print "hungarian matching score upper bound: %f" %(sum(hung_score)/float(len(hung_score)))
-		print "percentage of pairs computed: %f" %(len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
+		print "percentage of pairs computed: %f" %(this_pair_computed/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
 
 	rank_score /= loop_num
 	rank_score_upper /= loop_num
@@ -234,6 +236,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 	df = df.append({'filename':filename, 'nodeAttributeFile': str(nodeAttributeFile), 'is_perm':is_perm\
 		, 'has_noise':has_noise, 'noise_level':noise_level\
 		, 'GraphType':GraphType, 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
+		, 'threshold':threshold\
 		, 'rank_score' : rank_score\
 		, 'rank_score_upper' : rank_score_upper\
 		, 'correct_score' : correct_score\
@@ -289,7 +292,8 @@ if __name__ == '__main__':
 			df = pickle.load(f)
 	else:
 		df = pd.DataFrame(
-			columns=['filename','nodeAttributeFile', 'is_perm', 'has_noise', 'GraphType', 'bandNumber', 'adaptiveLSH', 'LSHType'\
+			columns=['filename','nodeAttributeFile', 'is_perm', 'has_noise', 'GraphType'\
+				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'pairs_computed'])
 
