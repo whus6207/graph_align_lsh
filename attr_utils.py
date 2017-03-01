@@ -4,13 +4,13 @@ import pandas as pd
 import random
 
 def getEgoAttr(UGraph, attributes, directed = True):
-    egoDeg = np.zeros((UGraph.GetNodes(),))
-    egoOutDeg = np.zeros((UGraph.GetNodes(),))
-    egoInDeg = np.zeros((UGraph.GetNodes(),))
-    egoConn = np.zeros((UGraph.GetNodes(),))
-    avgNeighDeg = np.zeros((UGraph.GetNodes(),))
-    avgNeighInDeg = np.zeros((UGraph.GetNodes(),))
-    avgNeighOutDeg = np.zeros((UGraph.GetNodes(),))
+    egoDeg = np.zeros((UGraph.GetMxNId(),))
+    egoOutDeg = np.zeros((UGraph.GetMxNId(),))
+    egoInDeg = np.zeros((UGraph.GetMxNId(),))
+    egoConn = np.zeros((UGraph.GetMxNId(),))
+    avgNeighDeg = np.zeros((UGraph.GetMxNId(),))
+    avgNeighInDeg = np.zeros((UGraph.GetMxNId(),))
+    avgNeighOutDeg = np.zeros((UGraph.GetMxNId(),))
 
     for NI in UGraph.Nodes():
         thisNID = NI.GetId()
@@ -73,7 +73,7 @@ def getEgoAttr(UGraph, attributes, directed = True):
 def getUndirAttribute(filename):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
 
-    attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 10)), 
+    attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetMxNId(), 10)), 
                               columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
                                        'FarnessCentrality', 'PageRank', 'NodeEccentricity',
                                        'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
