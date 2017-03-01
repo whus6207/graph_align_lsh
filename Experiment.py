@@ -6,6 +6,7 @@ from lsh_utils import *
 import pandas as pd
 import os.path
 import pickle
+import time
 
 
 def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, multipleGraph = False, is_perm = False, 
@@ -17,6 +18,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 	Experiment on two graphs with multiple setting
 
 	"""
+	start_preprocess = time.time()
 	path = 'metadata/' + str(GraphType)
 
 	A = loadGraph(filename, GraphType)
@@ -76,6 +78,8 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
 		attributes += nodeAttributesName
 
+	end_preprocess = time.time()
+	preprocess_time = end_preprocess - start_preprocess
 	if compute_sim:
 		sim_matrix = computeWholeSimMat(attributesA, attributesB, LSHType)
 
@@ -85,7 +89,9 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 	correct_score_upper = 0
 	correct_score_hungarian = 0
 	pairs_computed = 0
+	matching_time = 0
 	for i in range(loop_num):
+		start_matching = time.time()
 		if GraphType == 'Undirected':
 			if adaptiveLSH == True :
 				bandDeg = ['Degree','PageRank','NodeBetweennessCentrality']
@@ -196,6 +202,8 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 		if compute_hungarian:
 			hung_score = hungarianMatch(sim_matrix, P)
 		
+		end_matching = time.time()
+		matching_time += end_matching - start_matching
 
 		rank_score += sum(Ranking)/len(Ranking)
 		if compute_sim:
@@ -232,6 +240,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 	correct_score_upper /= loop_num
 	correct_score_hungarian /= loop_num
 	pairs_computed /= loop_num
+	matching_time /= loop_num
 
 	df = df.append({'filename':filename, 'nodeAttributeFile': str(nodeAttributeFile), 'is_perm':is_perm\
 		, 'has_noise':has_noise, 'noise_level':noise_level\
@@ -243,6 +252,8 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 		, 'correct_score_upper' : correct_score_upper\
 		, 'correct_score_hungarian' : correct_score_hungarian\
 		, 'pairs_computed' : pairs_computed\
+		, 'preprocess_time': preprocess_time\
+		, 'matching_time': matching_time\
 		}, ignore_index=True)
 
 	if plotAttribute == True:

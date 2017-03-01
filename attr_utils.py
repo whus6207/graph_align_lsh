@@ -72,16 +72,16 @@ def getEgoAttr(UGraph, attributes, directed = True):
 
 def getUndirAttribute(filename):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
-
+    # or UGraph.GetNodes()
     attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 10)), 
                               columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
                                        'FarnessCentrality', 'PageRank', 'NodeEccentricity',
                                        'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
 
-    attributes['Graph'] = [filename] * (UGraph.GetMxNId())#UGraph.GetNodes()
+    attributes['Graph'] = [filename] * UGraph.GetNodes()#UGraph.GetNodes()
     # Degree
-    attributes['Id'] = range(1, UGraph.GetMxNId()+1)
-    degree = np.zeros((UGraph.GetMxNId(),))
+    attributes['Id'] = range(1, UGraph.GetNodes()+1)
+    degree = np.zeros((UGraph.GetNodes(),))
     OutDegV = snap.TIntPrV()
     snap.GetNodeOutDegV(UGraph, OutDegV)
     for item in OutDegV:
@@ -91,8 +91,8 @@ def getUndirAttribute(filename):
     getEgoAttr(UGraph, attributes, directed=False)
 
     # Farness Centrality, Node Eccentricity
-    farCentr = np.zeros((UGraph.GetMxNId(),))
-    nodeEcc = np.zeros((UGraph.GetMxNId(),))
+    farCentr = np.zeros((UGraph.GetNodes(),))
+    nodeEcc = np.zeros((UGraph.GetNodes(),))
     for NI in UGraph.Nodes():
         farCentr[NI.GetId()] = snap.GetFarnessCentr(UGraph, NI.GetId())
         nodeEcc[NI.GetId()] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
@@ -100,7 +100,7 @@ def getUndirAttribute(filename):
     attributes['NodeEccentricity'] = nodeEcc
 
     # Betweenness Centrality
-    betCentr = np.zeros((UGraph.GetMxNId(),))
+    betCentr = np.zeros((UGraph.GetNodes(),))
     Nodes = snap.TIntFltH()
     Edges = snap.TIntPrFltH()
     snap.GetBetweennessCentr(UGraph, Nodes, Edges, 1.0)
@@ -109,7 +109,7 @@ def getUndirAttribute(filename):
     attributes['NodeBetweennessCentrality'] = betCentr
 
     # PageRank
-    pgRank = np.zeros((UGraph.GetMxNId(),))
+    pgRank = np.zeros((UGraph.GetNodes(),))
     PRankH = snap.TIntFltH()
     snap.GetPageRank(UGraph, PRankH)
     for item in PRankH:

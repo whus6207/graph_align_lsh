@@ -124,7 +124,7 @@ def combineBucketsBySum(buckets, combineAB, Afname):
             B_idx = ~A_idx
             colli_arr = np.array(collisions)
             
-            if sum(A_idx) == len(A_idx):    # Not all in A 
+            if sum(A_idx) == len(A_idx):    # We don't want all in A 
                 continue
                 
             for aid in colli_arr[A_idx]:
