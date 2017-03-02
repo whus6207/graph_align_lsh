@@ -9,7 +9,8 @@ import pickle
 import time
 
 
-def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, multipleGraph = False, is_perm = False, 
+def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,  
+	multipleGraph = False, largeGraph = False, is_perm = False, 
 	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = True,
@@ -24,9 +25,10 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 	A = loadGraph(filename, GraphType)
 	A, rest_idx = removeIsolatedNodes(A)
 
+
 	if nodeAttributeFile is not None:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(nodeAttributeFile)
-		nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
+		#nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
 	else:
 		nodeAttributesValue, nodeAttributesName = [], []
 
@@ -184,12 +186,14 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 						for k, v in bucket.items():
 							f.write(str(k) + str(v) + '\n')
 
+
 		combineAB = selectAndCombine(attributesA, attributesB)	 
 		pair_count_dict = combineBucketsBySum(buckets, combineAB, path+'/A.edges')
 		matching_matrix, this_pair_computed = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold)
 		
 
 		Ranking = Rank(matching_matrix, P)
+
 		Best_Ranking = Ranking
 		if compute_sim:
 			Best_Ranking = Rank(sim_matrix, P)
@@ -205,6 +209,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 		end_matching = time.time()
 		matching_time += end_matching - start_matching
 
+
 		rank_score += sum(Ranking)/len(Ranking)
 		if compute_sim:
 			rank_score_upper += sum(Best_Ranking)/len(Best_Ranking)
@@ -213,11 +218,13 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, m
 			rank_score_upper += 0
 			correct_score_upper += 0
 		correct_score += sum(correctMatch) / float(len(correctMatch))
+
 		if compute_hungarian:
 			correct_score_hungarian += sum(hung_score)/float(len(hung_score))
 		else:
 			correct_score_hungarian += 0
 		pairs_computed += this_pair_computed/float(matching_matrix.shape[0]*matching_matrix.shape[1])
+
 
 		print "=========================================================="
 		print filename
@@ -303,6 +310,7 @@ if __name__ == '__main__':
 			df = pickle.load(f)
 	else:
 		df = pd.DataFrame(
+
 			columns=['filename','nodeAttributeFile', 'is_perm', 'has_noise', 'GraphType'\
 				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\

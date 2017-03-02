@@ -72,6 +72,7 @@ def getEgoAttr(UGraph, attributes, directed = True):
 
 def getUndirAttribute(filename):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
+
     # or UGraph.GetNodes()
     attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 10)), 
                               columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 

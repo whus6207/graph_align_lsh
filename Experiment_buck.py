@@ -22,8 +22,8 @@ def permuteNoiseMat(A, is_perm = False, has_noise = False, level = 0.05):
     
     return B, P
 
-def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_perm = False, 
-	has_noise = False, noise_level = 0, 
+def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, largeGraph = False, 
+	is_perm = False, has_noise = False, noise_level = 0, 
 	plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 3, cos_num_plane = 20, euc_width = 2):
@@ -185,13 +185,14 @@ def experiment(df, filename = 'metadata/phys.edges', multipleGraph = False, is_p
 		Best_ranking = Rank(sim_matrix, P)
 		correctMatch = argmaxMatch(matching_matrix, attributesA, attributesB, P)
 		Best_correctMatch = argmaxMatch(sim_matrix, attributesA, attributesB, P)
-		hung_score = hungarianMatch(sim_matrix, P)
-
 		rank_score += sum(Ranking)/len(Ranking)
 		rank_score_upper += sum(Ranking)/len(Ranking)
 		correct_score += sum(correctMatch) / float(len(correctMatch))
 		correct_score_upper += sum(Best_correctMatch) / float(len(Best_correctMatch))
-		correct_score_hungarian += sum(hung_score)/float(len(hung_score))
+		
+		if largeGraph == False:
+			hung_score = hungarianMatch(sim_matrix, P)
+			correct_score_hungarian += sum(hung_score)/float(len(hung_score))
 		pairs_computed += len(pair_count_dict)/float(matching_matrix.shape[0]*matching_matrix.shape[1])
 
 		print "=========================================================="
