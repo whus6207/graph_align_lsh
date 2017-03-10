@@ -79,9 +79,9 @@ def getUndirAttribute(filename):
                                        'FarnessCentrality', 'PageRank', 'NodeEccentricity',
                                        'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
 
-    attributes['Graph'] = [filename] * UGraph.GetNodes()#UGraph.GetNodes()
+    attributes['Graph'] = [filename.split('/')[-1]] * UGraph.GetNodes()#UGraph.GetNodes()
     # Degree
-    attributes['Id'] = range(1, UGraph.GetNodes()+1)
+    attributes['Id'] = range(0, UGraph.GetNodes()) #???????????????? 1, +1?????
     degree = np.zeros((UGraph.GetNodes(),))
     OutDegV = snap.TIntPrV()
     snap.GetNodeOutDegV(UGraph, OutDegV)
@@ -129,8 +129,8 @@ def getDirAttribute(filename):
 
     attributes = pd.DataFrame(np.zeros((Graph.GetNodes(), len(attributeNames))), columns=attributeNames)
     
-    attributes['Graph'] = [filename] * Graph.GetNodes()
-    attributes['Id'] = range(1, Graph.GetNodes()+1)
+    attributes['Graph'] = [filename.split('/')[-1]] * Graph.GetNodes()
+    attributes['Id'] = range(0, Graph.GetNodes())
     
     # Degree
     degree = np.zeros((Graph.GetNodes(),))

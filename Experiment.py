@@ -13,7 +13,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 	multipleGraph = False, largeGraph = False, is_perm = False, 
 	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = True,
+	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = True,
 	threshold = 1):
 	"""
 	Experiment on two graphs with multiple setting
@@ -188,7 +188,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 
 
 		combineAB = selectAndCombine(attributesA, attributesB)	 
-		pair_count_dict = combineBucketsBySum(buckets, combineAB, path+'/A.edges')
+		pair_count_dict = combineBucketsBySum(buckets, combineAB, 'A.edges')
 		matching_matrix, this_pair_computed = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold)
 		
 
@@ -295,7 +295,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 		for bucket in buckets:
 			plotBucketCorrectness(bucket, attributesA.shape[0])
 
-		plotCorrectness(bucketAll, attributesA.shape[0])
+		plotBucketCorrectness(bucketAll, attributesA.shape[0])
 
 	return df
 
