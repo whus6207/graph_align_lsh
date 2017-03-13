@@ -22,6 +22,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	start_preprocess = time.time()
 	path = 'metadata/multigraph/' + str(GraphType)
 
+	# Adjacency matrices of original and noised version
 	multi_graphs = generate_multi_graph_synthetic(filename = filename, graph_type = GraphType, number = 5, noise_level = noise_level)
 	graph_attrs = {}
 	P = np.identity(len(multi_graphs['M0.edges']))
@@ -44,7 +45,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 				for index, row in attributesA.iterrows():
 					f.write(str(attributesA.ix[index]))
 
-			graph_attrs[key] = attributesA
+			graph_attrs[key] = attributesA      # Map graph name to attributes of graph
 
 		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
 		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
