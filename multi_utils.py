@@ -9,6 +9,8 @@ import scipy.spatial.distance
 from scipy import stats
 import os
 
+# generate <number> synthetic graphs using <A> with noise=<level>
+# noise of different graphs are disjoint
 def permuteMultiNoise(A, number, level):
 	noise = np.zeros((len(A), len(A)))
 	multi_graph_w_permutation = []
@@ -24,6 +26,7 @@ def permuteMultiNoise(A, number, level):
 		noise = np.zeros((len(A), len(A)))
 	return multi_graph_w_permutation
 
+# generate a dict of graph_name:graph from a edge file <filename>
 def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5, noise_level = 0.02):
 	path = 'metadata/multigraph/'
 	# multi_graph_w_permutation = []
@@ -117,11 +120,17 @@ def get_multi_graph_signature(graph_type = 'Undirected', graph_attrs = None):
 		multigraph_sig[graph] = get_graph_signature(attr)
 	return multigraph_sig
 
-def get_canberra_distance(sig1,sig2):
-    return scipy.spatial.distance.canberra(sig1, sig2)
-    #return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
-    #return cos_sim(sig1,sig2)
-def get_distance_matrix_and_order(multigraph, check_center = True):
+def get_distance(sig1,sig2,type='canberra'):
+	if type == 'canberra':
+		return scipy.spatial.distance.canberra(sig1, sig2)
+	elif type == 'manhattan':
+		return numpy.linalg.norm(np.array(sig1) - np.array(sig2), ord=1)
+	elif type == 'euclidean':
+		return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
+	else:
+		return cos_sim(sig1,sig2)
+
+def get_distance_matrix_and_order(multigraph, check_center = True, distance = 'canberra'):
 	m = multigraph.keys()
 	D = np.zeros((len(m), len(m)))
 	# if check_center:
@@ -130,16 +139,16 @@ def get_distance_matrix_and_order(multigraph, check_center = True):
 	for i, g1 in enumerate(m):
 		for j, g2 in enumerate(m):
 			if i <= j:
-				D[i][j] = get_canberra_distance(multigraph[g1], multigraph[g2]) 
+				D[i][j] = get_distance(multigraph[g1], multigraph[g2], distance) 
 	D = D + D.T 
 	return D, m
 
 
-def find_center(multigraph):
+def find_center(multigraph, distance_type='canberra'):
 	"""
 	rtype: string
 	"""
-	D, m = get_distance_matrix_and_order(multigraph)
+	D, m = get_distance_matrix_and_order(multigraph, distance_type)
 	min_index = np.argmin(sum(D))
 	return m[min_index]
 
