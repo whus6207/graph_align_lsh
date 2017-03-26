@@ -14,7 +14,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	has_noise = False, noise_level = 0.02,
 	GraphType = 'Undirected', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = True,
-	threshold = 1):
+	threshold = 1, center_distance = 'canberra'):
 	"""
 	Experiment on multiple graphs with multiple setting
 
@@ -24,9 +24,12 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 
 	# Adjacency matrices of original and noised version
 	multi_graphs = generate_multi_graph_synthetic(filename = filename, graph_type = GraphType, number = 5, noise_level = noise_level)
+	# graphs and the (structual and node) features of their nodes
 	graph_attrs = {}
+	# permutation does not make difference, 
 	P = np.identity(len(multi_graphs['M0.edges']))
 
+	# get node attribute is file is specified
 	if nodeAttributeFile is not None:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(nodeAttributeFile)
 		#nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
@@ -36,6 +39,11 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	### get graph attributes
 	
 	if GraphType == 'Undirected':
+
+		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
+		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+		attributes += nodeAttributesName
+
 		for key in multi_graphs.keys():
 			attributesA = getUndirAttribute(path + '/' + key)
 			# TODO: handle when permutation possible
@@ -45,13 +53,16 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 				for index, row in attributesA.iterrows():
 					f.write(str(attributesA.ix[index]))
 
-			graph_attrs[key] = attributesA      # Map graph name to attributes of graph
+			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
-		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
-		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
-		attributes += nodeAttributesName
-		
 	elif GraphType == 'Directed':
+
+		attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
+					  'PageRank', 'HubsScore', 'AuthoritiesScore',
+					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
+					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
+		attributes += nodeAttributesName
+
 		for key in multi_graphs.keys():
 			attributesA = getDirAttribute(path + '/' + key)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
@@ -60,16 +71,12 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 				for index, row in attributesA.iterrows():
 					f.write(str(attributesA.ix[index]))
 
-			graph_attrs[key] = attributesA
+			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
-		attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
-					  'PageRank', 'HubsScore', 'AuthoritiesScore',
-					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
-					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
-		attributes += nodeAttributesName
+		
 
 	graph_signatures = get_multi_graph_signature(GraphType, graph_attrs)
-	center_id = find_center(graph_signatures)
+	center_id = find_center(graph_signatures, center_distance)
 	print "found center graph: " + center_id
 
 	end_preprocess = time.time()
@@ -80,6 +87,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		if g != center_id:
 			sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 
+	# use original center
 	M0_sim_matrix = {}
 	for g in graph_attrs.keys():
 		if g != 'M0.edges':
@@ -99,6 +107,8 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	M0_correct_score = 0
 	M0_correct_score_upper = 0
 	M0_pairs_computed = 0
+
+	# evaluate the accuracy and efficiency of our alg by generating buckets for <loop_num> times
 	for i in range(loop_num):
 		if GraphType == 'Undirected':
 			if adaptiveLSH == True :
@@ -242,7 +252,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 			pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
 
 			print "=========================================================="
-			print filename + ' ' + g + ', center:' + center_id
+			print filename + ' ' + g + ', center:' + center_id + ', center_dist: '+center_distance
 			print "has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
 			print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
 			print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)+", threshold = "+str(threshold)
@@ -270,7 +280,17 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 		print 'avg derived rank score: ' + str(avg_derived_rank)
 		
+		### original center
 		### =======TODO MAKE THIS CLEANER========= ####
+		M0_pair_count_dict = {}
+		M0_rank_score = 0
+		M0_rank_score_upper = 0
+		M0_correct_score = 0
+		M0_correct_score_upper = 0
+		M0_avg_derived_rank = 0
+		if center_id == 'M0.edges':
+			print '======= same center !!! ======='
+			continue
 		M0_pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), 'M0.edges')
 		M0_matching_matrix = {}
 		M0_this_pair_computed = {}
@@ -310,7 +330,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 			M0_pairs_computed += M0_this_pair_computed[g]/float(M0_matching_matrix[g].shape[0]*M0_matching_matrix[g].shape[1])
 
 			print "=========================================================="
-			print filename + ' ' + g + ', center: M0.edges'
+			print filename + ' ' + g + ', center: M0.edges, center_dist: '+center_distance
 			print "has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
 			print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
 			print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)+", threshold = "+str(threshold)
@@ -343,11 +363,12 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	correct_score_upper /= loop_num * len(pair_count_dict.keys())
 	correct_score_hungarian /= loop_num * len(pair_count_dict.keys())
 	pairs_computed /= loop_num * len(pair_count_dict.keys())
-	M0_rank_score /= loop_num * len(M0_pair_count_dict.keys())
-	M0_rank_score_upper /= loop_num * len(M0_pair_count_dict.keys())
-	M0_correct_score /= loop_num * len(M0_pair_count_dict.keys())
-	M0_correct_score_upper /= loop_num * len(M0_pair_count_dict.keys())
-	M0_pairs_computed /= loop_num * len(M0_pair_count_dict.keys())
+	if len(M0_pair_count_dict.keys()):
+		M0_rank_score /= loop_num * len(M0_pair_count_dict.keys())
+		M0_rank_score_upper /= loop_num * len(M0_pair_count_dict.keys())
+		M0_correct_score /= loop_num * len(M0_pair_count_dict.keys())
+		M0_correct_score_upper /= loop_num * len(M0_pair_count_dict.keys())
+		M0_pairs_computed /= loop_num * len(M0_pair_count_dict.keys())
 	end_matching = time.time()
 	matching_time = end_matching - start_matching
 
@@ -368,6 +389,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		, 'M0_correct_score_upper' : M0_correct_score_upper\
 		, 'avg_derived_rank': avg_derived_rank\
 		, 'M0_avg_derived_rank': M0_avg_derived_rank\
+		, 'center_dist': center_distance\
 		, 'pairs_computed' : pairs_computed\
 		, 'preprocess_time': preprocess_time\
 		, 'matching_time': matching_time\
@@ -380,6 +402,7 @@ if __name__ == '__main__':
 	noise = [True]
 	bandNumber = [2]
 	LSH = ['Cosine', 'Euclidean']
+	center_distance_types = ['canberra', 'manhattan', 'euclidean']
 	fname = 'exp_result_multi.pkl'
 
 	if os.path.isfile(fname):
@@ -391,16 +414,19 @@ if __name__ == '__main__':
 				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'pairs_computed'])
-
-	df = multi_experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
-			has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-			adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01)
-	df = multi_experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
-			has_noise = True, GraphType = 'Directed', bandNumber = 2, 
-			adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01)
-	df = multi_experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
-			has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-			adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01)
+	for dist_type in center_distance_types:
+		df = multi_experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
+				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+				center_distance = dist_type)
+		df = multi_experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
+				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+				center_distance = dist_type)
+		df = multi_experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
+				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
+				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+				center_distance = dist_type)
 
 	pickle.dump(df, open(fname,'wb'))
 
