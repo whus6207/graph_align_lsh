@@ -1,0 +1,11 @@
+/metadata/*
+facebook/
+netalign/
+*.DS_Store
+.ipynb_checkpoints
+*.pyc
+*.zip
+*.xlsx
+*.pkl
+*.o
+*.csv
