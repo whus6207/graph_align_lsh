@@ -22,7 +22,7 @@ def generateCosineBuckets(attributes, cols):
 
 def generateEuclideanBuckets(attributes, bin_wid):
     attr = attributes.drop(['Graph', 'Id'], axis=1).as_matrix()
-    randVec = np.random.normal(size=(attr.shape[1],))
+    randVec = np.random.normal(size=(attr.shape[1],))     # Apply only once
     randVec = np.multiply((randVec).T, 10 / np.mean(attr, axis=0)).T
     bias = random.uniform(0, bin_wid)
     
@@ -30,7 +30,7 @@ def generateEuclideanBuckets(attributes, bin_wid):
     hashVec = hashVec.astype(int)
     dic = defaultdict(list)
     for i in range((len(hashVec))):
-        dic[hashVec[i]].append((attributes.ix[i]['Graph'], attributes.ix[i]['Id']))
+        dic[hashVec[i]].append((attributes.ix[i]['Graph'], attributes.ix[i]['Id']))   # Bucket number: (graph name, node id)
     return dic
 
 def generateNodeBuckets(LSHType, attributesA, attributesB, bandNode):

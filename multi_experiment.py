@@ -50,6 +50,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
 		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 		attributes += nodeAttributesName
+		
 	elif GraphType == 'Directed':
 		for key in multi_graphs.keys():
 			attributesA = getDirAttribute(path + '/' + key)
@@ -192,7 +193,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 				# 			f.write(str(k) + str(v) + '\n')
 
 
-		stacked_attrs = selectAndCombineMulti(graph_attrs)	 
+		stacked_attrs = selectAndCombineMulti(graph_attrs)	
 		pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), center_id)
 		
 		matching_matrix = {}

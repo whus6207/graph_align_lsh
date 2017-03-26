@@ -84,7 +84,7 @@ def get_graph_feature(path, filename, graph_type = 'Undirected'):
 def get_graph_signature(attributes):
 	signature = []
 	""" Extract features: Degree, EgonetDegree, Avg Egonet Neighbor, Egonet Connectivity, Clustering Coefficient  """
-	for i in range(2, len(attributes.columns)): 
+	for i in range(2, len(attributes.columns)): # Will get noisy attt
 		# if i == 2 or i == 6:
 		#  	continue
 		feature = attributes.iloc[:, i]  
@@ -144,7 +144,7 @@ def find_center(multigraph):
 	return m[min_index]
 
 if __name__ == '__main__':
-	generate_multi_graph_synthetic(filename = 'facebook/0.edges', graph_type = 'Undirected')
+	graph_info = generate_multi_graph_synthetic(filename = 'facebook/0.edges', graph_type = 'Undirected')
 	graph_signatures = get_multi_graph_signature()
 	print(sum(get_distance_matrix_and_order(graph_signatures)[0]))
 	print(find_center(graph_signatures))
