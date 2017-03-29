@@ -10,6 +10,7 @@ def loadGraph(fname, graph_type='Undirected'):
 
     A_size = max(nodes)+1
     A = np.zeros((A_size,A_size))
+    
 
     for i in range(0,len(nodes),2):
         A[nodes[i]][nodes[i+1]]=1
@@ -17,6 +18,7 @@ def loadGraph(fname, graph_type='Undirected'):
             A[nodes[i+1]][nodes[i]]=1
     
     return A
+
 
 def permuteNoiseMat(A, is_perm = False, has_noise = False, level = 0.05):
     perm = np.random.permutation(len(A))

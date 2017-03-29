@@ -3,17 +3,17 @@ import numpy as np
 from attr_utils import *
 from io_utils import *
 from lsh_utils import *
+#from netalign_utils import *
 import pandas as pd
 import os.path
 import pickle
 import time
 
-
 def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,  
 	multipleGraph = False, largeGraph = False, is_perm = False, 
 	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = True,
+	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = False, compute_netalign = False,
 	threshold = 1):
 	"""
 	Experiment on two graphs with multiple setting
@@ -92,7 +92,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 	correct_score_hungarian = 0
 	pairs_computed = 0
 	matching_time = 0
-	for i in range(loop_num):
+	for loop in range(loop_num):
 		start_matching = time.time()
 		if GraphType == 'Undirected':
 			if adaptiveLSH == True :
@@ -188,7 +188,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 
 
 		combineAB = selectAndCombine(attributesA, attributesB)	 
-		pair_count_dict = combineBucketsBySum(buckets, combineAB, 'A.edges')
+		pair_count_dict = combineBucketsBySum(buckets, combineAB, path+'/A.edges')
 		matching_matrix, this_pair_computed = computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold)
 		
 
@@ -240,6 +240,8 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 		if compute_hungarian:
 			print "hungarian matching score upper bound: %f" %(sum(hung_score)/float(len(hung_score)))
 		print "percentage of pairs computed: %f" %(this_pair_computed/float(matching_matrix.shape[0]*matching_matrix.shape[1]))
+		if compute_netalign:
+			getNetalignScore(A, B, matching_matrix, filename + str(bandNumber) + LSHType + str(loop) + '.mat')
 
 	rank_score /= loop_num
 	rank_score_upper /= loop_num
@@ -295,7 +297,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 		for bucket in buckets:
 			plotBucketCorrectness(bucket, attributesA.shape[0])
 
-		plotBucketCorrectness(bucketAll, attributesA.shape[0])
+		plotCorrectness(bucketAll, attributesA.shape[0])
 
 	return df
 
@@ -320,36 +322,16 @@ if __name__ == '__main__':
 	for a in adaptiveLSH:
 		for n in noise:
 			for b in bandNumber:
-				df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+				df = experiment(df, filename = 'testdata/dblp.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
 					plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
-					adaptiveLSH = a, LSHType = 'Cosine')
-				df = experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+					adaptiveLSH = a, LSHType = 'Cosine', compute_hungarian = False)
+				df = experiment(df, filename = 'testdata/dblp.edges', nodeAttributeFile = None, 
 					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
 					plotBucket = False, plotCorrectness = False, GraphType = 'Undirected', bandNumber = b, 
-					adaptiveLSH = a, LSHType = 'Euclidean')
-
-				df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
-					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
-					plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
-					adaptiveLSH = a, LSHType = 'Cosine')
-				df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
-					multipleGraph = False, is_perm = False, has_noise = n, plotAttribute = False, 
-					plotBucket = False, plotCorrectness = False, GraphType = 'Directed', bandNumber = b, 
-					adaptiveLSH = a, LSHType = 'Euclidean')
-				if a:
-					break
-
-
-	#df = experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = 'phys.nodes', multipleGraph = False, is_perm = False, 
-	#                has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-	#                GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Cosine')
+					adaptiveLSH = a, LSHType = 'Euclidean', compute_hungarian = False)
 
 	pickle.dump(df, open(fname,'wb'))
-
-	# experiment(df, filename = 'facebook/0.edges', multipleGraph = False, is_perm = False, 
-	#           has_noise = True, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
-	#           GraphType = 'Undirected', bandNumber = 4, adaptiveLSH = False, LSHType = 'Cosine')
 
 	writer = pd.ExcelWriter('exp_result_attr.xlsx')
 	df.to_excel(writer, sheet_name='Sheet1')
