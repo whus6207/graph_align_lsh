@@ -24,6 +24,34 @@ def permutemultiNoise(A, number, level):
 		noise = np.zeros((len(A), len(A)))
 	return multi_graph_w_permutation
 
+# A should be sparse matrix
+def permuteSparse(A, number, level):
+	m, n = A.get_shape()
+	multi_graph_w_permutation = []
+	B = A.copy()
+	noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v]
+	visited = set(noise)
+	scipy.random.shuffle(noise) # [0] ????
+	noise = noise[0][: int(len(noise[0]) * level) * number]
+	# Dealing with existing edges
+	multi_noise = [noise[len(noise) * i // number: len(noise) * (i+1) // number]for i in range(number)]
+	for n in multi_noise:
+		for i, j in n:
+			B[i, j] = 0
+			B[j, i] = 0
+		# Adding edges
+		for _ in range(int(m * m * level)):
+			add1, add2 = np.random.choice(m), np.random.choice(m)
+			while ((add1, add2) in visited):
+				add1, add2 = np.random.choice(m), np.random.choice(m)
+			B[add1, add2] = 1
+			visited.add(add1, add2)
+		multi_graph_w_permutation.append(B)
+		B = A.copy()
+	return multi_graph_w_permutation
+
+
+
 def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5):
 	path = 'metadata/multigraph/'
 	# multi_graph_w_permutation = []
@@ -47,12 +75,12 @@ def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', n
 
 
 def get_node_degree(UGraph, graph_type, attributes):
-    degree = np.zeros((UGraph.GetNodes(),))
-    OutDegV = snap.TIntPrV()
-    snap.GetNodeOutDegV(UGraph, OutDegV)
-    for item in OutDegV:
-        degree[item.GetVal1()] = item.GetVal2()
-    attributes['Degree'] = degree
+	degree = np.zeros((UGraph.GetNodes(),))
+	OutDegV = snap.TIntPrV()
+	snap.GetNodeOutDegV(UGraph, OutDegV)
+	for item in OutDegV:
+		degree[item.GetVal1()] = item.GetVal2()
+	attributes['Degree'] = degree
 
 def get_clustering_coeff(UGraph, attributes):
 	coeff = np.zeros((UGraph.GetNodes(), ))
@@ -83,7 +111,7 @@ def get_graph_signature(attributes):
 	""" Extract features: Degree, EgonetDegree, Avg Egonet Neighbor, Egonet Connectivity, Clustering Coefficient  """
 	for i in range(2, len(attributes.columns)): 
 		if i == 2 or i == 6:
-		 	continue
+			continue
 		feature = attributes.iloc[:, i]  
 		# median
 		md = np.median(feature)
@@ -112,9 +140,10 @@ def get_multi_graph_signature(graph_type = 'Undirected'):
 	return multigraph
 
 def get_canberra_distance(sig1,sig2):
-    return scipy.spatial.distance.canberra(sig1, sig2)
-    #return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
-    #return cos_sim(sig1,sig2)
+	return scipy.spatial.distance.canberra(sig1, sig2)
+	#return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
+	#return cos_sim(sig1,sig2)
+
 def get_distance_matrix_and_order(multigraph, check_center = True):
 	m = multigraph.keys()
 	D = np.zeros((len(m), len(m)))
@@ -128,6 +157,22 @@ def get_distance_matrix_and_order(multigraph, check_center = True):
 	D = D + D.T 
 	return D, m
 
+def get_distribution_matrix(aggregations):
+	m = len(aggregations)
+	D = np.zeros((m, m))
+	att = {}
+	attributes = aggregations[0].columns[2:]
+	attributes = ['Degree']
+	for a in attributes:
+		for i in range(len(aggregations) - 1):
+			for j in range(i + 1, len(aggregations)):
+				D[i][j] = KL_sim(aggregations[i][a], aggregations[j][a])
+		D = D + D.T
+		att[a] = D
+		D = np.zeros((m, m))
+	return att
+
+
 
 def find_center(multigraph):
 	"""
@@ -139,7 +184,7 @@ def find_center(multigraph):
 	return m[min_index]
 
 if __name__ == '__main__':
-	generate_multi_graph_synthetic(filename = 'facebook/0.edges', graph_type = 'Undirected')
+	A, multigraph = generate_multi_graph_synthetic(filename = 'facebook/0.edges', graph_type = 'Undirected')
 	multigraph = get_multi_graph_signature()
 	print(sum(get_distance_matrix_and_order(multigraph)[0]))
 	print(find_center(multigraph))

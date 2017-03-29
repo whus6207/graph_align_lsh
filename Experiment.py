@@ -3,7 +3,7 @@ import numpy as np
 from attr_utils import *
 from io_utils import *
 from lsh_utils import *
-from netalign_utils import *
+#from netalign_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -13,7 +13,7 @@ def experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None,
 	multipleGraph = False, largeGraph = False, is_perm = False, 
 	has_noise = False, noise_level = 0.05, plotAttribute = False, plotBucket = False, plotCorrectness = False, 
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = True, compute_netalign = True,
+	loop_num = 3, cos_num_plane = 25, euc_width = 2, compute_hungarian = True, compute_sim = False, compute_netalign = False,
 	threshold = 1):
 	"""
 	Experiment on two graphs with multiple setting

@@ -1,9 +1,11 @@
 import numpy as np
 from collections import defaultdict
 from scipy.stats import entropy
+from scipy.sparse import lil_matrix
+from itertools import izip
 import matplotlib.pyplot as plt
 import random
-from munkres import Munkres
+#from munkres import Munkres
 
 def generateCosineBuckets(attributes, cols):
     randMatrix = np.random.random((attributes.shape[1], cols))
@@ -97,6 +99,24 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
         
     return matching_matrix, pair_computed
 
+def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
+    combineAB = selectAndCombine(attributesA, attributesB)
+    matching_matrix = lil_matrix((len(attributesA), len(attributesB)))
+    scale = np.mean(combineAB[:,2:], axis=0)
+    pair_computed = 0
+    if LSHType == 'Cosine':               
+        for pair, count in pair_count_dict.items():
+            if count >= threshold:
+                pair_computed += 1
+                matching_matrix[pair[0], pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+    elif LSHType == 'Euclidean':
+        for pair, count in pair_count_dict.items():
+            if count >= threshold:
+                pair_computed += 1
+                matching_matrix[pair[0], pair[1]-len(attributesA)] = Euclidean_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+    matching_matrix = matching_matrix.tocsr()
+    return matching_matrix, pair_computed
+
 def computeWholeSimMat(attributesA, attributesB, LSHType):
     combineAB = selectAndCombine(attributesA, attributesB)
     sim_vec = []
@@ -173,6 +193,28 @@ def Rank(matching_matrix, P = None):
         if matching_matrix[i,i] != 0:
             rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
             ranking[i] = 1.0 / rank
+    return ranking
+
+def sparseRank(matching_matrix, P = None):
+    if P:
+        matching_matrix = matching_matrix.dot(P)
+
+    n, d = matching_matrix.shape
+    ranking = np.zeros((n))
+    sorted_row = defaultdict(list)
+
+    matching_matrix = matching_matrix.tocoo() # For .row and .col
+    tuples = izip(matching_matrix.row, matching_matrix.col, matching_matrix.data)
+    rank = sorted(tuples, key = lambda x: (x[0], x[2]), reverse = True)
+    rank = [(pair[0], pair[1]) for pair in rank]
+    # Dictionary for each node to other nodes sorted by score
+    for r in rank:
+        sorted_row[r[0]].append(r[1])
+    # Find position of same index
+    matching_matrix = matching_matrix.tocsr() # For [i, i]
+    for i in range(n):
+        if i in sorted_row and matching_matrix[i, i] != 0:
+            ranking[i] = 1.0 / (sorted_row[i].index(i) + 1)
     return ranking
 
 def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
