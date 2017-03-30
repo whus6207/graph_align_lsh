@@ -45,7 +45,7 @@ def permuteSparse(A, number, level):
 			while ((add1, add2) in visited):
 				add1, add2 = np.random.choice(m), np.random.choice(m)
 			B[add1, add2] = 1
-			visited.add(add1, add2)
+			visited.add((add1, add2))
 		multi_graph_w_permutation.append(B)
 		B = A.copy()
 	return multi_graph_w_permutation
