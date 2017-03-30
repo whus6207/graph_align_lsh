@@ -9,7 +9,8 @@ import scipy.spatial.distance
 from scipy import stats
 import os
 
-def permutemultiNoise(A, number, level):
+
+def permuteMultiNoise(A, number, level):
 	noise = np.zeros((len(A), len(A)))
 	multi_graph_w_permutation = []
 	noise_nodes = np.where(np.triu(np.random.choice([0, 1], size=(len(A), len(A)), p=[(100-level * number)/100, level * number /100])))
@@ -24,35 +25,8 @@ def permutemultiNoise(A, number, level):
 		noise = np.zeros((len(A), len(A)))
 	return multi_graph_w_permutation
 
-# A should be sparse matrix
-def permuteSparse(A, number, level):
-	m, n = A.get_shape()
-	multi_graph_w_permutation = []
-	B = A.copy()
-	noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v]
-	visited = set(noise)
-	scipy.random.shuffle(noise) # [0] ????
-	noise = noise[0][: int(len(noise[0]) * level) * number]
-	# Dealing with existing edges
-	multi_noise = [noise[len(noise) * i // number: len(noise) * (i+1) // number]for i in range(number)]
-	for n in multi_noise:
-		for i, j in n:
-			B[i, j] = 0
-			B[j, i] = 0
-		# Adding edges
-		for _ in range(int(m * m * level)):
-			add1, add2 = np.random.choice(m), np.random.choice(m)
-			while ((add1, add2) in visited):
-				add1, add2 = np.random.choice(m), np.random.choice(m)
-			B[add1, add2] = 1
-			visited.add((add1, add2))
-		multi_graph_w_permutation.append(B)
-		B = A.copy()
-	return multi_graph_w_permutation
 
-
-
-def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5):
+def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5, noise_level = 0.02):
 	path = 'metadata/multigraph/'
 	# multi_graph_w_permutation = []
 	if filename:
@@ -128,21 +102,24 @@ def get_graph_signature(attributes):
 	return signature
 
 	
-def get_multi_graph_signature(graph_type = 'Undirected'):
-	multigraph = {}
-	aggregations = []
-	path = 'metadata/multigraph/'
-	for filename in os.listdir(path + graph_type):
-		if not filename.startswith('.'):
-			aggregations.append(get_graph_feature(path, filename))
-	for agg in aggregations:
-		multigraph[agg['Graph'][0]] = get_graph_signature(agg)
-	return multigraph
+def get_multi_graph_signature(graph_type = 'Undirected', graph_attrs = None):
+	multigraph_sig = {}
+	aggregations = {}
+	if not graph_attrs:
+		path = 'metadata/multigraph/'
+		for filename in os.listdir(path + graph_type):
+			if not filename.startswith('.'):
+				aggregations[filename] = get_graph_feature(path, filename)
+	else:
+		aggregations = graph_attrs
+	for graph, attr in aggregations.iteritems():
+		multigraph_sig[graph] = get_graph_signature(attr)
+	return multigraph_sig
 
 def get_canberra_distance(sig1,sig2):
-	return scipy.spatial.distance.canberra(sig1, sig2)
-	#return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
-	#return cos_sim(sig1,sig2)
+    return scipy.spatial.distance.canberra(sig1, sig2)
+    #return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
+    #return cos_sim(sig1,sig2)
 
 def get_distance_matrix_and_order(multigraph, check_center = True):
 	m = multigraph.keys()
@@ -179,7 +156,6 @@ def find_center(multigraph):
 	rtype: string
 	"""
 	D, m = get_distance_matrix_and_order(multigraph)
-	print(m)
 	min_index = np.argmin(sum(D))
 	return m[min_index]
 
