@@ -40,7 +40,7 @@ def permuteSparse(A, is_perm = False, has_noise = False, level = 0.05):
         noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v]
         visited = set(noise)  # Remove duplicate edges in undirected
         scipy.random.shuffle(noise)
-        noise = noise[0][: int(len(noise[0]) * level)]
+        noise = noise[: int(len(noise[0]) * level)]
         B = B.tolil()
         for pair in noise:
             B[pair[0], pair[1]] = 0

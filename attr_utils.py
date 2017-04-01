@@ -3,14 +3,14 @@ import numpy as np
 import pandas as pd
 import random
 
-def getEgoAttr(UGraph, attributes, directed = True):
-    egoDeg = np.zeros((UGraph.GetNodes(),))
-    egoOutDeg = np.zeros((UGraph.GetNodes(),))
-    egoInDeg = np.zeros((UGraph.GetNodes(),))
-    egoConn = np.zeros((UGraph.GetNodes(),))
-    avgNeighDeg = np.zeros((UGraph.GetNodes(),))
-    avgNeighInDeg = np.zeros((UGraph.GetNodes(),))
-    avgNeighOutDeg = np.zeros((UGraph.GetNodes(),))
+def getEgoAttr(UGraph, node_num, attributes, directed = True):
+    egoDeg = np.zeros((node_num,))
+    egoOutDeg = np.zeros((node_num,))
+    egoInDeg = np.zeros((node_num,))
+    egoConn = np.zeros((node_num,))
+    avgNeighDeg = np.zeros((node_num,))
+    avgNeighInDeg = np.zeros((node_num,))
+    avgNeighOutDeg = np.zeros((node_num,))
 
     for NI in UGraph.Nodes():
         thisNID = NI.GetId()
@@ -70,41 +70,38 @@ def getEgoAttr(UGraph, attributes, directed = True):
         attributes['AvgNeighborInDeg'] = avgNeighInDeg
         attributes['AvgNeighborOutDeg'] = avgNeighOutDeg
 
-def getUndirAttribute(filename):
+def getUndirAttribute(filename, node_num):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
 
-    # or UGraph.GetNodes()
-    attributes = pd.DataFrame(np.zeros(shape=(UGraph.GetNodes(), 8)), 
+    # or node_num
+    attributes = pd.DataFrame(np.zeros(shape=(node_num, 10)), 
                               columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
-                                       'PageRank', 'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
+                                       'FarnessCentrality', 'PageRank', 'NodeEccentricity',
+                                       'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
 
-    attributes['Graph'] = [filename] * UGraph.GetNodes()#UGraph.GetNodes()
+    attributes['Graph'] = [filename.split('/')[-1]] * node_num #node_num
     # Degree
-    print 'Processing Degree'
-    attributes['Id'] = range(1, UGraph.GetNodes()+1)
-    degree = np.zeros((UGraph.GetNodes(),))
+    attributes['Id'] = range(0, node_num) #???????????????? 1, +1?????
+    degree = np.zeros((node_num,))
     OutDegV = snap.TIntPrV()
     snap.GetNodeOutDegV(UGraph, OutDegV)
     for item in OutDegV:
         degree[item.GetVal1()] = item.GetVal2()
     attributes['Degree'] = degree
 
-    print 'Processing Egonet'
-    getEgoAttr(UGraph, attributes, directed=False)
+    getEgoAttr(UGraph, node_num, attributes, directed=False)
 
     # Farness Centrality, Node Eccentricity
-    # print 'Processing farness centrality and eccentricity'
-    # farCentr = np.zeros((UGraph.GetNodes(),))
-    # nodeEcc = np.zeros((UGraph.GetNodes(),))
-    # for NI in UGraph.Nodes():
-        # farCentr[NI.GetId()] = snap.GetFarnessCentr(UGraph, NI.GetId())
-        # nodeEcc[NI.GetId()] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
-    # attributes['FarnessCentrality'] = farCentr
-    # attributes['NodeEccentricity'] = nodeEcc
+    farCentr = np.zeros((node_num,))
+    nodeEcc = np.zeros((node_num,))
+    for NI in UGraph.Nodes():
+        farCentr[NI.GetId()] = snap.GetFarnessCentr(UGraph, NI.GetId())
+        nodeEcc[NI.GetId()] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
+    attributes['FarnessCentrality'] = farCentr
+    attributes['NodeEccentricity'] = nodeEcc
 
     # Betweenness Centrality
-    print 'Processing Betweenness centrality'
-    betCentr = np.zeros((UGraph.GetNodes(),))
+    betCentr = np.zeros((node_num,))
     Nodes = snap.TIntFltH()
     Edges = snap.TIntPrFltH()
     snap.GetBetweennessCentr(UGraph, Nodes, Edges, 1.0)
@@ -113,8 +110,7 @@ def getUndirAttribute(filename):
     attributes['NodeBetweennessCentrality'] = betCentr
 
     # PageRank
-    print 'Processing PageRank'
-    pgRank = np.zeros((UGraph.GetNodes(),))
+    pgRank = np.zeros((node_num,))
     PRankH = snap.TIntFltH()
     snap.GetPageRank(UGraph, PRankH)
     for item in PRankH:
@@ -123,21 +119,21 @@ def getUndirAttribute(filename):
 
     return attributes
 
-def getDirAttribute(filename):
+def getDirAttribute(filename, node_num):
     Graph = snap.LoadEdgeList(snap.PNGraph, filename, 0, 1)
     
     attributeNames = ['Graph', 'Id', 'Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
-                      'PageRank', 'HubsScore', 'AuthoritiesScore',
+                      'FarnessCentrality', 'PageRank', 'HubsScore', 'AuthoritiesScore', 'NodeEccentricity',
                       'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
                       'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
 
-    attributes = pd.DataFrame(np.zeros((Graph.GetNodes(), len(attributeNames))), columns=attributeNames)
+    attributes = pd.DataFrame(np.zeros((node_num, len(attributeNames))), columns=attributeNames)
     
-    attributes['Graph'] = [filename] * Graph.GetNodes()
-    attributes['Id'] = range(1, Graph.GetNodes()+1)
+    attributes['Graph'] = [filename.split('/')[-1]] * node_num
+    attributes['Id'] = range(0, node_num)
     
     # Degree
-    degree = np.zeros((Graph.GetNodes(),))
+    degree = np.zeros((node_num,))
     InDegV = snap.TIntPrV()
     snap.GetNodeInDegV(Graph, InDegV)
     for item in InDegV:
@@ -145,7 +141,7 @@ def getDirAttribute(filename):
     attributes['Degree'] += degree
     attributes['InDegree'] = degree
     
-    degree = np.zeros((Graph.GetNodes(),))
+    degree = np.zeros((node_num,))
     OutDegV = snap.TIntPrV()
     snap.GetNodeOutDegV(Graph, OutDegV)
     for item in OutDegV:
@@ -155,21 +151,21 @@ def getDirAttribute(filename):
     
     getEgoAttr(Graph, attributes)
 
-    attributes['Degree'] /= Graph.GetNodes()
-    attributes['InDegree'] /= Graph.GetNodes()
-    attributes['OutDegree'] /= Graph.GetNodes()
+    attributes['Degree'] /= node_num
+    attributes['InDegree'] /= node_num
+    attributes['OutDegree'] /= node_num
 
     # Degree, Closeness, Farness Centrality, Node Eccentricity
-    # farCentr = np.zeros((Graph.GetNodes(),))
-    # nodeEcc = np.zeros((Graph.GetNodes(),))
-    # for NI in Graph.Nodes():
-        # farCentr[NI.GetId()] = snap.GetFarnessCentr(Graph, NI.GetId(), True, True)
-        # nodeEcc[NI.GetId()] = snap.GetNodeEcc(Graph, NI.GetId(), True)
-    # attributes['FarnessCentrality'] = farCentr
-    # attributes['NodeEccentricity'] = nodeEcc
+    farCentr = np.zeros((node_num,))
+    nodeEcc = np.zeros((node_num,))
+    for NI in Graph.Nodes():
+        farCentr[NI.GetId()] = snap.GetFarnessCentr(Graph, NI.GetId(), True, True)
+        nodeEcc[NI.GetId()] = snap.GetNodeEcc(Graph, NI.GetId(), True)
+    attributes['FarnessCentrality'] = farCentr
+    attributes['NodeEccentricity'] = nodeEcc
 
     # Betweenness Centrality
-    betCentr = np.zeros((Graph.GetNodes(),))
+    betCentr = np.zeros((node_num,))
     Nodes = snap.TIntFltH()
     Edges = snap.TIntPrFltH()
     snap.GetBetweennessCentr(Graph, Nodes, Edges, 1.0, True)
@@ -178,7 +174,7 @@ def getDirAttribute(filename):
     attributes['NodeBetweennessCentrality'] = betCentr
 
     # PageRank
-    pgRank = np.zeros((Graph.GetNodes(),))
+    pgRank = np.zeros((node_num,))
     PRankH = snap.TIntFltH()
     snap.GetPageRank(Graph, PRankH)
     for item in PRankH:
@@ -186,8 +182,8 @@ def getDirAttribute(filename):
     attributes['PageRank'] = pgRank
 
     # Hubs, Authorities score 
-    hubs = np.zeros((Graph.GetNodes(),))
-    auth = np.zeros((Graph.GetNodes(),))
+    hubs = np.zeros((node_num,))
+    auth = np.zeros((node_num,))
     NIdHubH = snap.TIntFltH()
     NIdAuthH = snap.TIntFltH()
     snap.GetHits(Graph, NIdHubH, NIdAuthH)

@@ -9,7 +9,8 @@ import scipy.spatial.distance
 from scipy import stats
 import os
 
-
+# generate <number> synthetic graphs using <A> with noise=<level>
+# noise of different graphs are disjoint
 def permuteMultiNoise(A, number, level):
 	noise = np.zeros((len(A), len(A)))
 	multi_graph_w_permutation = []
@@ -25,10 +26,11 @@ def permuteMultiNoise(A, number, level):
 		noise = np.zeros((len(A), len(A)))
 	return multi_graph_w_permutation
 
-
+# generate a dict of graph_name:graph from a edge file <filename>
 def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5, noise_level = 0.02):
 	path = 'metadata/multigraph/'
 	# multi_graph_w_permutation = []
+	graph_info = {} # {graph name: adjacency matrix}
 	if filename:
 		A = loadGraph(filename, graph_type)
 	elif graph_type == 'Undirected':
@@ -40,21 +42,23 @@ def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', n
 	A, rest_idx = removeIsolatedNodes(A)
 	# for i in range(number):
 	# 	multi_graph_w_permutation.append(permuteNoiseMat(A, is_perm = False, has_noise = True, level = 0.05))
-	multi_graph_w_permutation = permutemultiNoise(A, number, level = 0.01)
-	writeEdgesToFile(path + graph_type + '/center.edges', A)
+	multi_graph_w_permutation = permuteMultiNoise(A, number, level = noise_level)
+	writeEdgesToFile(path + graph_type + '/M0.edges', A)
+	graph_info['M0.edges'] = A
 	for i, g in enumerate(multi_graph_w_permutation):
-		writeEdgesToFile(path + graph_type + '/M' + str(i) + '.edges', g)
+		writeEdgesToFile(path + graph_type + '/M' + str(i+1) + '.edges', g)
+		graph_info['M'+str(i+1)+'.edges'] = g
 
-	return A, multi_graph_w_permutation
+	return graph_info
 
 
 def get_node_degree(UGraph, graph_type, attributes):
-	degree = np.zeros((UGraph.GetNodes(),))
-	OutDegV = snap.TIntPrV()
-	snap.GetNodeOutDegV(UGraph, OutDegV)
-	for item in OutDegV:
-		degree[item.GetVal1()] = item.GetVal2()
-	attributes['Degree'] = degree
+    degree = np.zeros((UGraph.GetNodes(),))
+    OutDegV = snap.TIntPrV()
+    snap.GetNodeOutDegV(UGraph, OutDegV)
+    for item in OutDegV:
+        degree[item.GetVal1()] = item.GetVal2()
+    attributes['Degree'] = degree
 
 def get_clustering_coeff(UGraph, attributes):
 	coeff = np.zeros((UGraph.GetNodes(), ))
@@ -84,8 +88,8 @@ def get_graph_signature(attributes):
 	signature = []
 	""" Extract features: Degree, EgonetDegree, Avg Egonet Neighbor, Egonet Connectivity, Clustering Coefficient  """
 	for i in range(2, len(attributes.columns)): 
-		if i == 2 or i == 6:
-			continue
+		# if i == 2 or i == 6:
+		#  	continue
 		feature = attributes.iloc[:, i]  
 		# median
 		md = np.median(feature)
@@ -116,51 +120,40 @@ def get_multi_graph_signature(graph_type = 'Undirected', graph_attrs = None):
 		multigraph_sig[graph] = get_graph_signature(attr)
 	return multigraph_sig
 
-def get_canberra_distance(sig1,sig2):
-    return scipy.spatial.distance.canberra(sig1, sig2)
-    #return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
-    #return cos_sim(sig1,sig2)
+def get_distance(sig1,sig2,type='canberra'):
+	if type == 'canberra':
+		return scipy.spatial.distance.canberra(sig1, sig2)
+	elif type == 'manhattan':
+		return numpy.linalg.norm(np.array(sig1) - np.array(sig2), ord=1)
+	elif type == 'euclidean':
+		return numpy.linalg.norm(np.array(sig1) - np.array(sig2))
+	else:
+		return cos_sim(sig1,sig2)
 
-def get_distance_matrix_and_order(multigraph, check_center = True):
+def get_distance_matrix_and_order(multigraph, check_center = True, distance = 'canberra'):
 	m = multigraph.keys()
 	D = np.zeros((len(m), len(m)))
-	if check_center:
-		m.remove('center.edges')
-		m = ['center.edges'] + m
+	# if check_center:
+	# 	m.remove('center.edges')
+	# 	m = ['center.edges'] + m
 	for i, g1 in enumerate(m):
 		for j, g2 in enumerate(m):
 			if i <= j:
-				D[i][j] = get_canberra_distance(multigraph[g1], multigraph[g2]) 
+				D[i][j] = get_distance(multigraph[g1], multigraph[g2], distance) 
 	D = D + D.T 
 	return D, m
 
-def get_distribution_matrix(aggregations):
-	m = len(aggregations)
-	D = np.zeros((m, m))
-	att = {}
-	attributes = aggregations[0].columns[2:]
-	attributes = ['Degree']
-	for a in attributes:
-		for i in range(len(aggregations) - 1):
-			for j in range(i + 1, len(aggregations)):
-				D[i][j] = KL_sim(aggregations[i][a], aggregations[j][a])
-		D = D + D.T
-		att[a] = D
-		D = np.zeros((m, m))
-	return att
 
-
-
-def find_center(multigraph):
+def find_center(multigraph, distance_type='canberra'):
 	"""
 	rtype: string
 	"""
-	D, m = get_distance_matrix_and_order(multigraph)
+	D, m = get_distance_matrix_and_order(multigraph, distance_type)
 	min_index = np.argmin(sum(D))
 	return m[min_index]
 
 if __name__ == '__main__':
-	A, multigraph = generate_multi_graph_synthetic(filename = 'facebook/0.edges', graph_type = 'Undirected')
-	multigraph = get_multi_graph_signature()
-	print(sum(get_distance_matrix_and_order(multigraph)[0]))
-	print(find_center(multigraph))
+	generate_multi_graph_synthetic(filename = 'facebook/0.edges', graph_type = 'Undirected')
+	graph_signatures = get_multi_graph_signature()
+	print(sum(get_distance_matrix_and_order(graph_signatures)[0]))
+	print(find_center(graph_signatures))
