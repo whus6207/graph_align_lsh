@@ -135,6 +135,19 @@ def get_distance_matrix_and_order(multigraph, check_center = True, distance = 'c
 			D[g1] += get_distance(attr1, attr2, distance)
 	# D = D + D.T 
 	return D
+
+def find_center(multigraph, distance_type='canberra'):
+	"""
+	rtype: string
+	"""
+	D = get_distance_matrix_and_order(multigraph, distance_type)
+	min_dist = 0
+	center = None
+	for g, dist in D.iteritems():
+		if min_dist >= dist:
+			dist = min_dist
+			center  = g
+	return center
 	
 if __name__ == '__main__':
 	GraphType = 'Undirected'
