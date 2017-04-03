@@ -10,4 +10,4 @@ def add_node_att(inputfile, outputfile, number, graph_type = 'Undirected'):
 	for i, c in enumerate(col):
 		df[c] = [random.randint(i * 4 + 2) for _ in range(m)]
 	df.to_csv(outputfile, index = False, header = True, sep = ' ')
-add_node_att('Data/facebook.edges', 'test.nodes', 5)
+add_node_att('Data/dblp.edges', 'Data/dblp.nodes', 5)
