@@ -130,6 +130,7 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
 
 def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
     combineAB = selectAndCombine(attributesA, attributesB)
+    combineAB = combineAB.as_matrix()
     matching_matrix = lil_matrix((len(attributesA), len(attributesB)))
     scale = np.mean(combineAB[:,2:], axis=0)
     pair_computed = 0
@@ -253,7 +254,7 @@ def Rank(matching_matrix, P = None):
     return ranking
 
 def sparseRank(matching_matrix, P = None):
-    if P:
+    if P != None:
         matching_matrix = matching_matrix.dot(P)
 
     n, d = matching_matrix.shape
@@ -279,7 +280,7 @@ def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
         matching_matrix = matching_matrix.dot(P)
     score =[]
     for i in range(matching_matrix.shape[0]):
-        score.append(attributesB['Id'][matching_matrix[i].argsort()[-1]] == attributesA['Id'][i])
+        score.append(attributesB['Id'][matching_matrix[i].toarray().argsort()[-1]] == attributesA['Id'][i])
     return score
 
 def hungarianMatch(matching_matrix, P):
