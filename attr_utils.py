@@ -149,7 +149,7 @@ def getDirAttribute(filename, node_num):
     attributes['Degree'] += degree
     attributes['OutDegree'] = degree
     
-    getEgoAttr(Graph, attributes)
+    getEgoAttr(Graph, node_num, attributes)
 
     attributes['Degree'] /= node_num
     attributes['InDegree'] /= node_num

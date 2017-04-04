@@ -11,7 +11,7 @@ from collections import defaultdict
 import os
 
 # A should be sparse matrix
-def permuteMultiSparse(A, number, level):
+def permuteMultiSparse(A, number, graph_type, level):
 	m, n = A.get_shape()
 	multi_graph_w_permutation = []
 	B = A.copy()
@@ -21,22 +21,39 @@ def permuteMultiSparse(A, number, level):
 	noise = noise[: int(len(noise) * level // 2) * number]
 	# Dealing with existing edges
 	multi_noise = [noise[len(noise) * i // number: len(noise) * (i+1) // number]for i in range(number)]
-	for n in multi_noise:
-		B = B.tolil()
-		for i, j in n:
-			B[i, j] = 0
-			B[j, i] = 0
-		# Adding edges
-		for _ in range(len(n)):  # Same amount as existing edges 
-			add1, add2 = np.random.choice(m), np.random.choice(m)
-			while ((add1, add2) in visited or (add2, add1) in visited):
+	if graph_type == 'Undirected':
+		for n in multi_noise:
+			B = B.tolil()
+			for i, j in n:
+				B[i, j] = 0
+				B[j, i] = 0
+			# Adding edges
+			for _ in range(len(n)):  # Same amount as existing edges 
 				add1, add2 = np.random.choice(m), np.random.choice(m)
-			B[add1, add2] = 1
-			B[add2, add1] = 1
-			visited.add((add1, add2))
-		B = B.tocsr()
-		multi_graph_w_permutation.append(B)
-		B = A.copy()
+				while ((add1, add2) in visited or (add2, add1) in visited):
+					add1, add2 = np.random.choice(m), np.random.choice(m)
+				B[add1, add2] = 1
+				B[add2, add1] = 1
+				visited.add((add1, add2))
+			B = B.tocsr()
+			multi_graph_w_permutation.append(B)
+			B = A.copy()
+	else:
+		for n in multi_noise:
+			B = B.tolil()
+			for i, j in n:
+				B[i, j] = 0
+			# Adding edges
+			for _ in range(len(n)):  # Same amount as existing edges 
+				add1, add2 = np.random.choice(m), np.random.choice(m)
+				while ((add1, add2) in visited or (add2, add1) in visited):  # no cyclic
+					add1, add2 = np.random.choice(m), np.random.choice(m)
+				B[add1, add2] = 1
+				visited.add((add1, add2))
+			B = B.tocsr()
+			multi_graph_w_permutation.append(B)
+			B = A.copy()
+
 	return multi_graph_w_permutation
 
 def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5, noise_level = 0.02):
@@ -48,7 +65,7 @@ def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', n
 	else:
 		raise RuntimeError("Need an input file")
 	A, rest_idx = removeIsolatedSparse(A)
-	multi_graph_w_permutation = permuteMultiSparse(A, number, level = noise_level)
+	multi_graph_w_permutation = permuteMultiSparse(A, number, graph_type, level = noise_level)
 	writeSparseToFile(path + graph_type + '/M0.edges', A)
 	graph_info['M0.edges'] = A
 	for i, g in enumerate(multi_graph_w_permutation):

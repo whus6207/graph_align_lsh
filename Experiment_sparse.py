@@ -330,18 +330,18 @@ if __name__ == '__main__':
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'pairs_computed'])
 	for dist_type in center_distance_types:
-		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				center_distance = dist_type, find_center = 0)
-		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
-		# 		has_noise = True, GraphType = 'Directed', bandNumber = 2, 
+		# df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
+		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
 		# 		center_distance = dist_type, find_center = 0)
-		df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
+		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
+				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
 				center_distance = dist_type, find_center = 0)
+		# df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
+		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
+		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+		# 		center_distance = dist_type, find_center = 0)
 
 	pickle.dump(df, open(fname,'wb'))
 
