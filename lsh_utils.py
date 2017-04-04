@@ -2,6 +2,7 @@ import numpy as np
 from collections import defaultdict
 from scipy.stats import entropy
 from scipy.sparse import lil_matrix
+from scipy.sparse import csr_matrix
 from itertools import izip
 import matplotlib.pyplot as plt
 import random
@@ -161,7 +162,8 @@ def computeWholeSimMat(attributesA, attributesB, LSHType):
             vec = [Euclidean_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
             sim_vec.append(vec)
 
-    return np.array(sim_vec)
+    #return np.array(sim_vec)
+    return csr_matrix(sim_vec)
 
 
 def combineBucketsBySum(buckets, combineAB, Afname):
@@ -259,6 +261,7 @@ def sparseRank(matching_matrix, P = None):
 
     n, d = matching_matrix.shape
     ranking = np.zeros((n))
+    correct_match = np.zeros((n))
     sorted_row = defaultdict(list)
 
     matching_matrix = matching_matrix.tocoo() # For .row and .col
@@ -273,7 +276,8 @@ def sparseRank(matching_matrix, P = None):
     for i in range(n):
         if i in sorted_row and matching_matrix[i, i] != 0:
             ranking[i] = 1.0 / (sorted_row[i].index(i) + 1)
-    return ranking
+            correct_match[i] = (i == sorted_row[i][0]) # max matching score at node i
+    return ranking, correct_match
 
 def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
     if P is not None:
@@ -283,8 +287,9 @@ def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
         score.append(attributesB['Id'][matching_matrix[i].toarray().argsort()[-1]] == attributesA['Id'][i])
     return score
 
+# Can't run on large graph
 def hungarianMatch(matching_matrix, P):
-    cost_mat = 100 - matching_matrix
+    cost_mat = 100 - matching_matrix.toarray()
     m = Munkres()
     indexes = m.compute(cost_mat)
     hun_index = [tup[1] for tup in indexes]

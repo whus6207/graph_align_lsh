@@ -18,7 +18,7 @@ def permuteMultiSparse(A, number, level):
 	noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v]
 	visited = set(noise)
 	scipy.random.shuffle(noise)
-	noise = noise[: int(len(noise) * level) * number]
+	noise = noise[: int(len(noise) * level // 2) * number]
 	# Dealing with existing edges
 	multi_noise = [noise[len(noise) * i // number: len(noise) * (i+1) // number]for i in range(number)]
 	for n in multi_noise:
@@ -27,7 +27,7 @@ def permuteMultiSparse(A, number, level):
 			B[i, j] = 0
 			B[j, i] = 0
 		# Adding edges
-		for _ in range(2 * len(n)):  # Same amount as existing edges 
+		for _ in range(len(n)):  # Same amount as existing edges 
 			add1, add2 = np.random.choice(m), np.random.choice(m)
 			while ((add1, add2) in visited or (add2, add1) in visited):
 				add1, add2 = np.random.choice(m), np.random.choice(m)

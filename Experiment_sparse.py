@@ -106,7 +106,6 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 		pairs_computed = 0
 		matching_time = 0
 
-		# Have to rewrite wholesimmat!!!!!!!!!!!!!
 		sim_matrix = {}
 		for g in graph_attrs.keys():
 			sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
@@ -225,17 +224,17 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 					= computeSparseMatchingMat(graph_attrs[center_id], graph_attrs[g], pair_count_dict[g], LSHType, threshold)
 			
 
-				Ranking[g] = sparseRank(matching_matrix[g], P)
+				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], P)
 
 				Best_Ranking[g] = Ranking[g]
 				if compute_sim:
-					Best_Ranking[g] = sparseRank(sim_matrix[g], P)
+					Best_Ranking[g], Best_correctMatch[g] = sparseRank(sim_matrix[g], P)
 				
 				# Have to rewrite argmaxMatch!!!!!!!!!
-				correctMatch[g] = argmaxMatch(matching_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
+				#correctMatch[g] = argmaxMatch(matching_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				Best_correctMatch[g] = correctMatch[g]
-				if compute_sim:
-					Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
+				# if compute_sim:
+				# 	Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				hung_score[g] = correctMatch[g]
 				if compute_hungarian:
 					hung_score[g] = hungarianMatch(sim_matrix[g], P)
@@ -281,9 +280,9 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 					derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 
 			print 'derived rank score: '
-			print derived_rank
+			#print derived_rank
 			avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
-			print 'avg derived rank score: ' + str(avg_derived_rank)
+			#print 'avg derived rank score: ' + str(avg_derived_rank)
 
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
@@ -316,7 +315,7 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 if __name__ == '__main__':
 	adaptiveLSH = [False]
 	noise = [True]
-	bandNumber = [2]
+	bandNumber = [2, 4, 8]
 	LSH = ['Cosine', 'Euclidean']
 	center_distance_types = ['canberra', 'manhattan', 'euclidean']
 	fname = 'exp_result_multi.pkl'
@@ -335,10 +334,10 @@ if __name__ == '__main__':
 				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
 				center_distance = dist_type, find_center = 0)
-		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				center_distance = dist_type, find_center = 0)
+		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
+		# 		has_noise = True, GraphType = 'Directed', bandNumber = 2, 
+		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+		# 		center_distance = dist_type, find_center = 0)
 		df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
