@@ -23,10 +23,11 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	path = 'metadata/multigraph/' + str(GraphType)
 
 	multi_graphs = generate_multi_graph_synthetic(filename = filename, graph_type = GraphType, number = 5, noise_level = noise_level)
+	node_num, n = multi_graphs['M0.edges'].shape
 	# graphs and the (structual and node) features of their nodes
 	graph_attrs = {}
 	# permutation does not make difference, 
-	P = np.identity(len(multi_graphs['M0.edges']))
+	P = np.identity(node_num)
 
 	# get node attribute is file is specified
 	if nodeAttributeFile is not None:
@@ -44,7 +45,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(path + '/' + key)
+			attributesA = getUndirAttribute(path + '/' + key, node_num)
 			# TODO: handle when permutation possible
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 
@@ -63,7 +64,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(path + '/' + key)
+			attributesA = getDirAttribute(path + '/' + key, node_num)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 
 			with open(path+'/attributesA', 'w') as f:
@@ -270,8 +271,10 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		non_center = matching_matrix.keys()
 		for i in xrange(len(non_center)):
 			for j in xrange(i+1, len(non_center)):
-				derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T*matching_matrix[non_center[j]]
-				Ranking = Rank(derived_matching_matrix[(non_center[i],non_center[j])], P)
+				tmp = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
+				tmp = tmp/tmp.sum(axis=1)[:, np.newaxis]
+				derived_matching_matrix[(non_center[i],non_center[j])] = tmp
+				Ranking = Rank(derived_matching_matrix[(non_center[i],non_center[j])], P, True)
 				derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 
 		print 'derived rank score: '
@@ -346,7 +349,9 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 		non_center = M0_matching_matrix.keys()
 		for i in xrange(len(non_center)):
 			for j in xrange(i+1, len(non_center)):
-				M0_derived_matching_matrix[(non_center[i],non_center[j])] = M0_matching_matrix[non_center[i]].T*M0_matching_matrix[non_center[j]]
+				tmp = M0_matching_matrix[non_center[i]].T.dot(M0_matching_matrix[non_center[j]])
+				tmp = tmp/tmp.sum(axis=1)[:, np.newaxis]
+				M0_derived_matching_matrix[(non_center[i],non_center[j])] = tmp
 				M0_Ranking = Rank(M0_derived_matching_matrix[(non_center[i],non_center[j])], P)
 				M0_derived_rank[(non_center[i],non_center[j])] = sum(M0_Ranking)/len(M0_Ranking)
 
@@ -415,17 +420,17 @@ if __name__ == '__main__':
 				, 'pairs_computed'])
 	for dist_type in center_distance_types:
 		df = multi_experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
+				has_noise = True, GraphType = 'Undirected', bandNumber = 4, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				center_distance = dist_type)
+				threshold = 2, center_distance = dist_type)
 		df = multi_experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
+				has_noise = True, GraphType = 'Directed', bandNumber = 4, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				center_distance = dist_type)
+				threshold = 2, center_distance = dist_type)
 		df = multi_experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
+				has_noise = True, GraphType = 'Undirected', bandNumber = 4, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				center_distance = dist_type)
+				threshold = 2, center_distance = dist_type)
 
 	pickle.dump(df, open(fname,'wb'))
 
