@@ -141,9 +141,9 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
                     combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
     
     ## experimental !!
-    matching_matrix =  matching_matrix/matching_matrix.sum(axis=1)[:, np.newaxis]
-    remove_id = matching_matrix < 1.0/matching_matrix.shape[0]
-    matching_matrix[remove_id] = 0
+    # matching_matrix =  matching_matrix/matching_matrix.sum(axis=1)[:, np.newaxis]
+    # remove_id = matching_matrix < 1.0/matching_matrix.shape[0]
+    # matching_matrix[remove_id] = 0
     return matching_matrix, pair_computed
 
 def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
