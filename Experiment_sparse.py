@@ -276,7 +276,7 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 			for i in xrange(len(non_center)):
 				for j in xrange(i+1, len(non_center)):
 					derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T*matching_matrix[non_center[j]]
-					Ranking = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P)
+					Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P)
 					derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 
 			print 'derived rank score: '
