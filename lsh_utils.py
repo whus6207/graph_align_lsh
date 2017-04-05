@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import random
 from munkres import Munkres
 
+import warnings
+
 def generateCosineBuckets(attributes, cols):
     attr = attributes.drop(['Graph', 'Id'], axis=1).as_matrix()
     randMatrix = np.random.normal(size=(attr.shape[1], cols))
@@ -76,11 +78,22 @@ def selectAndCombineMulti(graph_attrs, cols = None):
     return stacked_attr
 
 def cos_sim(v1, v2, scaling=None):
+    # try:
     if scaling is None:
         scaling = np.ones((len(v1),))
+    if sum(v1) == 0 or sum(v2) == 0:
+        print 'caught!!'
+        print v1, v2
+        return 0
     v1 = np.multiply(v1, 1/scaling)
     v2 = np.multiply(v2, 1/scaling)
+
     return v1.dot(v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
+    # except FloatingPointError:
+    #     print 'caught!!'
+    #     print FloatingPointError
+    #     print v1, v2
+    #     return
 
 def KL_sim(distribution1, distribution2):
     v1, bin1 = np.histogram(distribution1, 30)
@@ -126,7 +139,11 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
                 pair_computed += 1
                 matching_matrix[pair[0]][pair[1]] = Euclidean_sim(combineAB[pair[0]][2:],\
                     combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
-        
+    
+    ## experimental !!
+    # matching_matrix =  matching_matrix/matching_matrix.sum(axis=1)[:, np.newaxis]
+    # remove_id = matching_matrix < 1.0/matching_matrix.shape[0]
+    # matching_matrix[remove_id] = 0
     return matching_matrix, pair_computed
 
 def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
@@ -139,12 +156,14 @@ def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType,
         for pair, count in pair_count_dict.items():
             if count >= threshold:
                 pair_computed += 1
-                matching_matrix[pair[0], pair[1]-len(attributesA)] = cos_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+                matching_matrix[pair[0], pair[1]] = cos_sim(combineAB[pair[0]][2:],\
+                    combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
     elif LSHType == 'Euclidean':
         for pair, count in pair_count_dict.items():
             if count >= threshold:
                 pair_computed += 1
-                matching_matrix[pair[0], pair[1]-len(attributesA)] = Euclidean_sim(combineAB[pair[0]][2:], combineAB[pair[1]][2:],scaling=scale)*count
+                matching_matrix[pair[0], pair[1]] = Euclidean_sim(combineAB[pair[0]][2:],\
+                    combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
     matching_matrix = matching_matrix.tocsr()
     return matching_matrix, pair_computed
 
@@ -242,7 +261,7 @@ def plotBucketCorrectness(d, n):
     plt.legend(loc='best')
     plt.show()
 
-def Rank(matching_matrix, P = None):
+def Rank(matching_matrix, P = None, printing = False):
     if P is not None:
         matching_matrix = matching_matrix.dot(P)
     n, d = matching_matrix.shape
@@ -251,11 +270,15 @@ def Rank(matching_matrix, P = None):
     for i in range(n):      
         #rank = n - matching_matrix[i, :].argsort().tolist().index(i)
         if matching_matrix[i,i] != 0:
+            if printing:
+                print "{}: ".format(i)
+                ranks = [ (val,idx) for idx, val in enumerate(matching_matrix[i,:]) ]
+                print sorted(ranks, key = lambda x: x[0], reverse=True)
             rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
             ranking[i] = 1.0 / rank
     return ranking
 
-def sparseRank(matching_matrix, P = None):
+def sparseRank(matching_matrix, P = None, printing = False):
     if P != None:
         matching_matrix = matching_matrix.dot(P)
 
@@ -267,10 +290,18 @@ def sparseRank(matching_matrix, P = None):
     matching_matrix = matching_matrix.tocoo() # For .row and .col
     tuples = izip(matching_matrix.row, matching_matrix.col, matching_matrix.data)
     rank = sorted(tuples, key = lambda x: (x[0], x[2]), reverse = True)
-    rank = [(pair[0], pair[1]) for pair in rank]
+    
+    if printing:
+        sorted_row = defaultdict(list)
+        for r in rank:
+            sorted_row[r[0]].append((r[1], r[2]))
+        print 'sorted_row: {}'.format(sorted_row)
+
+    rank = [(pair[0], pair[1], pair[2]) for pair in rank]
     # Dictionary for each node to other nodes sorted by score
     for r in rank:
         sorted_row[r[0]].append(r[1])
+
     # Find position of same index
     matching_matrix = matching_matrix.tocsr() # For [i, i]
     for i in range(n):
@@ -280,6 +311,14 @@ def sparseRank(matching_matrix, P = None):
     return ranking, correct_match
 
 def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
+    if P is not None:
+        matching_matrix = matching_matrix.dot(P)
+    score =[]
+    for i in range(matching_matrix.shape[0]):
+        score.append(attributesB['Id'][matching_matrix[i].argsort()[-1]] == attributesA['Id'][i])
+    return score
+
+def sparseArgmaxMatch(matching_matrix, attributesA, attributesB, P = None):
     if P is not None:
         matching_matrix = matching_matrix.dot(P)
     score =[]
