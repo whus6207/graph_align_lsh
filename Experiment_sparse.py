@@ -19,7 +19,7 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
 	threshold = 1, center_distance = 'canberra',
-	find_center = 0): #find_center = 1: find and check that one and original center; 0: check all, -1: original only
+	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -82,20 +82,22 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
-	graph_signatures = get_multi_graph_signature(GraphType, graph_attrs)
 
+
+	graph_signatures = get_multi_graph_signature(GraphType, graph_attrs)
 	centers = []
-	if find_center == 1:
-		centers.append(find_center(graph_signatures, center_distance))
+	found_center = find_center(graph_signatures, center_distance)
+	print "found center: "+found_center
+	if findcenter == 1:
+		centers.append(found_center)
 		if centers[0] != 'M0.edges':
 			centers.append('M0.edges')
 		else:
 			print "found same center!!"
-	elif find_center == 0:
+	elif findcenter == 0:
 		centers = sorted(multi_graphs.keys())
 	else:
 		centers.append('M0.edges')
-
 	print "check for center graph: {}".format(centers)
 
 	end_preprocess = time.time()
@@ -314,6 +316,7 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 			, 'correct_score_upper' : correct_score_upper\
 			, 'correct_score_hungarian' : correct_score_hungarian\
 			, 'center_id': center_id\
+			, 'found_center' : found_center\
 			, 'avg_derived_rank': avg_derived_rank\
 			, 'center_dist': center_distance\
 			, 'pairs_computed' : pairs_computed\
@@ -344,15 +347,15 @@ if __name__ == '__main__':
 		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-				center_distance = dist_type, find_center = 0)
+				center_distance = dist_type, findcenter = 0)
 		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-				center_distance = dist_type, find_center = 0)
+				center_distance = dist_type, findcenter = 0)
 		# df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
 		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-		# 		center_distance = dist_type, find_center = 0)
+		# 		center_distance = dist_type, findcenter = 0)
 
 	pickle.dump(df, open(fname,'wb'))
 
