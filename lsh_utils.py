@@ -82,8 +82,7 @@ def cos_sim(v1, v2, scaling=None):
     if scaling is None:
         scaling = np.ones((len(v1),))
     if sum(v1) == 0 or sum(v2) == 0:
-        print 'caught!!'
-        print v1, v2
+        #print 'caught!!'
         return 0
     v1 = np.multiply(v1, 1/scaling)
     v2 = np.multiply(v2, 1/scaling)

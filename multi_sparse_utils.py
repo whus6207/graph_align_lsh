@@ -9,6 +9,7 @@ import scipy.spatial.distance
 from scipy import stats
 from collections import defaultdict
 import os
+import sys
 
 # A should be sparse matrix
 def permuteMultiSparse(A, number, graph_type, level):
@@ -158,11 +159,11 @@ def find_center(multigraph, distance_type='canberra'):
 	rtype: string
 	"""
 	D = get_distance_matrix_and_order(multigraph, distance_type)
-	min_dist = 0
+	min_dist = sys.maxint
 	center = None
 	for g, dist in D.iteritems():
 		if min_dist >= dist:
-			dist = min_dist
+			min_dist = dist
 			center  = g
 	return center
 	
