@@ -7,6 +7,7 @@ from multi_sparse_utils import *
 from scipy.sparse import identity
 #from netalign_utils import *
 import pandas as pd
+import h5py
 import os.path
 import pickle
 import time
@@ -29,82 +30,16 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 	np.seterr(all='raise')
 	warnings.filterwarnings('error')
 
-	start_preprocess = time.time()
-	path = 'metadata/multigraph/' + str(GraphType)
-
-	multi_graphs = generate_multi_graph_synthetic(filename = filename, graph_type = GraphType, number = 5, noise_level = noise_level)
-	# graphs and the (structual and node) features of their nodes
-	graph_attrs = {}
-	# permutation does not make difference
-	node_num, n = multi_graphs['M0.edges'].get_shape()
-	P = identity(node_num)
-
-	# get node attribute is file is specified
-	if nodeAttributeFile is not None:
-		nodeAttributesValue, nodeAttributesName = loadNodeFeature(nodeAttributeFile)
-		#nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
-	else:
-		nodeAttributesValue, nodeAttributesName = [], []
-
-	### get graph attributes
-	if GraphType == 'Undirected':
-
-		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
-		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
-		attributes += nodeAttributesName
-
-		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(path + '/' + key, node_num)
-			# TODO: handle when permutation possible
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
-
-			with open(path + '/attributes'+key.split('.')[0], 'w') as f:
-				for index, row in attributesA.iterrows():
-					f.write(str(attributesA.ix[index]))
-
-			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
-
-	elif GraphType == 'Directed':
-
-		attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
-					  'PageRank', 'HubsScore', 'AuthoritiesScore',
-					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
-					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
-		attributes += nodeAttributesName
-
-		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(path + '/' + key, node_num)
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
-
-			with open(path+'/attributesA', 'w') as f:
-				for index, row in attributesA.iterrows():
-					f.write(str(attributesA.ix[index]))
-
-			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
-
-
-
-	graph_signatures = get_multi_graph_signature(GraphType, graph_attrs)
 	centers = []
-	found_center = find_center(graph_signatures, center_distance)
-	print "found center: "+found_center
-	if findcenter == 1:
-		centers.append(found_center)
-		if centers[0] != 'M0.edges':
-			centers.append('M0.edges')
-		else:
-			print "found same center!!"
-	elif findcenter == 0:
-		centers = sorted(multi_graphs.keys())
-	else:
-		centers.append('M0.edges')
-	print "check for center graph: {}".format(centers)
+	graph_attrs = {}
+	with open('./private_data/test/centers') as f:
+		for line in f:
+			centers.append(line.strip().split())
 
-	end_preprocess = time.time()
-	preprocess_time = end_preprocess - start_preprocess
-	
-	print 'Pre-processing time: ' + str(preprocess_time)
-	
+	hf = h5py.File('./private_data/test/attributes.h5')
+	for k in hf.keys():
+		graph_attrs[k] = pd.read_hdf('./private_data/test/attributes.h5', k)
+	P = identity(node_num) # Have to handle in permutation
 
 	for center_id in centers:
 		rank_score = 0
