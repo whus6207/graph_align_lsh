@@ -79,7 +79,7 @@ def getUndirAttribute(filename, node_num):
                                        'FarnessCentrality', 'PageRank', 'NodeEccentricity',
                                        'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
 
-    attributes['Graph'] = [filename.split('/')[-1]] * node_num #node_num
+    attributes['Graph'] = [filename.split('/')[-1].split('.')[0]] * node_num #node_num
     # Degree
     attributes['Id'] = range(0, node_num) #???????????????? 1, +1?????
     degree = np.zeros((node_num,))

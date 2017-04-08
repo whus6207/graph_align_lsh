@@ -5,19 +5,23 @@ import numpy as np
 from attr_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-import h5py
+import scipy.sparse as sparse
+import pickle
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected'
-	, number = 2, noise_level = 0.05, center_distance = 'canberra', findcenter = 0):
+	, number = 5, noise_level = 0.01, weighted_noise = None, center_distance = 'canberra', findcenter = 0):
 	path = './private_data/' + save_dir
 	if not os.path.exists(path):
 		os.makedirs(path)
 	start_preprocess = time.time()
 
-	multi_graphs, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level)
-	node_num, n = multi_graphs['M0.edges'].get_shape()
+	multi_graphs, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level, weighted_noise = weighted_noise)
+	node_num, n = multi_graphs['M0'].get_shape()
 	nodeAttributesValue, nodeAttributesName = [], []
-	P = identity(node_num)
+	P = sparse.lil_matrix((node_num, n))
+	for i in range(node_num):
+		P[i, i] = 0
+	P = P.tocsr()
 	graph_attrs = {}
 
 	if node_dir:
@@ -31,13 +35,10 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
+			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num)
 			# TODO: handle when permutation possible
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
-			attributesA = attributesA[['Graph', 'Id']+attributes]
-			attributesA.to_hdf(path + '/attributes.h5', key.split('.')[0])
-
-			graph_attrs[key] = attributesA
+			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
 	elif graph_type == 'Directed':
 
@@ -48,15 +49,13 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
+			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
-			attributesA = attributesA[['Graph', 'Id']+attributes]
+			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
-			attributesA.to_hdf(path + '/attributes.h5', key.split('.')[0])
-
-			graph_attrs[key] = attributesA
-
-
+	with open(path + '/attributes', 'w') as f:
+		for a in attributes:
+			f.write(a + '\n')
 
 	graph_signatures = get_multi_graph_signature(graph_type, graph_attrs)
 	centers = []
@@ -64,23 +63,29 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print "found center: "+found_center
 	if findcenter == 1:
 		centers.append(found_center)
-		if centers[0] != 'M0.edges':
-			centers.append('M0.edges')
+		if centers[0] != 'M0':
+			centers.append('M0')
 		else:
 			print "found same center!!"
 	elif findcenter == 0:
 		centers = sorted(multi_graphs.keys())
 	else:
-		centers.append('M0.edges')
+		centers.append('M0')
 	print "check for center graph: {}".format(centers)
 
 	# Save 
-	# P = P.to_csr()
-	# np.savez('Permutation.npz', data = P.data ,indices = P.indices, indptr = P.indptr, shape = P.shape )
+	# np.savez(path + '/Permutation.npz', data = P.data ,indices = P.indices, indptr = P.indptr, shape = P.shape )
 	# save centers
 	with open(path + '/centers', 'w') as f:
 		for c in centers:
 			f.write(c + '\n')
+		f.close()
+	with open(path + '/found_center', 'w') as f:
+		f.write(found_center)
+		f.close()
+	print graph_attrs
+	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
+
 
 	end_preprocess = time.time()
 	preprocess_time = end_preprocess - start_preprocess
@@ -88,7 +93,8 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
-	preprocessing(edge_dir = 'Data/facebook.edges', save_dir = 'facebook')
+	preprocessing(edge_dir = 'Data/facebook.edges',weighted_noise = 1.0, save_dir = 'facebook')
+
 	
 
 

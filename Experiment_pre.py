@@ -7,6 +7,7 @@ from multi_sparse_utils import *
 from scipy.sparse import identity
 #from netalign_utils import *
 import pandas as pd
+import h5py
 import os.path
 import pickle
 import time
@@ -29,83 +30,26 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 	np.seterr(all='raise')
 	warnings.filterwarnings('error')
 
-	start_preprocess = time.time()
-	path = 'metadata/multigraph/' + str(GraphType)
-
-	multi_graphs, syn_path = generate_multi_graph_synthetic(filename = filename, graph_type = GraphType, number = 5, noise_level = noise_level)
-	# graphs and the (structual and node) features of their nodes
-	print multi_graphs
-	graph_attrs = {}
-	# permutation does not make difference
-	node_num, n = multi_graphs['M0'].get_shape()
-	P = identity(node_num)
-
-	# get node attribute is file is specified
-	if nodeAttributeFile is not None:
-		nodeAttributesValue, nodeAttributesName = loadNodeFeature(nodeAttributeFile)
-		#nodeAttributesValue = [nodeAttributesValue[i] for i in rest_idx]
-	else:
-		nodeAttributesValue, nodeAttributesName = [], []
-
-	### get graph attributes
-	if GraphType == 'Undirected':
-
-		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
-		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
-		attributes += nodeAttributesName
-
-		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(path + '/' + key + '.edges', node_num)
-			# TODO: handle when permutation possible
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
-
-			with open(path + '/attributes'+key, 'w') as f:
-				for index, row in attributesA.iterrows():
-					f.write(str(attributesA.ix[index]))
-
-			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
-
-	elif GraphType == 'Directed':
-
-		attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
-					  'PageRank', 'HubsScore', 'AuthoritiesScore',
-					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
-					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
-		attributes += nodeAttributesName
-
-		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(path + '/' + key + '.edges', node_num)
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
-
-			with open(path+'/attributesA', 'w') as f:
-				for index, row in attributesA.iterrows():
-					f.write(str(attributesA.ix[index]))
-
-			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
-
-
-
-	graph_signatures = get_multi_graph_signature(GraphType, graph_attrs)
 	centers = []
-	found_center = find_center(graph_signatures, center_distance)
-	print "found center: "+found_center
-	if findcenter == 1:
-		centers.append(found_center)
-		if centers[0] != 'M0':
-			centers.append('M0')
-		else:
-			print "found same center!!"
-	elif findcenter == 0:
-		centers = sorted(multi_graphs.keys())
-	else:
-		centers.append('M0')
-	print "check for center graph: {}".format(centers)
+	found_center = None
+	graph_attrs = {}
+	with open('./private_data/facebook/centers') as f:
+		for line in f:
+			centers.append(line.strip().split()[0])
+		f.close()
+	with open('./private_data/facebook/centers') as f:
+		for line in f:
+			found_center = line.strip().split()[0]
 
-	end_preprocess = time.time()
-	preprocess_time = end_preprocess - start_preprocess
-	
-	print 'Pre-processing time: ' + str(preprocess_time)
-	
+	graph_attrs = pickle.load(open('./private_data/facebook/attributes.pkl', 'rb'))
+	attributes = []
+	with open('./private_data/facebook/attributes') as f:
+		for line in f:
+			attributes.append(line.strip().split()[0])
+	# loader = np.load('./private_data/facebook/Permutation.npz')
+	# P = csr_matrix((loader['data'], loader['indices'], loader['indptr']), shape = loader['shape'])
+	P = identity(len(graph_attrs['M0']))
+
 
 	for center_id in centers:
 		rank_score = 0
@@ -321,7 +265,6 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 			, 'avg_derived_rank': avg_derived_rank\
 			, 'center_dist': center_distance\
 			, 'pairs_computed' : pairs_computed\
-			, 'preprocess_time': preprocess_time\
 			, 'matching_time': matching_time\
 			}, ignore_index=True)
 
@@ -347,7 +290,7 @@ if __name__ == '__main__':
 	for dist_type in center_distance_types:
 		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
 				center_distance = dist_type, findcenter = 0)
 		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
