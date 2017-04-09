@@ -47,7 +47,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(real_path + '/' + key +'.edges', node_num, 0.01)
+			attributesA = getUndirAttribute(real_path + '/' + key +'.edges', node_num, 0.1)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
@@ -62,7 +62,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, 0.01)
+			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, 0.1)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]

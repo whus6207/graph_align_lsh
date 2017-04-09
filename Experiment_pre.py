@@ -17,8 +17,7 @@ import warnings
 def experiment(df, filename, is_perm = False, noise_level = 0.05, 
 	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 1,
-	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
+	threshold = 0.003): 
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -61,7 +60,6 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 	# Load permutation matrix 
 	P = identity(len(graph_attrs['M0'])) # Should handle permutation case!!!!!!!!!!!
-
 
 	for center_id in centers:
 		rank_score = 0
@@ -177,6 +175,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 			stacked_attrs = selectAndCombineMulti(graph_attrs)	 
 			pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), center_id)
 			
+			print pair_count_dict		
 			matching_matrix = {}
 			this_pair_computed = {}
 			Ranking = {}
@@ -191,7 +190,6 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				matching_matrix[g], this_pair_computed[g]\
 					= computeSparseMatchingMat(graph_attrs[center_id], graph_attrs[g], pair_count_dict[g], LSHType, threshold)
 			
-
 				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], P)
 
 				Best_Ranking[g] = Ranking[g]
@@ -289,7 +287,7 @@ if __name__ == '__main__':
 	bandNumber = [2, 4, 8]
 	LSH = ['Cosine', 'Euclidean']
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_result_multi_pre.pkl'
+	fname = 'exp_pair_band_thre.pkl'
 
 	if os.path.isfile(fname):
 		with open(fname, 'rb') as f:
@@ -301,7 +299,10 @@ if __name__ == '__main__':
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
 	# for dist_type in center_distance_types:
-	df = experiment(df, filename = 'dblp', bandNumber = 2, adaptiveLSH = False, LSHType = 'Cosine')
+	for b in bandNumber:
+		for lsh in LSH:
+			df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh)
+
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
@@ -313,6 +314,6 @@ if __name__ == '__main__':
 
 	pickle.dump(df, open(fname,'wb'))
 
-	writer = pd.ExcelWriter('exp_result_multi_pre.xlsx')
+	writer = pd.ExcelWriter('exp_pair_band_thre.xlsx')
 	df.to_excel(writer, sheet_name='Sheet1')
 	writer.save()
