@@ -70,16 +70,19 @@ def getEgoAttr(UGraph, node_num, attributes, directed = True):
         attributes['AvgNeighborInDeg'] = avgNeighInDeg
         attributes['AvgNeighborOutDeg'] = avgNeighOutDeg
 
-def getUndirAttribute(filename, node_num):
+def getUndirAttribute(filename, node_num, param = 1.0):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
-
+    # UGraph = snap.LoadPajek(snap.PUNGraph, filename + '.paj')
     # or node_num
-    attributes = pd.DataFrame(np.zeros(shape=(node_num, 10)), 
-                              columns=['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
-                                       'FarnessCentrality', 'PageRank', 'NodeEccentricity',
-                                       'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
+    attributeNames = ['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
+                                       'PageRank', 'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+    # attributeNames = ['Graph', 'Id', 'Degree', 'NodeBetweennessCentrality', 
+                              #          'FarnessCentrality', 'PageRank', 'NodeEccentricity',
+                              #          'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity'])
+    attributes = pd.DataFrame(np.zeros((node_num, len(attributeNames))), columns =  attributeNames)
+                              
 
-    attributes['Graph'] = [filename.split('/')[-1]] * node_num #node_num
+    attributes['Graph'] = [filename.split('/')[-1].split('.')[0]] * node_num #node_num
     # Degree
     attributes['Id'] = range(0, node_num) #???????????????? 1, +1?????
     degree = np.zeros((node_num,))
@@ -92,19 +95,19 @@ def getUndirAttribute(filename, node_num):
     getEgoAttr(UGraph, node_num, attributes, directed=False)
 
     # Farness Centrality, Node Eccentricity
-    farCentr = np.zeros((node_num,))
-    nodeEcc = np.zeros((node_num,))
-    for NI in UGraph.Nodes():
-        farCentr[NI.GetId()] = snap.GetFarnessCentr(UGraph, NI.GetId())
-        nodeEcc[NI.GetId()] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
-    attributes['FarnessCentrality'] = farCentr
-    attributes['NodeEccentricity'] = nodeEcc
+    # farCentr = np.zeros((node_num,))
+    # nodeEcc = np.zeros((node_num,))
+    # for NI in UGraph.Nodes():
+    #     farCentr[NI.GetId()] = snap.GetFarnessCentr(UGraph, NI.GetId())
+    #     nodeEcc[NI.GetId()] = snap.GetNodeEcc(UGraph, NI.GetId(), False)
+    # attributes['FarnessCentrality'] = farCentr
+    # attributes['NodeEccentricity'] = nodeEcc
 
     # Betweenness Centrality
     betCentr = np.zeros((node_num,))
     Nodes = snap.TIntFltH()
     Edges = snap.TIntPrFltH()
-    snap.GetBetweennessCentr(UGraph, Nodes, Edges, 1.0)
+    snap.GetBetweennessCentr(UGraph, Nodes, Edges, param)
     for node in Nodes:
         betCentr[node] = Nodes[node]
     attributes['NodeBetweennessCentrality'] = betCentr
@@ -119,17 +122,19 @@ def getUndirAttribute(filename, node_num):
 
     return attributes
 
-def getDirAttribute(filename, node_num):
+def getDirAttribute(filename, node_num, param = 1.0):
     Graph = snap.LoadEdgeList(snap.PNGraph, filename, 0, 1)
+    # Graph = snap.LoadPajek(snap.PNGraph, filename + '.paj')
     
     attributeNames = ['Graph', 'Id', 'Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
-                      'FarnessCentrality', 'PageRank', 'HubsScore', 'AuthoritiesScore', 'NodeEccentricity',
+                      'PageRank', 
+                      # 'FarnessCentrality', 'HubsScore', 'AuthoritiesScore', 'NodeEccentricity',
                       'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
                       'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
 
     attributes = pd.DataFrame(np.zeros((node_num, len(attributeNames))), columns=attributeNames)
     
-    attributes['Graph'] = [filename.split('/')[-1]] * node_num
+    attributes['Graph'] = [filename.split('/')[-1].split('.')[0]] * node_num
     attributes['Id'] = range(0, node_num)
     
     # Degree
@@ -156,19 +161,19 @@ def getDirAttribute(filename, node_num):
     attributes['OutDegree'] /= node_num
 
     # Degree, Closeness, Farness Centrality, Node Eccentricity
-    farCentr = np.zeros((node_num,))
-    nodeEcc = np.zeros((node_num,))
-    for NI in Graph.Nodes():
-        farCentr[NI.GetId()] = snap.GetFarnessCentr(Graph, NI.GetId(), True, True)
-        nodeEcc[NI.GetId()] = snap.GetNodeEcc(Graph, NI.GetId(), True)
-    attributes['FarnessCentrality'] = farCentr
-    attributes['NodeEccentricity'] = nodeEcc
+    # farCentr = np.zeros((node_num,))
+    # nodeEcc = np.zeros((node_num,))
+    # for NI in Graph.Nodes():
+    #     farCentr[NI.GetId()] = snap.GetFarnessCentr(Graph, NI.GetId(), True, True)
+    #     nodeEcc[NI.GetId()] = snap.GetNodeEcc(Graph, NI.GetId(), True)
+    # attributes['FarnessCentrality'] = farCentr
+    # attributes['NodeEccentricity'] = nodeEcc
 
     # Betweenness Centrality
     betCentr = np.zeros((node_num,))
     Nodes = snap.TIntFltH()
     Edges = snap.TIntPrFltH()
-    snap.GetBetweennessCentr(Graph, Nodes, Edges, 1.0, True)
+    snap.GetBetweennessCentr(Graph, Nodes, Edges, param, True)
     for node in Nodes:
         betCentr[node] = Nodes[node]
     attributes['NodeBetweennessCentrality'] = betCentr
@@ -182,17 +187,17 @@ def getDirAttribute(filename, node_num):
     attributes['PageRank'] = pgRank
 
     # Hubs, Authorities score 
-    hubs = np.zeros((node_num,))
-    auth = np.zeros((node_num,))
-    NIdHubH = snap.TIntFltH()
-    NIdAuthH = snap.TIntFltH()
-    snap.GetHits(Graph, NIdHubH, NIdAuthH)
-    for item in NIdHubH:
-        hubs[item] = NIdHubH[item]
-    for item in NIdAuthH:
-        auth[item] = NIdAuthH[item]
-    attributes['HubsScore'] = hubs
-    attributes['AuthoritiesScore'] = auth
+    # hubs = np.zeros((node_num,))
+    # auth = np.zeros((node_num,))
+    # NIdHubH = snap.TIntFltH()
+    # NIdAuthH = snap.TIntFltH()
+    # snap.GetHits(Graph, NIdHubH, NIdAuthH)
+    # for item in NIdHubH:
+    #     hubs[item] = NIdHubH[item]
+    # for item in NIdAuthH:
+    #     auth[item] = NIdAuthH[item]
+    # attributes['HubsScore'] = hubs
+    # attributes['AuthoritiesScore'] = auth
 
     return attributes
 

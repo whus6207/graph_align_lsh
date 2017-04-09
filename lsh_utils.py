@@ -7,6 +7,8 @@ from itertools import izip
 import matplotlib.pyplot as plt
 import random
 from munkres import Munkres
+from sklearn.preprocessing import normalize
+import pandas as pd
 
 import warnings
 
@@ -66,11 +68,12 @@ def selectAndCombine(A, B, cols = None):
 
 def selectAndCombineMulti(graph_attrs, cols = None):
     graphs = graph_attrs.keys()
-    if cols is not None:
-        stacked_attr = graph_attrs[graphs[0]][cols + ['Graph', 'Id']]
-    else:
-        stacked_attr = graph_attrs[graphs[0]]
-    for i in xrange(1, len(graphs)):
+    stacked_attr = pd.DataFrame()\
+    # if cols is not None:
+    #     stacked_attr = graph_attrs[graphs[0]][cols + ['Graph', 'Id']]
+    # else:
+    #     stacked_attr = graph_attrs[graphs[0]]
+    for i in xrange(len(graphs)):
         if cols is not None:
             stacked_attr = stacked_attr.append(graph_attrs[graphs[i]][cols + ['Graph', 'Id']], ignore_index=True)
         else:
@@ -82,7 +85,7 @@ def cos_sim(v1, v2, scaling=None):
     if scaling is None:
         scaling = np.ones((len(v1),))
     if sum(v1) == 0 or sum(v2) == 0:
-        print 'caught!!'
+        #print 'caught!!'
         return 0
     v1 = np.multiply(v1, 1/scaling)
     v2 = np.multiply(v2, 1/scaling)
@@ -166,6 +169,7 @@ def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType,
                 matching_matrix[pair[0], pair[1]] = Euclidean_sim(combineAB[pair[0]][2:],\
                     combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
     matching_matrix = matching_matrix.tocsr()
+    matching_matrix = normalize(matching_matrix, norm='l1', axis=1)
     return matching_matrix, pair_computed
 
 def computeWholeSimMat(attributesA, attributesB, LSHType):
@@ -210,15 +214,12 @@ def combineBucketsBySum(buckets, combineAB, Afname):
 
 def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
     pair_count_dict = defaultdict(lambda : defaultdict(int))
-
     for bucket in buckets:
         for buck, collisions in bucket.items(): # collisions = [(Graph, Id)]
             if len(collisions) <= 1:
                 continue
-            
             A_idx = stacked_attrs[(stacked_attrs['Graph'] == center_id)\
                 & (stacked_attrs['Id'].isin([c[1] for c in collisions if c[0]==center_id]))]
-
             if len(collisions) == len(A_idx) or len(A_idx) == 0:    # We don't want all in A 
                 continue
 

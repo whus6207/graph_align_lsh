@@ -9,7 +9,7 @@ def loadSparseGraph(fname, graph_type = 'Undirected'):
             pair = line.strip().split()
             nodes.append(int(pair[0]))
             nodes.append(int(pair[1]))
-    A_size = max(nodes)+1 # Node Id starts from 1
+    A_size = max(nodes)+1 # Node Id starts from 0
     A = lil_matrix((A_size, A_size))
     for i in range(0,len(nodes),2):
         A[nodes[i], nodes[i+1]]=1
@@ -25,7 +25,7 @@ def removeIsolatedSparse(A):
     A = A[:, rest_idx]
     return A, rest_idx
 
-def permuteSparse(A, is_perm = False, has_noise = False, level = 0.05):
+def permuteSparse(A, is_perm = False, has_noise = False, weighted_noise = None, level = 0.05):
     m, n = A.get_shape()
     perm = scipy.random.permutation(m)
 
@@ -43,15 +43,21 @@ def permuteSparse(A, is_perm = False, has_noise = False, level = 0.05):
         noise = noise[: int(len(noise[0]) * level)]
         B = B.tolil()
         for pair in noise:
-            B[pair[0], pair[1]] = 0
-            B[pair[1], pair[0]] = 0
+            if weighted_noise:
+                B[pair[1], pair[0]] = B[pair[0], pair[1]] = max(min(np.random.normal(1, weighted_noise), 2), 0) # 0 ~ 2
+            else:
+                B[pair[0], pair[1]] = 0
+                B[pair[1], pair[0]] = 0
         # Adding edges, should not be visited before
         for _ in range(int(m*m*level)):
             add1, add2 = np.random.choice(m), np.random.choice(m)
             while ((add1, add2) in visited or (add2, add1) in visited):
                 add1, add2 = np.random.choice(m), np.random.choice(m)
-            B[add1, add2] = 1
-            B[add2, add1] = 1
+            if weighted_noise:
+                B[add1, add2] = B[add2, add1] = max(min(np.random.normal(1, weighted_noise), 2), 0)
+            else:
+                B[add1, add2] = 1
+                B[add2, add1] = 1
             visited.add((add1, add2))
         B = B.tocsr()
 
@@ -59,12 +65,21 @@ def permuteSparse(A, is_perm = False, has_noise = False, level = 0.05):
 
 # B is a sparse matrix
 def writeSparseToFile(fname, B):
-    edges = [zip(B.nonzero()[0], B.nonzero()[1])][0]  # list of tuples
+    weighted_edges = [zip(B.nonzero()[0], B.nonzero()[1], B.data)][0]  # list of node1 -> node2 with weight
     with open(fname, 'w') as f:
-        for e1, e2 in edges:
-            f.write(str(e1)+" "+str(e2)+"\n")
+        for e1, e2, w in weighted_edges:
+            f.write(str(e1)+" "+str(e2)+" "+str(w)+"\n")
     f.close()
 
+def loadNodeFeature(fname):
+    nodeFeaturesValue = []
+    nodeFeaturesName =[]
+    with open(fname) as f:
+        nodeFeaturesName = f.readline().strip().split()
+        for line in f:
+            v = line.strip().split()
+            nodeFeaturesValue.append([int(i) for i in v])
+    return nodeFeaturesValue, nodeFeaturesName
 
 
 
