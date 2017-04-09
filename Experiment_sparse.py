@@ -299,7 +299,7 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 			tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 			avg_derived_rank += tmp_avg_derived_rank
 			print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
-			print 'avg derived netalign score: ' + np.mean([v for k,v in derived_netalign.iteritems()])
+			print 'avg derived netalign score: ' + str(np.mean([v for k,v in derived_netalign.iteritems()]))
 
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
@@ -352,7 +352,7 @@ if __name__ == '__main__':
 	for dist_type in center_distance_types:
 		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
+				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
 				center_distance = dist_type, findcenter = 0, threshold = 0.003)
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		has_noise = True, GraphType = 'Directed', bandNumber = 2, 

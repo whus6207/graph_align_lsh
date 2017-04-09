@@ -7,7 +7,7 @@ from multi_sparse_utils import *
 from scipy.sparse import identity
 #from netalign_utils import *
 import pandas as pd
-import h5py
+#import h5py
 import os.path
 import pickle
 import time
@@ -16,8 +16,8 @@ import warnings
 
 def experiment(df, filename, is_perm = False, noise_level = 0.05, 
 	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 1,
+	loop_num = 1, cos_num_plane = 30, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
+	threshold = 0.003,
 	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	"""
 	Experiment on two graphs with multiple setting
@@ -301,7 +301,7 @@ if __name__ == '__main__':
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
 	# for dist_type in center_distance_types:
-	df = experiment(df, filename = 'dblp', bandNumber = 2, adaptiveLSH = False, LSHType = 'Cosine')
+	df = experiment(df, filename = 'facebook', bandNumber = 2, adaptiveLSH = False, LSHType = 'Cosine')
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
