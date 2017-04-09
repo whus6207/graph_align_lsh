@@ -13,7 +13,7 @@ import time
 def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None,
 	has_noise = False, noise_level = 0.02,
 	GraphType = 'Undirected', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = True,
+	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False,
 	threshold = 1, center_distance = 'canberra'):
 	"""
 	Experiment on multiple graphs with multiple setting
@@ -83,15 +83,15 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 	preprocess_time = end_preprocess - start_preprocess
 
 	sim_matrix = {}
-	for g in graph_attrs.keys():
-		if g != center_id:
-			sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
-
 	# use original center
 	M0_sim_matrix = {}
-	for g in graph_attrs.keys():
-		if g != 'M0.edges':
-			M0_sim_matrix[g] = computeWholeSimMat(graph_attrs['M0.edges'], graph_attrs[g], LSHType)
+	if compute_sim:
+		for g in graph_attrs.keys():
+			if g != center_id:
+				sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
+		for g in graph_attrs.keys():
+			if g != 'M0.edges':
+				M0_sim_matrix[g] = computeWholeSimMat(graph_attrs['M0.edges'], graph_attrs[g], LSHType)
 
 	rank_score = 0
 	rank_score_upper = 0
@@ -205,7 +205,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 
 		stacked_attrs = selectAndCombineMulti(graph_attrs)	 
 		pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), center_id)
-		
+		#print pair_count_dict
 		matching_matrix = {}
 		this_pair_computed = {}
 		Ranking = {}
@@ -274,7 +274,7 @@ def multi_experiment(df, filename = 'facebook/0.edges', nodeAttributeFile = None
 				tmp = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
 				tmp = tmp/tmp.sum(axis=1)[:, np.newaxis]
 				derived_matching_matrix[(non_center[i],non_center[j])] = tmp
-				Ranking = Rank(derived_matching_matrix[(non_center[i],non_center[j])], P, True)
+				Ranking = Rank(derived_matching_matrix[(non_center[i],non_center[j])], P, False)
 				derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 
 		print 'derived rank score: '
@@ -419,18 +419,19 @@ if __name__ == '__main__':
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'pairs_computed'])
 	for dist_type in center_distance_types:
-		df = multi_experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 4, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				threshold = 2, center_distance = dist_type)
-		df = multi_experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Directed', bandNumber = 4, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				threshold = 2, center_distance = dist_type)
-		df = multi_experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 4, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-				threshold = 2, center_distance = dist_type)
+		for thres in [0.003, 0.005]:
+			df = multi_experiment(df, filename = 'metadata/A.edges', nodeAttributeFile = None, 
+					has_noise = True, GraphType = 'Undirected', bandNumber = 4, 
+					adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+					threshold = thres, center_distance = dist_type)
+			df = multi_experiment(df, filename = 'metadata/phys.edges', nodeAttributeFile = None, 
+					has_noise = True, GraphType = 'Directed', bandNumber = 4, 
+					adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+					threshold = thres, center_distance = dist_type)
+			# df = multi_experiment(df, filename = 'metadata/email.edges', nodeAttributeFile = None, 
+			# 		has_noise = True, GraphType = 'Undirected', bandNumber = 4, 
+			# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
+			# 		threshold = 0.003, center_distance = dist_type)
 
 	pickle.dump(df, open(fname,'wb'))
 

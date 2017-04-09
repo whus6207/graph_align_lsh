@@ -117,8 +117,9 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 		avg_derived_rank = 0
 
 		sim_matrix = {}
-		for g in graph_attrs.keys():
-			sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
+		if compute_sim:
+			for g in graph_attrs.keys():
+				sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 
 		start_matching = time.time()
 		# evaluate the accuracy and efficiency of our alg by generating buckets for <loop_num> times
@@ -347,15 +348,15 @@ if __name__ == '__main__':
 		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-				center_distance = dist_type, findcenter = 0)
+				center_distance = dist_type, findcenter = 0, threshold = 0.003)
 		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-				center_distance = dist_type, findcenter = 0)
+				center_distance = dist_type, findcenter = 0, threshold = 0.003)
 		# df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
 		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-		# 		center_distance = dist_type, findcenter = 0)
+		# 		center_distance = dist_type, findcenter = 0, threshold = 0.03)
 
 	pickle.dump(df, open(fname,'wb'))
 

@@ -82,7 +82,7 @@ def cos_sim(v1, v2, scaling=None):
     if scaling is None:
         scaling = np.ones((len(v1),))
     if sum(v1) == 0 or sum(v2) == 0:
-        #print 'caught!!'
+        print 'caught!!'
         return 0
     v1 = np.multiply(v1, 1/scaling)
     v2 = np.multiply(v2, 1/scaling)
@@ -130,8 +130,10 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
         for pair, count in pair_count_dict.items():
             if count >= threshold:
                 pair_computed += 1
+                # matching_matrix[pair[0]][pair[1]] = count
+                # experimental
                 matching_matrix[pair[0]][pair[1]] = cos_sim(combineAB[pair[0]][2:],\
-                    combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
+                    combineAB[pair[1]+len(attributesA)][2:],scaling=None)*count
     elif LSHType == 'Euclidean':
         for pair, count in pair_count_dict.items():
             if count >= threshold:
@@ -227,7 +229,8 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
                     & (stacked_attrs['Id'].isin([c[1] for c in collisions if c[0]==g]))]
                 for aid in A_idx.index.values:
                     for bid in B_idx.index.values:
-                        pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1
+                        # experimental
+                        pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)
 
     return pair_count_dict
 
@@ -268,13 +271,19 @@ def Rank(matching_matrix, P = None, printing = False):
     ranking = np.zeros((n))
     for i in range(n):      
         #rank = n - matching_matrix[i, :].argsort().tolist().index(i)
-        if matching_matrix[i,i] != 0:
-            if printing:
-                print "{}: ".format(i)
-                ranks = [ (val,idx) for idx, val in enumerate(matching_matrix[i,:]) ]
-                print sorted(ranks, key = lambda x: x[0], reverse=True)
-            rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
-            ranking[i] = 1.0 / rank
+        try:
+            if matching_matrix[i,i] != 0:
+                if printing:
+                    print "{}: ".format(i)
+                    ranks = [ (val,idx) for idx, val in enumerate(matching_matrix[i,:]) ]
+                    print sorted(ranks, key = lambda x: x[0], reverse=True)
+                rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
+                ranking[i] = 1.0 / rank
+        except ValueError:
+            print ValueError
+            print i
+            print matching_matrix[i,i]
+
     return ranking
 
 def sparseRank(matching_matrix, P = None, printing = False):
@@ -314,7 +323,12 @@ def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
         matching_matrix = matching_matrix.dot(P)
     score =[]
     for i in range(matching_matrix.shape[0]):
+        # print '{} :'.format(i)
+        # print sorted([(j, matching_matrix[i][j])for j in range(len(matching_matrix[i]))], key = lambda k: matching_matrix[i][k[0]])
+        # print 'equal?'
+        # print attributesB['Id'][matching_matrix[i].argsort()[-1]], attributesA['Id'][i]
         score.append(attributesB['Id'][matching_matrix[i].argsort()[-1]] == attributesA['Id'][i])
+    # print 'sum: {}'.format(sum(score))
     return score
 
 def sparseArgmaxMatch(matching_matrix, attributesA, attributesB, P = None):
