@@ -5,7 +5,7 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-#from netalign_utils import *
+from netalign_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -285,18 +285,21 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 			derived_matching_matrix = {}
 			derived_rank = {}
 			non_center = matching_matrix.keys()
+			derived_netalign = {}
 			
 			for i in xrange(len(non_center)):
 				for j in xrange(i+1, len(non_center)):
 					derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
 					Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
 					derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
+					derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])])
 
 			print 'derived rank score: '
 			print derived_rank
 			tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 			avg_derived_rank += tmp_avg_derived_rank
 			print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
+			print 'avg derived netalign score: ' + np.mean([v for k,v in derived_netalign.iteritems()])
 
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
@@ -347,14 +350,14 @@ if __name__ == '__main__':
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'pairs_computed'])
 	for dist_type in center_distance_types:
-		# df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
-		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-		# 		center_distance = dist_type, findcenter = 0, threshold = 0.003)
-		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
+		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
+				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
 				center_distance = dist_type, findcenter = 0, threshold = 0.003)
+		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
+		# 		has_noise = True, GraphType = 'Directed', bandNumber = 2, 
+		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
+		# 		center_distance = dist_type, findcenter = 0, threshold = 0.003)
 		# df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
 		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,

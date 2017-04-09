@@ -8,3 +8,4 @@ netalign/
 *.pkl
 *.o
 *.csv
+temp.mat
