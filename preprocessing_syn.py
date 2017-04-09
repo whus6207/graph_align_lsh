@@ -7,6 +7,7 @@ from multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
 import pickle
+import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
 	number = 5, noise_level = 0.01, weighted_noise = None, center_distance = 'canberra', findcenter = 0):
@@ -110,7 +111,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
-	preprocessing(edge_dir = 'Data/facebook.edges',number = 1, weighted_noise = 1.0, save_dir = 'facebook')
+	preprocessing(edge_dir = sys.argv[1], number = int(sys.argv[3]), save_dir = sys.argv[2])
 
 	
 

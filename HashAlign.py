@@ -7,7 +7,7 @@ from multi_sparse_utils import *
 from scipy.sparse import identity
 #from netalign_utils import *
 import pandas as pd
-import h5py
+#import h5py
 import os.path
 import pickle
 import time
