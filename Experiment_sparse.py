@@ -293,13 +293,15 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 					Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
 					derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 					derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])])
+					break
+				break
 
 			print 'derived rank score: '
 			print derived_rank
 			tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 			avg_derived_rank += tmp_avg_derived_rank
 			print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
-			print 'avg derived netalign score: ' + np.mean([v for k,v in derived_netalign.iteritems()])
+			print 'avg derived netalign score: ' + str(np.mean(derived_netalign.values()))
 
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
