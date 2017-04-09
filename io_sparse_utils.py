@@ -65,10 +65,10 @@ def permuteSparse(A, is_perm = False, has_noise = False, weighted_noise = None, 
 
 # B is a sparse matrix
 def writeSparseToFile(fname, B):
-    edges = [zip(B.nonzero()[0], B.nonzero()[1])][0]  # list of tuples
+    weighted_edges = [zip(B.nonzero()[0], B.nonzero()[1], B.data)][0]  # list of node1 -> node2 with weight
     with open(fname, 'w') as f:
-        for e1, e2 in edges:
-            f.write(str(e1)+" "+str(e2)+"\n")
+        for e1, e2, w in weighted_edges:
+            f.write(str(e1)+" "+str(e2)+" "+str(w)+"\n")
     f.close()
 
 def loadNodeFeature(fname):

@@ -14,12 +14,10 @@ import time
 
 import warnings
 
-def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,  
-	multipleGraph = False, largeGraph = False, is_perm = False, 
-	has_noise = False, noise_level = 0.05, 
-	GraphType = 'Directed', bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
+def experiment(df, filename, is_perm = False, noise_level = 0.05, 
+	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 1, center_distance = 'canberra',
+	threshold = 1,
 	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	"""
 	Experiment on two graphs with multiple setting
@@ -30,25 +28,39 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 	np.seterr(all='raise')
 	warnings.filterwarnings('error')
 
+	# Load all necessary data
+	metadata = {}
 	centers = []
 	found_center = None
 	graph_attrs = {}
-	with open('./private_data/facebook/centers') as f:
+	# Load synthetic graph information
+	with open('./private_data/' + filename + '/metadata') as f:
 		for line in f:
-			centers.append(line.strip().split()[0])
-		f.close()
-	with open('./private_data/facebook/centers') as f:
-		for line in f:
-			found_center = line.strip().split()[0]
+			line = line.strip().split()
+			metadata[line[0]] = line[1]
 
-	graph_attrs = pickle.load(open('./private_data/facebook/attributes.pkl', 'rb'))
+	# Check multiple graphs
+	if metadata['number'] >= 1:	
+		with open('./private_data/' + filename + '/centers') as f:
+			for line in f:
+				centers.append(line.strip().split()[0])
+			f.close()
+	else:
+		raise RuntimeError("Need two graphs to align")
+
+	# Load all graph attributes
+	graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
+
+	# Load attributes name
 	attributes = []
-	with open('./private_data/facebook/attributes') as f:
+	with open('./private_data/' + filename + '/attributes') as f:
 		for line in f:
 			attributes.append(line.strip().split()[0])
 	# loader = np.load('./private_data/facebook/Permutation.npz')
 	# P = csr_matrix((loader['data'], loader['indices'], loader['indptr']), shape = loader['shape'])
-	P = identity(len(graph_attrs['M0']))
+
+	# Load permutation matrix 
+	P = identity(len(graph_attrs['M0'])) # Should handle permutation case!!!!!!!!!!!
 
 
 	for center_id in centers:
@@ -62,13 +74,14 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 		avg_derived_rank = 0
 
 		sim_matrix = {}
-		for g in graph_attrs.keys():
-			sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
+		if compute_sim:
+			for g in graph_attrs.keys():
+				sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 
 		start_matching = time.time()
 		# evaluate the accuracy and efficiency of our alg by generating buckets for <loop_num> times
 		for i in range(loop_num):
-			if GraphType == 'Undirected':
+			if metadata['graph_type'] == 'Undirected':
 				if adaptiveLSH == True :
 					bandDeg = ['Degree','PageRank','NodeBetweennessCentrality']
 					bandEdge = ['EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
@@ -111,7 +124,7 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 					# 			f.write(str(k) + str(v) + '\n')
 
 			
-			elif GraphType == 'Directed':
+			elif metadata['graph_type']  == 'Directed':
 				if adaptiveLSH == True:
 					bandDeg = ['Degree','InDegree','OutDegree']
 					bandEgo = ['EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
@@ -211,10 +224,10 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 				pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
 
 				print "=========================================================="
-				print filename + ' ' + g + ', center:' + center_id + ', center_dist: '+center_distance
-				print "has_noise = "+ str(has_noise)+", GraphType = "+ GraphType
-				print "bandNumber = "+str(bandNumber)+", adaptiveLSH = "+ str(adaptiveLSH)+", LSHType = "+LSHType
-				print "noise_level = "+str(noise_level)+", nodeAttributeFile = "+str(nodeAttributeFile)+", threshold = "+str(threshold)
+				print filename + ' ' + g + ', center:' + center_id + ', center_dist: '+ metadata['center_distance']
+				print "GraphType = " + metadata['graph_type'] 
+				print "bandNumber = " + str(bandNumber) + ", adaptiveLSH = " + str(adaptiveLSH) + ", LSHType = " + LSHType
+				print "noise_level = " + metadata['noise_level'] + ", nodeAttributeFile = " + metadata['node_dir'] + ", threshold = " + str(threshold)
 				print "matching score by ranking: %f" %(sum(Ranking[g])/len(Ranking[g]))
 				if compute_sim:
 					print "matching score by ranking upper bound: %f" %(sum(Best_Ranking[g])/len(Best_Ranking[g]))
@@ -225,20 +238,20 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 					print "hungarian matching score upper bound: %f" %(sum(hung_score[g])/float(len(hung_score[g])))
 				print "percentage of pairs computed: %f" %(this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1]))
 
-			derived_matching_matrix = {}
-			derived_rank = {}
-			non_center = matching_matrix.keys()
-			for i in xrange(len(non_center)):
-				for j in xrange(i+1, len(non_center)):
-					derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
-					Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
-					derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
-
-			print 'derived rank score: '
-			print derived_rank
-			tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
-			avg_derived_rank += tmp_avg_derived_rank
-			print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
+			if int(metadata['number']) >1:
+				derived_matching_matrix = {}
+				derived_rank = {}
+				non_center = matching_matrix.keys()
+				for i in xrange(len(non_center)):
+					for j in xrange(i+1, len(non_center)):
+						derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
+						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
+						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
+				print 'derived rank score: '
+				print derived_rank
+				tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
+				avg_derived_rank += tmp_avg_derived_rank
+				print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
 
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
@@ -251,9 +264,9 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 		end_matching = time.time()
 		matching_time = end_matching - start_matching		
 
-		df = df.append({'filename':filename, 'nodeAttributeFile': str(nodeAttributeFile)\
-			, 'has_noise':has_noise, 'noise_level':noise_level\
-			, 'GraphType':GraphType, 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
+		df = df.append({'filename':filename, 'nodeAttributeFile': metadata['node_dir']\
+			, 'noise_level':metadata['noise_level']\
+			, 'GraphType':metadata['graph_type'], 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
 			, 'threshold':threshold\
 			, 'rank_score' : rank_score\
 			, 'rank_score_upper' : rank_score_upper\
@@ -261,10 +274,11 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 			, 'correct_score_upper' : correct_score_upper\
 			, 'correct_score_hungarian' : correct_score_hungarian\
 			, 'center_id': center_id\
-			, 'found_center' : found_center\
+			, 'found_center' : metadata['found_center']\
 			, 'avg_derived_rank': avg_derived_rank\
-			, 'center_dist': center_distance\
+			, 'center_dist': metadata['center_distance']\
 			, 'pairs_computed' : pairs_computed\
+			# , 'preprocess_time': preprocess_time\
 			, 'matching_time': matching_time\
 			}, ignore_index=True)
 
@@ -272,30 +286,26 @@ def experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None,
 
 if __name__ == '__main__':
 	adaptiveLSH = [False]
-	noise = [True]
 	bandNumber = [2, 4, 8]
 	LSH = ['Cosine', 'Euclidean']
-	center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_result_multi_sparse.pkl'
+	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
+	fname = 'exp_result_multi_pre.pkl'
 
 	if os.path.isfile(fname):
 		with open(fname, 'rb') as f:
 			df = pickle.load(f)
 	else:
 		df = pd.DataFrame(
-			columns=['filename','nodeAttributeFile', 'has_noise', 'GraphType'\
+			columns=['filename','nodeAttributeFile', 'noise_level', 'GraphType'\
 				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
-				, 'pairs_computed'])
-	for dist_type in center_distance_types:
-		df = experiment(df, filename = 'Data/facebook.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-				center_distance = dist_type, findcenter = 0)
-		df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
-				has_noise = True, GraphType = 'Directed', bandNumber = 2, 
-				adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-				center_distance = dist_type, findcenter = 0)
+				, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
+	# for dist_type in center_distance_types:
+	df = experiment(df, filename = 'dblp', bandNumber = 2, adaptiveLSH = False, LSHType = 'Cosine')
+		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
+		# 		GraphType = 'Directed', bandNumber = 2, 
+		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
+		# 		center_distance = dist_type, findcenter = 0)
 		# df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
 		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
@@ -303,6 +313,6 @@ if __name__ == '__main__':
 
 	pickle.dump(df, open(fname,'wb'))
 
-	writer = pd.ExcelWriter('exp_result_multi_sparse.xlsx')
+	writer = pd.ExcelWriter('exp_result_multi_pre.xlsx')
 	df.to_excel(writer, sheet_name='Sheet1')
 	writer.save()

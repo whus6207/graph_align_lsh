@@ -78,9 +78,11 @@ def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', n
 	A, rest_idx = removeIsolatedSparse(A)
 	multi_graph_w_permutation = permuteMultiSparse(A, number, graph_type, level = noise_level, weighted_noise = weighted_noise)
 	writeSparseToFile(path + graph_type + '/M0.edges', A)
+	# writeSparseToFile(path + graph_type + '/M0', A)
 	graph_info['M0'] = A
 	for i, g in enumerate(multi_graph_w_permutation):
 		writeSparseToFile(path + graph_type + '/M' + str(i+1) + '.edges', g)
+		# writeSparseToFile(path + graph_type + '/M' + str(i+1), g)
 		graph_info['M'+str(i+1)] = g
 
 	return graph_info, path + graph_type
