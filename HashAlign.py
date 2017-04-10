@@ -14,9 +14,11 @@ import time
 
 import warnings
 
+sim_matrix = {}
+
 def experiment(df, filename, is_perm = False, noise_level = 0.05, 
 	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 30, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
+	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
 	threshold = 0.003,
 	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	"""
@@ -73,10 +75,12 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 		matching_time = 0
 		avg_derived_rank = 0
 
-		sim_matrix = {}
+		# sim_matrix = {}
 		if compute_sim:
 			for g in graph_attrs.keys():
-				sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
+				if g not in sim_matrix:
+					print '!!! computed sim_matrix !!!'
+					sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 
 		start_matching = time.time()
 		# evaluate the accuracy and efficiency of our alg by generating buckets for <loop_num> times
@@ -195,12 +199,12 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], P)
 
 				Best_Ranking[g] = Ranking[g]
+				Best_correctMatch[g] = correctMatch[g]
 				if compute_sim:
 					Best_Ranking[g], Best_correctMatch[g] = sparseRank(sim_matrix[g], P)
 				
 				# Have to rewrite argmaxMatch!!!!!!!!!
 				#correctMatch[g] = argmaxMatch(matching_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
-				Best_correctMatch[g] = correctMatch[g]
 				# if compute_sim:
 				# 	Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				hung_score[g] = correctMatch[g]
@@ -286,10 +290,12 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 if __name__ == '__main__':
 	adaptiveLSH = [False]
-	bandNumber = [2, 4, 8]
+	bandNumbers = [1, 2, 4, 6]
+	thresholds = [0.001, 0.002, 0.004, 0.008, 0.01, 0.02] 
 	LSH = ['Cosine', 'Euclidean']
+	folders = ['facebook', 'email']
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_result_multi_pre.pkl'
+	fname = 'exp_band_thres.pkl'
 
 	if os.path.isfile(fname):
 		with open(fname, 'rb') as f:
@@ -300,8 +306,14 @@ if __name__ == '__main__':
 				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
 				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 				, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
-	# for dist_type in center_distance_types:
-	df = experiment(df, filename = 'facebook', bandNumber = 2, adaptiveLSH = False, LSHType = 'Cosine')
+	for fold in folders:
+		for band in bandNumbers:
+			for lsh_type in LSH:
+				for thres in thresholds:
+					df = experiment(df, filename = fold, loop_num = 3, bandNumber = band, threshold = thres, compute_sim = True, adaptiveLSH = False, LSHType = lsh_type)
+		sim_matrix = {}
+		pickle.dump(df, open(fname,'wb'))
+		df.to_csv('exp_band_thres.csv')
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
@@ -311,8 +323,9 @@ if __name__ == '__main__':
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
 		# 		center_distance = dist_type, findcenter = 0)
 
-	pickle.dump(df, open(fname,'wb'))
-
-	writer = pd.ExcelWriter('exp_result_multi_pre.xlsx')
-	df.to_excel(writer, sheet_name='Sheet1')
-	writer.save()
+	#pickle.dump(df, open(fname,'wb'))
+	
+	#writer = pd.ExcelWriter('exp_band_thres.xlsx')
+	#df.to_csv('exp_band_thres.csv') 
+	#df.to_excel('exp_band_thres.xlsx', sheet_name='Sheet1', index=False, engine='xlsxwriter')
+	#writer.save()
