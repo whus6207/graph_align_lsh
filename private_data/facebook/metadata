@@ -1,7 +1,7 @@
 graph_type Undirected
 noise_level 0.01
-weighted_noise 1.0
-found_center M3
-number 3
+weighted_noise None
+found_center M0
+number 1
 node_dir None
 center_distance canberra

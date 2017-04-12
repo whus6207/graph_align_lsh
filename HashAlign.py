@@ -16,8 +16,8 @@ import warnings
 
 def experiment(df, filename, is_perm = False, noise_level = 0.05, 
 	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 0.003): 
+	loop_num = 1, cos_num_plane = 200, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
+	threshold = 0.0005): 
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -285,9 +285,11 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 if __name__ == '__main__':
 	adaptiveLSH = [False]
 	bandNumber = [2, 4, 8]
+	cos_num_plane = [25, 50, 100]
+	euc_width = [2, 4, 8]
 	LSH = ['Cosine', 'Euclidean']
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_pair_band_thre.pkl'
+	fname = 'exp_pair_band_lsh.pkl'
 
 	if os.path.isfile(fname):
 		with open(fname, 'rb') as f:
@@ -301,7 +303,13 @@ if __name__ == '__main__':
 	# for dist_type in center_distance_types:
 	for b in bandNumber:
 		for lsh in LSH:
-			df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh)
+			if lsh == 'Cosine':
+				for c in cos_num_plane:
+					df = experiment(df, filename = 'dblp', bandNumber = b, adaptiveLSH = False, LSHType = lsh, cos_num_plane = c)
+			else:
+				for e in euc_width:
+					df = experiment(df, filename = 'dblp', bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
+
 
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
@@ -314,6 +322,6 @@ if __name__ == '__main__':
 
 	pickle.dump(df, open(fname,'wb'))
 
-	writer = pd.ExcelWriter('exp_pair_band_thre.xlsx')
+	writer = pd.ExcelWriter('exp_pair_band_lsh.xlsx')
 	df.to_excel(writer, sheet_name='Sheet1')
 	writer.save()
