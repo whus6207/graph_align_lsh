@@ -5,7 +5,7 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-#from netalign_utils import *
+from netalign_utils import *
 import pandas as pd
 #import h5py
 import os.path
@@ -13,6 +13,10 @@ import pickle
 import time
 
 import warnings
+
+sim_matrix = {}
+Best_Ranking = {}
+Best_correctMatch = {}
 
 def experiment(df, filename, is_perm = False, noise_level = 0.05, 
 	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
@@ -49,7 +53,9 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 	# Load all graph attributes
 	graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
-
+	multi_graphs = {}
+	if compute_netalign:
+		multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
 	# Load attributes name
 	attributes = []
 	with open('./private_data/' + filename + '/attributes') as f:
@@ -67,15 +73,23 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 		correct_score = 0
 		correct_score_upper = 0
 		correct_score_hungarian = 0
+		netalign_score = 0
 		pairs_computed = 0
 		matching_time = 0
 		avg_derived_rank = 0
+		avg_derived_netalign = 0
 
-		sim_matrix = {}
+		# sim_matrix = {}
+		start_sim = time.time()
 		if compute_sim:
 			for g in graph_attrs.keys():
-				sim_matrix[g] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
-
+				if (center_id, g) not in sim_matrix and g != center_id:
+					print '!!! computed sim_matrix !!!'
+					sim_matrix[(center_id, g)] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
+				if (center_id, g) not in Best_Ranking and g != center_id:
+                			Best_Ranking[(center_id, g)], Best_correctMatch[(center_id, g)] = sparseRank(sim_matrix[(center_id, g)], P)
+		end_sim = time.time()
+		print 'sim_time: '+str(end_sim-start_sim)
 		start_matching = time.time()
 		# evaluate the accuracy and efficiency of our alg by generating buckets for <loop_num> times
 		for i in range(loop_num):
@@ -179,10 +193,9 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 			matching_matrix = {}
 			this_pair_computed = {}
 			Ranking = {}
-			Best_Ranking = {}
 			correctMatch = {}
-			Best_correctMatch = {}
 			hung_score = {}
+			netalign_scores = {}
 
 			for g in pair_count_dict.keys():
 				if g == center_id:
@@ -191,25 +204,24 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 					= computeSparseMatchingMat(graph_attrs[center_id], graph_attrs[g], pair_count_dict[g], LSHType, threshold)
 			
 				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], P)
-
-				Best_Ranking[g] = Ranking[g]
-				if compute_sim:
-					Best_Ranking[g], Best_correctMatch[g] = sparseRank(sim_matrix[g], P)
+				
+				if not compute_sim:
+					Best_Ranking[(center_id, g)] = Ranking[g]
+					Best_correctMatch[(center_id, g)] = correctMatch[g]
 				
 				# Have to rewrite argmaxMatch!!!!!!!!!
 				#correctMatch[g] = argmaxMatch(matching_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
-				Best_correctMatch[g] = correctMatch[g]
 				# if compute_sim:
 				# 	Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				hung_score[g] = correctMatch[g]
 				if compute_hungarian:
-					hung_score[g] = hungarianMatch(sim_matrix[g], P)
+					hung_score[g] = hungarianMatch(sim_matrix[(center_id, g)], P)
 
 
 				rank_score += sum(Ranking[g])/len(Ranking[g])
 				if compute_sim:
-					rank_score_upper += sum(Best_Ranking[g])/len(Best_Ranking[g])
-					correct_score_upper += sum(Best_correctMatch[g]) / float(len(Best_correctMatch[g]))
+					rank_score_upper += sum(Best_Ranking[(center_id, g)])/len(Best_Ranking[(center_id, g)])
+					correct_score_upper += sum(Best_correctMatch[(center_id, g)]) / float(len(Best_correctMatch[(center_id, g)]))
 				else:
 					rank_score_upper += 0
 					correct_score_upper += 0
@@ -220,7 +232,9 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				else:
 					correct_score_hungarian += 0
 				pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
-
+				if compute_netalign:
+					netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g])
+					netalign_score += netalign_scores[g]
 				print "=========================================================="
 				print filename + ' ' + g + ', center:' + center_id + ', center_dist: '+ metadata['center_distance']
 				print "GraphType = " + metadata['graph_type'] 
@@ -228,37 +242,48 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				print "noise_level = " + metadata['noise_level'] + ", nodeAttributeFile = " + metadata['node_dir'] + ", threshold = " + str(threshold)
 				print "matching score by ranking: %f" %(sum(Ranking[g])/len(Ranking[g]))
 				if compute_sim:
-					print "matching score by ranking upper bound: %f" %(sum(Best_Ranking[g])/len(Best_Ranking[g]))
+					print "matching score by ranking upper bound: %f" %(sum(Best_Ranking[(center_id, g)])/len(Best_Ranking[(center_id, g)]))
 				print "matching score by correct match: %f" % (sum(correctMatch[g]) / float(len(correctMatch[g])))
 				if compute_sim:
-					print "matching score by correct match upper bound %f" % (sum(Best_correctMatch[g]) / float(len(Best_correctMatch[g])))
+					print "matching score by correct match upper bound %f" % (sum(Best_correctMatch[(center_id, g)]) / float(len(Best_correctMatch[(center_id, g)])))
 				if compute_hungarian:
 					print "hungarian matching score upper bound: %f" %(sum(hung_score[g])/float(len(hung_score[g])))
+				if compute_netalign:
+					print "netalign score: %f" %(netalign_scores[g])
 				print "percentage of pairs computed: %f" %(this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1]))
 
 			if int(metadata['number']) >1:
 				derived_matching_matrix = {}
 				derived_rank = {}
+				derived_netalign = {}
 				non_center = matching_matrix.keys()
 				for i in xrange(len(non_center)):
 					for j in xrange(i+1, len(non_center)):
 						derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
 						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
 						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
+						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])])
 				print 'derived rank score: '
 				print derived_rank
 				tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 				avg_derived_rank += tmp_avg_derived_rank
 				print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
-
+				
+				print 'derived netalign score: '
+				print derived_netalign
+				tmp_avg_netalign = np.mean(derived_netalign.values())
+				avg_derived_netalign += tmp_avg_netalign
+				print 'avg derived netalign score: ' + str(np.mean(tmp_avg_netalign))	
+		
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
 		correct_score /= loop_num * len(pair_count_dict.keys())
 		correct_score_upper /= loop_num * len(pair_count_dict.keys())
 		correct_score_hungarian /= loop_num * len(pair_count_dict.keys())
+		netalign_score /= loop_num * len(pair_count_dict.keys())
 		pairs_computed /= loop_num * len(pair_count_dict.keys())
 		avg_derived_rank /= loop_num
-		
+		avg_derived_netalign /= loop_num	
 		end_matching = time.time()
 		matching_time = end_matching - start_matching		
 
@@ -274,6 +299,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 			, 'center_id': center_id\
 			, 'found_center' : metadata['found_center']\
 			, 'avg_derived_rank': avg_derived_rank\
+			, 'avg_derived_netalign': avg_derived_netalign\
 			, 'center_dist': metadata['center_distance']\
 			, 'pairs_computed' : pairs_computed\
 			# , 'preprocess_time': preprocess_time\
@@ -288,6 +314,7 @@ if __name__ == '__main__':
 	cos_num_plane = [25, 50, 100]
 	euc_width = [2, 4, 8]
 	LSH = ['Cosine', 'Euclidean']
+	folders = ['facebook', 'email']
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
 	fname = 'exp_pair_band_lsh.pkl'
 
@@ -310,7 +337,6 @@ if __name__ == '__main__':
 				for e in euc_width:
 					df = experiment(df, filename = 'dblp', bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
 
-
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
@@ -325,3 +351,4 @@ if __name__ == '__main__':
 	writer = pd.ExcelWriter('exp_pair_band_lsh.xlsx')
 	df.to_excel(writer, sheet_name='Sheet1')
 	writer.save()
+

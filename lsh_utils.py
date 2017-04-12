@@ -215,6 +215,10 @@ def combineBucketsBySum(buckets, combineAB, Afname):
 def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
     pair_count_dict = defaultdict(lambda : defaultdict(int))
     for bucket in buckets:
+	if len(bucket)>1:
+		sorted_bucks = sorted(bucket.items(), key=lambda item: len(item[1]))
+		if len(sorted_bucks[-1][1])>len(stacked_attrs.index)*3/4:
+			bucket = dict(sorted_bucks[:-1])
         for buck, collisions in bucket.items(): # collisions = [(Graph, Id)]
             if len(collisions) <= 1:
                 continue
@@ -231,7 +235,7 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
                 for aid in A_idx.index.values:
                     for bid in B_idx.index.values:
                         # experimental
-                        pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)
+                        pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)*len(stacked_attrs.index)
 
     return pair_count_dict
 

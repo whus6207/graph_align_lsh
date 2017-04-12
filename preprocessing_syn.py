@@ -12,6 +12,7 @@ import sys
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
 	number = 5, noise_level = 0.01, weighted_noise = None, center_distance = 'canberra', findcenter = 0):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
+
 	path = './private_data/' + save_dir
 	if not os.path.exists(path):
 		os.makedirs(path)
@@ -101,7 +102,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		f.write('node_dir' + " " + str(node_dir) + '\n')
 		f.write('center_distance' + " " + str(center_distance) + '\n')
 		f.close()
-
+	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
 	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
 
 
@@ -111,8 +112,11 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
-	preprocessing(edge_dir = sys.argv[1], number = int(sys.argv[3]), save_dir = sys.argv[2])
-
+	# python prepocessing_syn.py edge_dir [node_dir] save_dir num_graphs
+	if len(sys.argv) == 4:
+		preprocessing(edge_dir = sys.argv[1], number = int(sys.argv[3]), save_dir = sys.argv[2])
+	elif len(sys.argv) == 5:
+		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], number = int(sys.argv[4]), save_dir = sys.argv[3])
 	
 
 

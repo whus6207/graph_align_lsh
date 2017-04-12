@@ -5,9 +5,13 @@ import pickle
 
 if __name__ == '__main__':
 	fname = 'exp_noise.pkl'
-	testdata = ['facebook','email']
-	df = pd.DataFrame(
-		columns=['filename','nodeAttributeFile', 'has_noise', 'GraphType'\
+	testdata = ['dblp']
+	if os.path.isfile(fname):
+		with open(fname, 'rb') as f:
+			df = pickle.load(f)
+	else:
+		df = pd.DataFrame(
+			columns=['filename','nodeAttributeFile', 'has_noise', 'GraphType'\
 			, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
 			, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
 			, 'pairs_computed'])
