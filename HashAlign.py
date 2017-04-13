@@ -298,6 +298,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 			, 'correct_score' : correct_score\
 			, 'correct_score_upper' : correct_score_upper\
 			, 'correct_score_hungarian' : correct_score_hungarian\
+			, 'netalign_score': netalign_score\
 			, 'center_id': center_id\
 			, 'found_center' : metadata['found_center']\
 			, 'avg_derived_rank': avg_derived_rank\
