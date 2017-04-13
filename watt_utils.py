@@ -3,76 +3,7 @@ import numpy as np
 import pandas as pd
 import random
 
-def getEgoAttr(UGraph, node_num, attributes, weighted_file = None, directed = True):
-    egoDeg = np.zeros((node_num,))
-    egoOutDeg = np.zeros((node_num,))
-    egoInDeg = np.zeros((node_num,))
-    egoConn = np.zeros((node_num,))
-    avgNeighDeg = np.zeros((node_num,))
-    avgNeighInDeg = np.zeros((node_num,))
-    avgNeighOutDeg = np.zeros((node_num,))
-
-
-    for NI in UGraph.Nodes():
-        thisNID = NI.GetId()
-        NIdegree = attributes['Degree'][thisNID]
-        if NIdegree == 0:
-            print thisNID, 'degree = 0!'
-        InNodes = []
-        OutNodes = []
-
-        if directed:
-            for Id in NI.GetInEdges():
-                InNodes.append(Id)
-
-        for Id in NI.GetOutEdges():
-            OutNodes.append(Id)
-        EgoNodes = set(InNodes+OutNodes+[NI.GetId()])
-
-        egoID = 0
-        egoOD = 0
-        neighIDsum = 0
-        neighODsum = 0
-        egoconn = 0
-        for Id in InNodes+OutNodes:
-            ego_NI = UGraph.GetNI(Id)
-
-            if directed:
-                for IID in ego_NI.GetInEdges():
-                    neighIDsum += 1
-                    if IID not in EgoNodes:
-                        egoID += 1
-                    else:
-                        egoconn += 1
-
-            for OID in ego_NI.GetOutEdges():
-                neighODsum += 1
-                if OID not in EgoNodes:
-                    egoOD += 1
-                else:
-                    egoconn += 1
-
-
-        egoDeg[thisNID] = egoID + egoOD
-        egoInDeg[thisNID] = egoID
-        egoOutDeg[thisNID] = egoOD
-        avgNeighDeg[thisNID] = (neighIDsum+neighODsum)/float(NIdegree)
-        avgNeighInDeg[thisNID] = neighIDsum/float(NIdegree)
-        avgNeighOutDeg[thisNID] = neighODsum/float(NIdegree)
-        egoConn[thisNID] = (egoconn+NIdegree)/float(NIdegree+1)
-
-    attributes['EgonetDegree'] = egoDeg
-    attributes['AvgNeighborDeg'] = avgNeighDeg
-    attributes['EgonetConnectivity'] = egoConn
-
-    if directed:
-        attributes['EgonetInDegree'] = egoInDeg
-        attributes['EgonetOutDegree'] = egoOutDeg
-        attributes['AvgNeighborInDeg'] = avgNeighInDeg
-        attributes['AvgNeighborOutDeg'] = avgNeighOutDeg
-
-
-def getWeightedEgoAttr(UGraph, node_num, attributes, weighted_file, directed = True):
+def getWeightedEgoAttr(UGraph, node_num, attributes, df, directed = True):
     egoDeg = np.zeros((node_num,))
     egoOutDeg = np.zeros((node_num,))
     egoInDeg = np.zeros((node_num,))
@@ -110,18 +41,18 @@ def getWeightedEgoAttr(UGraph, node_num, attributes, weighted_file, directed = T
 
             if directed:
                 for IID in ego_NI.GetInEdges():
-                    neighIDsum += wnodes[(IID, ID)]
+                    neighIDsum += wnodes[(IID, Id)]
                     if IID not in EgoNodes:
-                        egoID += wnodes[(IID, ID)]
+                        egoID += wnodes[(IID, Id)]
                     else:
-                        egoconn += wnodes[(IID, ID)]
+                        egoconn += wnodes[(IID, Id)]
 
             for OID in ego_NI.GetOutEdges():
-                neighODsum += wnodes[(NI, OID)]
+                neighODsum += wnodes[(Id, OID)]
                 if OID not in EgoNodes:
-                    egoOD += wnodes[(NI, OID)]
+                    egoOD += wnodes[(Id, OID)]
                 else:
-                    egoconn += wnodes[(NI, OID)]
+                    egoconn += wnodes[(Id, OID)]
 
 
         egoDeg[thisNID] = egoID + egoOD
@@ -144,15 +75,26 @@ def getWeightedEgoAttr(UGraph, node_num, attributes, weighted_file, directed = T
 
 
 # Should be two-way
-def getWeightedDegree(filename, node_num, attributes):
+def getWeightedDegree(filename, node_num, attributes, directed = True):
     df = pd.read_csv(filename, header = None, sep = ' ')
     wdegree = np.zeros((node_num, ))
     df_d = df.groupby([0])[2].sum()
+    # Out degree
     for i in df_d.index:
         wdegree[i] = df_d[i]
     attributes['Degree'] = wdegree
+    if directed:       
+        attributes['OutDegree'] = wdegree
+        # In degree
+        df_d = df.groupby([1])[2].sum()
+        wdegree = np.zeros((node_num, ))
+        for i in df_d.index:
+            wdegree[i] = df_d[i]
+        attributes['InDegree'] = wdegree
+        attributes['Degree'] += wdegree
 
     return df
+
 
 def getUndirAttribute(filename, node_num, param = 1.0):
     UGraph = snap.LoadEdgeList(snap.PUNGraph, filename, 0, 1)
@@ -169,14 +111,10 @@ def getUndirAttribute(filename, node_num, param = 1.0):
     attributes['Graph'] = [filename.split('/')[-1].split('.')[0]] * node_num #node_num
     # Degree
     attributes['Id'] = range(0, node_num) #???????????????? 1, +1?????
-    degree = np.zeros((node_num,))
-    OutDegV = snap.TIntPrV()
-    snap.GetNodeOutDegV(UGraph, OutDegV)
-    for item in OutDegV:
-        degree[item.GetVal1()] = item.GetVal2()
-    attributes['Degree'] = degree
+    
+    df = getWeightedDegree(filename, node_num, attributes, directed = False)
 
-    getEgoAttr(UGraph, node_num, attributes, directed=False)
+    getWeightedEgoAttr(UGraph, node_num, attributes, df, directed=False)
 
     # Farness Centrality, Node Eccentricity
     # farCentr = np.zeros((node_num,))
@@ -222,23 +160,9 @@ def getDirAttribute(filename, node_num, param = 1.0):
     attributes['Id'] = range(0, node_num)
     
     # Degree
-    degree = np.zeros((node_num,))
-    InDegV = snap.TIntPrV()
-    snap.GetNodeInDegV(Graph, InDegV)
-    for item in InDegV:
-        degree[item.GetVal1()] = item.GetVal2()
-    attributes['Degree'] += degree
-    attributes['InDegree'] = degree
-    
-    degree = np.zeros((node_num,))
-    OutDegV = snap.TIntPrV()
-    snap.GetNodeOutDegV(Graph, OutDegV)
-    for item in OutDegV:
-        degree[item.GetVal1()] = item.GetVal2()
-    attributes['Degree'] += degree
-    attributes['OutDegree'] = degree
-    
-    getEgoAttr(Graph, node_num, attributes)
+    df = getWeightedDegree(filename, node_num, attributes, directed=True)
+
+    getWeightedEgoAttr(UGraph, node_num, attributes, df, directed=True)
 
     attributes['Degree'] /= node_num
     attributes['InDegree'] /= node_num
@@ -294,7 +218,3 @@ def addNodeAttribute(structAttributes, nodeAttributeNames = None, nodeAttributeV
             nodeAttributes = pd.DataFrame(nodeAttributeValues, columns = nodeAttributeNames)
         structAttributes = pd.concat([structAttributes, nodeAttributes], axis = 1)
     return structAttributes
-
-
-
-

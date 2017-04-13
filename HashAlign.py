@@ -5,7 +5,7 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-from netalign_utils import *
+# from netalign_utils import *
 import pandas as pd
 #import h5py
 import os.path
@@ -18,10 +18,9 @@ sim_matrix = {}
 Best_Ranking = {}
 Best_correctMatch = {}
 
-def experiment(df, filename, is_perm = False, noise_level = 0.05, 
-	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
+def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 1, cos_num_plane = 200, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 0.0005): 
+	threshold = 3.5): 
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -36,6 +35,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 	centers = []
 	found_center = None
 	graph_attrs = {}
+	graph_perm = {}
 	# Load synthetic graph information
 	with open('./private_data/' + filename + '/metadata') as f:
 		for line in f:
@@ -53,6 +53,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 	# Load all graph attributes
 	graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
+	graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))
 	multi_graphs = {}
 	if compute_netalign:
 		multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
@@ -87,7 +88,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 					print '!!! computed sim_matrix !!!'
 					sim_matrix[(center_id, g)] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 				if (center_id, g) not in Best_Ranking and g != center_id:
-                			Best_Ranking[(center_id, g)], Best_correctMatch[(center_id, g)] = sparseRank(sim_matrix[(center_id, g)], P)
+                			Best_Ranking[(center_id, g)], Best_correctMatch[(center_id, g)] = sparseRank(sim_matrix[(center_id, g)], graph_perm[center_id], graph_perm[g])
 		end_sim = time.time()
 		print 'sim_time: '+str(end_sim-start_sim)
 		start_matching = time.time()
@@ -189,7 +190,6 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 			stacked_attrs = selectAndCombineMulti(graph_attrs)	 
 			pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), center_id)
 			
-			print pair_count_dict		
 			matching_matrix = {}
 			this_pair_computed = {}
 			Ranking = {}
@@ -203,7 +203,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				matching_matrix[g], this_pair_computed[g]\
 					= computeSparseMatchingMat(graph_attrs[center_id], graph_attrs[g], pair_count_dict[g], LSHType, threshold)
 			
-				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], P)
+				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], graph_perm[center_id], graph_perm[g])
 				
 				if not compute_sim:
 					Best_Ranking[(center_id, g)] = Ranking[g]
@@ -215,7 +215,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				# 	Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				hung_score[g] = correctMatch[g]
 				if compute_hungarian:
-					hung_score[g] = hungarianMatch(sim_matrix[(center_id, g)], P)
+					hung_score[g] = hungarianMatch(sim_matrix[(center_id, g)], graph_perm[g])
 
 
 				rank_score += sum(Ranking[g])/len(Ranking[g])
@@ -260,7 +260,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				for i in xrange(len(non_center)):
 					for j in xrange(i+1, len(non_center)):
 						derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
-						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
+						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]] , printing=False) # handle!!!!!!!! P1, P2
 						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])])
 				print 'derived rank score: '
@@ -310,9 +310,9 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 if __name__ == '__main__':
 	adaptiveLSH = [False]
-	bandNumber = [2, 4, 8]
-	cos_num_plane = [25, 50, 100]
-	euc_width = [2, 4, 8]
+	bandNumber = [4]
+	cos_num_plane = [25]
+	euc_width = [4]
 	LSH = ['Cosine', 'Euclidean']
 	folders = ['facebook', 'email']
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
@@ -332,10 +332,10 @@ if __name__ == '__main__':
 		for lsh in LSH:
 			if lsh == 'Cosine':
 				for c in cos_num_plane:
-					df = experiment(df, filename = 'dblp', bandNumber = b, adaptiveLSH = False, LSHType = lsh, cos_num_plane = c)
+					df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh, cos_num_plane = c)
 			else:
 				for e in euc_width:
-					df = experiment(df, filename = 'dblp', bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
+					df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
 
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 

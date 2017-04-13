@@ -2,7 +2,7 @@ import time
 import os
 import pandas as pd
 import numpy as np
-from attr_utils import *
+from watt_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
@@ -10,7 +10,7 @@ import pickle
 import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
-	number = 5, noise_level = 0.01, weighted_noise = None, center_distance = 'canberra', findcenter = 0):
+	number = 5, noise_level = 0.01, weighted_noise = 1.0, center_distance = 'canberra', findcenter = 0):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 
 	path = './private_data/' + save_dir
@@ -18,15 +18,16 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		os.makedirs(path)
 	start_preprocess = time.time()
 
-	multi_graphs, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level, weighted_noise = weighted_noise)
-	node_num, n = multi_graphs['M0'].get_shape()
+	multi_graphs, multi_perm, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level, weighted_noise = weighted_noise)
+	node_num, n = multi_graphs['M0'].get_shape() 
 
 	nodeAttributesValue, nodeAttributesName = [], []
-	P = sparse.lil_matrix((node_num, n))
-	for i in range(node_num):
-		P[i, i] = 1
-	P = P.tocsr()
+	# P = sparse.lil_matrix((node_num, n))
+	# for i in range(node_num):
+	# 	P[i, i] = 1
+	# P = P.tocsr()
 	graph_attrs = {}
+
 
 	if node_dir:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(node_dir)
@@ -37,6 +38,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
 		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 		attributes += nodeAttributesName
+
 
 		for key in multi_graphs.keys():
 			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num)
@@ -102,8 +104,12 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		f.write('node_dir' + " " + str(node_dir) + '\n')
 		f.write('center_distance' + " " + str(center_distance) + '\n')
 		f.close()
+	# print list(graph_attrs['M1']['Degree'])
 	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
 	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
+	pickle.dump(multi_perm, open(path + '/permutations.pkl', 'wb'))
+	# g = pickle.load(open(path + '/attributes.pkl', 'rb'))
+	# print list(g['M1']['Degree'])
 
 
 	end_preprocess = time.time()
@@ -117,6 +123,7 @@ if __name__ == '__main__':
 		preprocessing(edge_dir = sys.argv[1], number = int(sys.argv[3]), save_dir = sys.argv[2])
 	elif len(sys.argv) == 5:
 		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], number = int(sys.argv[4]), save_dir = sys.argv[3])
+
 	
 
 
