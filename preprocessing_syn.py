@@ -2,7 +2,7 @@ import time
 import os
 import pandas as pd
 import numpy as np
-from watt_utils import *
+from attr_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
@@ -37,11 +37,14 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 
 		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
 		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+		if weighted_noise:
+			attributes += ['WeightedDegree', 'EgoWeightedDegree', 'AvgWeightedNeighborDeg', 'EgonetWeightedConnectivity']
+
 		attributes += nodeAttributesName
 
 
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num)
+			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
@@ -53,10 +56,14 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 					  'PageRank', 'HubsScore', 'AuthoritiesScore',
 					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
 					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
+		if weighted_noise:
+			attributes += ['WeightedDegree', 'WeightedInDegree', 'WeightedOutDegree', 'EgoWeightedDegree', 'AvgWeightedNeighborDeg', 'EgonetWeightedConnectivity'\
+			, 'EgoWeightedInDegree', 'EgoWeightedOutDegree', 'AvgWeightedNeighborInDeg', 'AvgWeightedNeighborOutDeg']
+
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num)
+			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]

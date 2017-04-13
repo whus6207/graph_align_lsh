@@ -12,7 +12,7 @@ import sys
 
 # A should be sparse matrix
 # Adding noise based on A, return multiple sparse matrix
-def permuteMultiSparse(A, number, graph_type, level, is_perm = False, weighted_noise = None):
+def permuteMultiSparse(A, number, graph_type, level, is_perm = True, weighted_noise = None):
 	m, n = A.get_shape()
 	multi_graph_w_permutation = []
 	permutation = []
