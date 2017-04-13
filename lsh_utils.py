@@ -291,9 +291,9 @@ def Rank(matching_matrix, P = None, printing = False):
 
     return ranking
 
-def sparseRank(matching_matrix, P = None, printing = False):
-    if P != None:
-        matching_matrix = matching_matrix.dot(P)
+def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
+    if P1 != None and P2 != None:
+        matching_matrix = (P1.T).dot(matching_matrix).dot(P2)
 
     n, d = matching_matrix.shape
     ranking = np.zeros((n))

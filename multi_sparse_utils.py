@@ -1,20 +1,21 @@
 from lsh_utils import *
 from io_sparse_utils import *
-from attr_utils import *
 import numpy as np
 import numpy.linalg
 import pandas as pd
 import scipy.spatial.distance
 from scipy import stats
 from collections import defaultdict
+from scipy.sparse import identity
 import os
 import sys
 
 # A should be sparse matrix
 # Adding noise based on A, return multiple sparse matrix
-def permuteMultiSparse(A, number, graph_type, level, weighted_noise = None):
+def permuteMultiSparse(A, number, graph_type, level, is_perm = False, weighted_noise = None):
 	m, n = A.get_shape()
-	multi_graph_w_permutation = []    
+	multi_graph_w_permutation = []
+	permutation = []
 	B = A.copy()
 	noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v] # No duplicate edges
 	visited = set(noise)
@@ -22,70 +23,68 @@ def permuteMultiSparse(A, number, graph_type, level, weighted_noise = None):
 	noise = noise[: int(len(noise) * level // 2) * number] # total number of noise / 2
 	# Noise (edges) for each graph
 	multi_noise = [noise[len(noise) * i // number: len(noise) * (i+1) // number]for i in range(number)]
-	if graph_type == 'Undirected':
-		for n in multi_noise:
-			# Dealing with existing edges
-			B = B.tolil()
-			for i, j in n:
-				if weighted_noise:
-					B[i, j] = B[j, i] = max(min(np.random.normal(1, weighted_noise), 2), 0) # 0 ~ 2
-				else:
-					B[i, j] = 0
-					B[j, i] = 0
-			# Adding edges
-			for _ in range(len(n)):  # Same amount as existing edges 
-				add1, add2 = np.random.choice(m), np.random.choice(m)
-				while ((add1, add2) in visited or (add2, add1) in visited):
-					add1, add2 = np.random.choice(m), np.random.choice(m)
-				if weighted_noise:
-					B[add1, add2] = B[add2, add1] = max(min(np.random.normal(1, weighted_noise), 2), 0) # 0 ~ 2
-				else:
-					B[add1, add2] = 1
-					B[add2, add1] = 1
-				visited.add((add1, add2))
-			B = B.tocsr()
-			multi_graph_w_permutation.append(B)
-			B = A.copy()
-	else:
-		for n in multi_noise:
-			B = B.tolil()
-			# Dealing with existing edges
-			for i, j in n:
+	for n in multi_noise:
+		P = identity(m)
+		# Dealing with existing edges
+		B = B.tolil()
+		for i, j in n:
+			if weighted_noise:
+				B[i, j]  = max(min(np.random.normal(1, weighted_noise), 2), 0) # 0 ~ 2
+			else:
 				B[i, j] = 0
-			# Adding edges
-			for _ in range(len(n)):  # Same amount as existing edges 
+			if graph_type == 'Undirected':
+				B[j, i] = B[i, j]
+		# Adding edges
+		for _ in range(len(n)):  # Same amount as existing edges 
+			add1, add2 = np.random.choice(m), np.random.choice(m)
+			while ((add1, add2) in visited or (add2, add1) in visited):
 				add1, add2 = np.random.choice(m), np.random.choice(m)
-				while ((add1, add2) in visited or (add2, add1) in visited):  # no cyclic
-					add1, add2 = np.random.choice(m), np.random.choice(m)
+			if weighted_noise:
+				B[add1, add2] = max(min(np.random.normal(1, weighted_noise), 2), 0) # 0 ~ 2
+			else:
 				B[add1, add2] = 1
-				visited.add((add1, add2))
-			B = B.tocsr()
-			multi_graph_w_permutation.append(B)
-			B = A.copy()
+			if graph_type == 'Undirected':
+				B[add2, add1] = B[add1, add2]
+			visited.add((add1, add2))
 
-	return multi_graph_w_permutation
+		if is_perm:
+			perm = scipy.random.permutation(m)
+			P = P.tocsr()[perm, :]
+		B = P.dot(B).dot(P.T)
+
+		B = B.tocsr()
+		multi_graph_w_permutation.append(B)
+		permutation.append(P)
+		B = A.copy()
+
+
+	return multi_graph_w_permutation, permutation
 
 # Load original graph from edge file and create multiple synthetic graphs with noise
 # Write sparse matrixes to edge file for later use
 def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5, noise_level = 0.02, weighted_noise = None):
 	path = 'metadata/multigraph/'
 	graph_info = {} # {graph name: sparse adjacency matrix}
+	perm_info = {} # {graph name: permutation} lenth =  number + 1 
 	if filename:
 		A = loadSparseGraph(filename, graph_type)
 	else:
 		raise RuntimeError("Need an input file")
 	# Remove Isolated nodes in A
 	A, rest_idx = removeIsolatedSparse(A)
-	multi_graph_w_permutation = permuteMultiSparse(A, number, graph_type, level = noise_level, weighted_noise = weighted_noise)
+	multi_graph_w_permutation, permutation = permuteMultiSparse(A, number, graph_type, level = noise_level, weighted_noise = weighted_noise)
 	writeSparseToFile(path + graph_type + '/M0.edges', A)
 	# writeSparseToFile(path + graph_type + '/M0', A)
 	graph_info['M0'] = A
-	for i, g in enumerate(multi_graph_w_permutation):
+	perm_info['M0'] = identity(A.get_shape()[0])
+	for i, gp in enumerate(zip(multi_graph_w_permutation, permutation)):
+		g, p = gp
 		writeSparseToFile(path + graph_type + '/M' + str(i+1) + '.edges', g)
 		# writeSparseToFile(path + graph_type + '/M' + str(i+1), g)
 		graph_info['M'+str(i+1)] = g
+		perm_info['M'+str(i+1)] = p
 
-	return graph_info, path + graph_type
+	return graph_info, perm_info, path + graph_type
 
 def get_graph_signature(attributes):
 	signature = []
@@ -187,18 +186,18 @@ if __name__ == '__main__':
 	attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
 	'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 	# attributes = ['Degree', 'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
-	node_num = multi_graphs['M0'].get_shape()[0] # m of (m, n)
-	for key in multi_graphs.keys():
-		print key
-		attributesA = getUndirAttribute(path + '/' + key, node_num)
-		# TODO: handle when permutation possible
-		with open(path + '/attributes'+key, 'w') as f:
-			for index, row in attributesA.iterrows():
-				f.write(str(attributesA.ix[index]))
-		graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
+	# node_num = multi_graphs['M0'].get_shape()[0] # m of (m, n)
+	# for key in multi_graphs.keys():
+	# 	print key
+	# 	attributesA = getUndirAttribute(path + '/' + key, node_num)
+	# 	# TODO: handle when permutation possible
+	# 	with open(path + '/attributes'+key, 'w') as f:
+	# 		for index, row in attributesA.iterrows():
+	# 			f.write(str(attributesA.ix[index]))
+	# 	graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 	#multigraph_sig = get_multi_graph_signature('Undirected', graph_attrs)
 	#D = get_distance_matrix_and_order(multigraph_sig)
-	graph_signatures = get_distribution_matrix(graph_attrs, attributes)
-	print graph_signatures
+	# graph_signatures = get_distribution_matrix(graph_attrs, attributes)
+	# print graph_signatures
 
 
