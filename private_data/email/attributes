@@ -4,7 +4,3 @@ PageRank
 EgonetDegree
 AvgNeighborDeg
 EgonetConnectivity
-WeightedDegree
-EgoWeightedDegree
-AvgWeightedNeighborDeg
-EgonetWeightedConnectivity

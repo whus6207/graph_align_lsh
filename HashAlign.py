@@ -5,7 +5,7 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-# from netalign_utils import *
+from netalign_utils import *
 import pandas as pd
 #import h5py
 import os.path
@@ -55,8 +55,8 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 	graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
 	graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))
 	multi_graphs = {}
-	if compute_netalign:
-		multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
+	#if compute_netalign:
+	multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
 	# Load attributes name
 	attributes = []
 	with open('./private_data/' + filename + '/attributes') as f:
@@ -262,7 +262,7 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 						derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
 						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]] , printing=False) # handle!!!!!!!! P1, P2
 						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
-						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])])
+						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 				print 'derived rank score: '
 				print derived_rank
 				tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)

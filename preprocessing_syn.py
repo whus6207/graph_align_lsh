@@ -122,6 +122,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	end_preprocess = time.time()
 	preprocess_time = end_preprocess - start_preprocess
 	
+	print 'noise level: '+str(noise_level)	
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
