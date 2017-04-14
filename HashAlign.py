@@ -5,7 +5,7 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-from netalign_utils import *
+from baseline_utils import *
 import pandas as pd
 #import h5py
 import os.path
@@ -19,8 +19,8 @@ Best_Ranking = {}
 Best_correctMatch = {}
 
 def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 200, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 3.5): 
+	loop_num = 1, cos_num_plane = 200, euc_width = 2, compute_sim = False, compute_netalign = False,
+	compute_final = False, threshold = 3.5): 
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -75,6 +75,7 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 		correct_score_upper = 0
 		correct_score_hungarian = 0
 		netalign_score = 0
+		final_score = 0
 		pairs_computed = 0
 		matching_time = 0
 		avg_derived_rank = 0
@@ -194,8 +195,8 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 			this_pair_computed = {}
 			Ranking = {}
 			correctMatch = {}
-			hung_score = {}
 			netalign_scores = {}
+			final_scores = {}
 
 			for g in pair_count_dict.keys():
 				if g == center_id:
@@ -213,10 +214,6 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 				#correctMatch[g] = argmaxMatch(matching_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				# if compute_sim:
 				# 	Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
-				hung_score[g] = correctMatch[g]
-				if compute_hungarian:
-					hung_score[g] = hungarianMatch(sim_matrix[(center_id, g)], graph_perm[g])
-
 
 				rank_score += sum(Ranking[g])/len(Ranking[g])
 				if compute_sim:
@@ -227,14 +224,15 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 					correct_score_upper += 0
 				correct_score += sum(correctMatch[g]) / float(len(correctMatch[g]))
 
-				if compute_hungarian:
-					correct_score_hungarian += sum(hung_score[g])/float(len(hung_score[g]))
 				else:
 					correct_score_hungarian += 0
 				pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
 				if compute_netalign:
-					netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g])
+					netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g], graph_perm[center_id], graph_perm[g])
 					netalign_score += netalign_scores[g]
+				if compute_final:
+					final_scores[g] = getFinalScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g], graph_perm[center_id], graph_perm[g])
+					final_score += final_scores[g]
 				print "=========================================================="
 				print filename + ' ' + g + ', center:' + center_id + ', center_dist: '+ metadata['center_distance']
 				print "GraphType = " + metadata['graph_type'] 
@@ -246,10 +244,10 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 				print "matching score by correct match: %f" % (sum(correctMatch[g]) / float(len(correctMatch[g])))
 				if compute_sim:
 					print "matching score by correct match upper bound %f" % (sum(Best_correctMatch[(center_id, g)]) / float(len(Best_correctMatch[(center_id, g)])))
-				if compute_hungarian:
-					print "hungarian matching score upper bound: %f" %(sum(hung_score[g])/float(len(hung_score[g])))
 				if compute_netalign:
 					print "netalign score: %f" %(netalign_scores[g])
+				if compute_final:
+					print "final score: %f" %(final_scores[g])
 				print "percentage of pairs computed: %f" %(this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1]))
 
 			if int(metadata['number']) >1:
@@ -263,6 +261,7 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]] , printing=False) # handle!!!!!!!! P1, P2
 						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+						derived_netalign[(non_center[i],non_center[j])] = getFinalScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 				print 'derived rank score: '
 				print derived_rank
 				tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
@@ -281,6 +280,7 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 		correct_score_upper /= loop_num * len(pair_count_dict.keys())
 		correct_score_hungarian /= loop_num * len(pair_count_dict.keys())
 		netalign_score /= loop_num * len(pair_count_dict.keys())
+		final_score /= loop_num * len(pair_count_dict.keys())
 		pairs_computed /= loop_num * len(pair_count_dict.keys())
 		avg_derived_rank /= loop_num
 		avg_derived_netalign /= loop_num	
@@ -297,6 +297,7 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 			, 'correct_score_upper' : correct_score_upper\
 			, 'correct_score_hungarian' : correct_score_hungarian\
 			, 'netalign_score': netalign_score\
+			, 'final_score': final_score\
 			, 'center_id': center_id\
 			, 'found_center' : metadata['found_center']\
 			, 'avg_derived_rank': avg_derived_rank\

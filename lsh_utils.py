@@ -6,7 +6,6 @@ from scipy.sparse import csr_matrix
 from itertools import izip
 import matplotlib.pyplot as plt
 import random
-from munkres import Munkres
 from sklearn.preprocessing import normalize
 import pandas as pd
 
