@@ -4,10 +4,20 @@ addpath('../netalign/matlab')
 [S,w,li,lj] = netalign_setup(A,B,L);
 x = netalignbp(S,w,0,1,li,lj);
 [ma, mb, ~, ~, ~] = mwmround(x,S,w,li,lj);
-size(Pa)
-size(ma)
-size(Pb)
-size(mb)
-ma = transpose(Pa)*ma;
-mb = transpose(Pb)*mb;
-accuracy = sum(ma == mb) / size(ma,1);
+
+[m, n] = size(Pa);
+M1 = zeros(m, 1);
+for i = ma
+	M1(i) = 1;
+end
+M2 = -1 * ones(m, 1);
+for j = mb
+	M2(j) = 1;
+end
+
+size(M1)
+size(M2)
+
+ma = transpose(Pa)*M1;
+mb = transpose(Pb)*M2;
+accuracy = sum(M1 == M2) / m;
