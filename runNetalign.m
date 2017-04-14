@@ -14,10 +14,6 @@ M2 = -1 * ones(m, 1);
 for j = mb
 	M2(j) = 1;
 end
-
-size(M1)
-size(M2)
-
 ma = transpose(Pa)*M1;
 mb = transpose(Pb)*M2;
 accuracy = sum(M1 == M2) / m;
