@@ -21,7 +21,7 @@ Best_correctMatch = {}
 def experiment(df, filename, is_perm = False, noise_level = 0.05, 
 	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
 	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 0.003,
+	threshold = 0.003, reweight = True,
 	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	"""
 	Experiment on two graphs with multiple setting
@@ -55,8 +55,9 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 	# Load all graph attributes
 	graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
 	multi_graphs = {}
-	if compute_netalign:
-		multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
+	# if compute_netalign:
+	multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
+	#print multi_graphs
 	# Load attributes name
 	attributes = []
 	with open('./private_data/' + filename + '/attributes') as f:
@@ -189,7 +190,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 
 			stacked_attrs = selectAndCombineMulti(graph_attrs)	 
-			pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), center_id)
+			pair_count_dict = combineBucketsBySumMulti(buckets, stacked_attrs[['Graph', 'Id']], graph_attrs.keys(), center_id, reweight)
 			
 			matching_matrix = {}
 			this_pair_computed = {}
@@ -298,6 +299,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 			, 'correct_score' : correct_score\
 			, 'correct_score_upper' : correct_score_upper\
 			, 'correct_score_hungarian' : correct_score_hungarian\
+			, 'netalign_score': netalign_score\
 			, 'center_id': center_id\
 			, 'found_center' : metadata['found_center']\
 			, 'avg_derived_rank': avg_derived_rank\
@@ -313,11 +315,12 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 if __name__ == '__main__':
 	adaptiveLSH = [False]
 	bandNumbers = [1, 2, 4, 6]
-	thresholds = [0.001, 0.002, 0.004, 0.008, 0.01, 0.02] 
+	thresholds = [1, 2, 4] 
 	LSH = ['Cosine', 'Euclidean']
-	folders = ['facebook', 'email']
+	folders = ['facebook']
+	reweights = [True, False]
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_band_thres_multi_netalign.pkl'
+	fname = 'exp_band_thres_no_weight.pkl'
 
 	if os.path.isfile(fname):
 		with open(fname, 'rb') as f:
@@ -330,14 +333,22 @@ if __name__ == '__main__':
 				, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
 	for fold in folders:
 		for band in bandNumbers:
-			for lsh_type in LSH:
-				for thres in thresholds:
-					df = experiment(df, filename = fold, loop_num = 1, bandNumber = band, threshold = thres, compute_netalign = True, compute_sim = True, adaptiveLSH = False, LSHType = lsh_type)
+			for thres in thresholds:
+				for rew in reweights:
+					if rew:
+						df = experiment(df, filename = fold, loop_num = 1, bandNumber = band, threshold = thres,\
+							compute_netalign = False, compute_sim = True, reweight = rew,\
+							adaptiveLSH = False, LSHType = 'Cosine')
+					else:
+						df = experiment(df, filename = fold, loop_num = 1, bandNumber = band, threshold = thres/100.0,\
+							compute_netalign = False, compute_sim = True, reweight = rew,\
+							adaptiveLSH = False, LSHType = 'Cosine')
+					pickle.dump(df, open(fname,'wb'))
+					df.to_csv('exp_band_thres_no_weight.csv')
 		sim_matrix = {}
 		Best_Ranking = {}
-                Best_correctMatch = {}
-		pickle.dump(df, open(fname,'wb'))
-		df.to_csv('exp_band_thres_multi_netalign.csv')
+        Best_correctMatch = {}
+		
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
 		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,

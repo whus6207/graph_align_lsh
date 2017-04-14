@@ -212,7 +212,7 @@ def combineBucketsBySum(buckets, combineAB, Afname):
 
     return pair_count_dict
 
-def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
+def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id, reweight = True):
     pair_count_dict = defaultdict(lambda : defaultdict(int))
     for bucket in buckets:
 	if len(bucket)>1:
@@ -234,9 +234,11 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
                     & (stacked_attrs['Id'].isin([c[1] for c in collisions if c[0]==g]))]
                 for aid in A_idx.index.values:
                     for bid in B_idx.index.values:
-                        # experimental
-                        pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)*len(stacked_attrs.index)
-
+                        if reweight:
+                            # experimental
+                            pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)*len(stacked_attrs.index)
+                        else:
+                            pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0
     return pair_count_dict
 
 
