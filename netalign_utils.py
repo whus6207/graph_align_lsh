@@ -13,3 +13,15 @@ def getNetalignScore(A, B, L, Pa, Pb):
   eng.quit()
 
   return accuracy
+
+def getFinalScore(A, B, H, Pa, Pb):
+	eng = mateng.start_matlab()
+
+	io.savemat('temp_final.mat', dict(A = A, B = B, H = H, Pa = Pa, Pb = Pb))
+
+	accuracy = eng.runFinal()
+	prtin "final: " + str(accuracy)
+
+	eng.quit()
+
+	return accuracy
