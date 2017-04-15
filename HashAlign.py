@@ -5,12 +5,13 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-from baseline_utils import *
+# from baseline_utils import *
 import pandas as pd
 #import h5py
 import os.path
 import pickle
 import time
+import sys
 
 import warnings
 
@@ -18,9 +19,9 @@ sim_matrix = {}
 Best_Ranking = {}
 Best_correctMatch = {}
 
-def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 200, euc_width = 2, compute_sim = False, compute_netalign = False,
-	compute_final = False, threshold = 3.5): 
+def experiment(df, filename, bandNumber = 4, adaptiveLSH = True, LSHType = 'Euclidean',
+	loop_num = 1, cos_num_plane = 50, euc_width = 3, compute_sim = False, compute_netalign = False,
+	compute_final = False, threshold = 0.2): 
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -73,13 +74,13 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 		rank_score_upper = 0
 		correct_score = 0
 		correct_score_upper = 0
-		correct_score_hungarian = 0
 		netalign_score = 0
 		final_score = 0
 		pairs_computed = 0
 		matching_time = 0
 		avg_derived_rank = 0
 		avg_derived_netalign = 0
+		avg_derived_final = 0
 
 		# sim_matrix = {}
 		start_sim = time.time()
@@ -224,8 +225,7 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 					correct_score_upper += 0
 				correct_score += sum(correctMatch[g]) / float(len(correctMatch[g]))
 
-				else:
-					correct_score_hungarian += 0
+
 				pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
 				if compute_netalign:
 					netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g], graph_perm[center_id], graph_perm[g])
@@ -254,57 +254,67 @@ def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Eucl
 				derived_matching_matrix = {}
 				derived_rank = {}
 				derived_netalign = {}
+				derived_final = {}
 				non_center = matching_matrix.keys()
 				for i in xrange(len(non_center)):
 					for j in xrange(i+1, len(non_center)):
 						derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
 						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]] , printing=False) # handle!!!!!!!! P1, P2
 						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
-						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
-						derived_netalign[(non_center[i],non_center[j])] = getFinalScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+						# derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+						derived_final[(non_center[i],non_center[j])] = getFinalScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 				print 'derived rank score: '
 				print derived_rank
 				tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 				avg_derived_rank += tmp_avg_derived_rank
 				print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
 				
-				print 'derived netalign score: '
-				print derived_netalign
-				tmp_avg_netalign = np.mean(derived_netalign.values())
-				avg_derived_netalign += tmp_avg_netalign
-				print 'avg derived netalign score: ' + str(np.mean(tmp_avg_netalign))	
+				# print 'derived netalign score: '
+				# print derived_netalign
+				# tmp_avg_netalign = np.mean(derived_netalign.values())
+				# avg_derived_netalign += tmp_avg_netalign
+				print 'derived final score: '
+				print derived_final
+				tmp_avg_final = np.mean(derived_final.values())
+				avg_derived_final += tmp_avg_final
+				
+
+				# print 'avg derived netalign score: ' + str(np.mean(tmp_avg_netalign))
+				print 'avg derived final score: ' + str(np.mean(tmp_avg_final))
 		
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
 		correct_score /= loop_num * len(pair_count_dict.keys())
 		correct_score_upper /= loop_num * len(pair_count_dict.keys())
-		correct_score_hungarian /= loop_num * len(pair_count_dict.keys())
 		netalign_score /= loop_num * len(pair_count_dict.keys())
 		final_score /= loop_num * len(pair_count_dict.keys())
 		pairs_computed /= loop_num * len(pair_count_dict.keys())
 		avg_derived_rank /= loop_num
-		avg_derived_netalign /= loop_num	
+		avg_derived_netalign /= loop_num
+		avg_derived_final /= loop_num	
 		end_matching = time.time()
 		matching_time = end_matching - start_matching		
 
 		df = df.append({'filename':filename, 'nodeAttributeFile': metadata['node_dir']\
 			, 'noise_level':metadata['noise_level']\
-			, 'GraphType':metadata['graph_type'], 'bandNumber':bandNumber, 'adaptiveLSH':adaptiveLSH, 'LSHType':LSHType\
+			, 'GraphType':metadata['graph_type']\
+			, 'bandNumber':bandNumber\
+			, 'adaptiveLSH':adaptiveLSH\
+			, 'LSHType':LSHType\
 			, 'threshold':threshold\
 			, 'rank_score' : rank_score\
 			, 'rank_score_upper' : rank_score_upper\
 			, 'correct_score' : correct_score\
 			, 'correct_score_upper' : correct_score_upper\
-			, 'correct_score_hungarian' : correct_score_hungarian\
 			, 'netalign_score': netalign_score\
 			, 'final_score': final_score\
 			, 'center_id': center_id\
 			, 'found_center' : metadata['found_center']\
 			, 'avg_derived_rank': avg_derived_rank\
 			, 'avg_derived_netalign': avg_derived_netalign\
+			, 'avg_derived_final': avg_derived_final\
 			, 'center_dist': metadata['center_distance']\
 			, 'pairs_computed' : pairs_computed\
-			# , 'preprocess_time': preprocess_time\
 			, 'matching_time': matching_time\
 			}, ignore_index=True)
 
@@ -318,7 +328,7 @@ if __name__ == '__main__':
 	LSH = ['Cosine', 'Euclidean']
 	folders = ['facebook', 'email']
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_pair_band_lsh.pkl'
+	fname = 'exp_syn.pkl'
 
 	if os.path.isfile(fname):
 		with open(fname, 'rb') as f:
@@ -327,17 +337,17 @@ if __name__ == '__main__':
 		df = pd.DataFrame(
 			columns=['filename','nodeAttributeFile', 'noise_level', 'GraphType'\
 				, 'bandNumber', 'adaptiveLSH', 'LSHType', 'threshold'\
-				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper', 'correct_score_hungarian'\
+				, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper'\
 				, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
 	# for dist_type in center_distance_types:
 	for b in bandNumber:
 		for lsh in LSH:
 			if lsh == 'Cosine':
 				for c in cos_num_plane:
-					df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh, cos_num_plane = c)
+					df = experiment(df, filename = sys.argv[1], bandNumber = b, adaptiveLSH = False, LSHType = lsh, cos_num_plane = c)
 			else:
 				for e in euc_width:
-					df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
+					df = experiment(df, filename = sys.argv[1], bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
 
 		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
 		# 		GraphType = 'Directed', bandNumber = 2, 
@@ -350,7 +360,7 @@ if __name__ == '__main__':
 
 	pickle.dump(df, open(fname,'wb'))
 
-	writer = pd.ExcelWriter('exp_pair_band_lsh.xlsx')
+	writer = pd.ExcelWriter('exp_syn.xlsx')
 	df.to_excel(writer, sheet_name='Sheet1')
 	writer.save()
 

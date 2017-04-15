@@ -1,6 +1,6 @@
-clear;
 function accuracy = runFinal()
-load(temp_final);
+clear;
+load temp_final;
 addpath('../final')
 S1 = final_NE(A, B, H, node_A, node_B,...
     A, B,...
@@ -10,6 +10,4 @@ S1 = final_NE(A, B, H, node_A, node_B,...
 
 row = Pa*row;
 col = Pb*col;
-// ground_sort = sortrows(ground_truth, 2);
-// accuracy = sum(row == ground_sort(:,1))/length(row)
-accuracy = sum(row == col) / size(row, 1)
+accuracy = sum(row == col) / size(row, 1);

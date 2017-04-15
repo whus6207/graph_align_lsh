@@ -1,5 +1,6 @@
 import numpy as np
 from collections import defaultdict
+import heapq as hp
 from scipy.stats import entropy
 from scipy.sparse import lil_matrix
 from scipy.sparse import csr_matrix
@@ -149,7 +150,7 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
     # matching_matrix[remove_id] = 0
     return matching_matrix, pair_computed
 
-def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
+def computeSparseMatchingMat2(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
     combineAB = selectAndCombine(attributesA, attributesB)
     combineAB = combineAB.as_matrix()
     matching_matrix = lil_matrix((len(attributesA), len(attributesB)))
@@ -167,6 +168,35 @@ def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType,
                 pair_computed += 1
                 matching_matrix[pair[0], pair[1]] = Euclidean_sim(combineAB[pair[0]][2:],\
                     combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
+    matching_matrix = matching_matrix.tocsr()
+    matching_matrix = normalize(matching_matrix, norm='l1', axis=1)
+    return matching_matrix, pair_computed
+
+def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold):
+    combineAB = selectAndCombine(attributesA, attributesB)
+    combineAB = combineAB.as_matrix()
+    matching_matrix = lil_matrix((len(attributesA), len(attributesB)))
+    scale = np.mean(combineAB[:,2:], axis=0)
+    node_pairs = defaultdict(list)
+    pair_computed = 0
+
+    for pair, count in pair_count_dict.iteritems():
+        hp.heappush(node_pairs[pair[0]], (-1 * count, pair[1]))   # small to large based on negative count
+
+    if LSHType == 'Cosine':               
+        for row in node_pairs.keys():
+            for _ in range(int(len(node_pairs[row]) * threshold)):
+                pair_computed += 1
+                neg_count, col = hp.heappop(node_pairs[row])
+                matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
+                    combineAB[col+len(attributesA)][2:],scaling=scale)*(-neg_count)
+    elif LSHType == 'Euclidean':
+        for row in node_pairs.keys():
+            for _ in range(int(len(node_pairs[row]) * threshold)):
+                pair_computed += 1
+                neg_count, col = hp.heappop(node_pairs[row])
+                matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
+                    combineAB[col+len(attributesA)][2:],scaling=scale)*(-neg_count)
     matching_matrix = matching_matrix.tocsr()
     matching_matrix = normalize(matching_matrix, norm='l1', axis=1)
     return matching_matrix, pair_computed
