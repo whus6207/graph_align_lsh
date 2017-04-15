@@ -1,7 +1,0 @@
-graph_type Undirected
-noise_level 0.01
-weighted_noise 1.0
-found_center M1
-number 2
-node_dir Data/facebook.nodes
-center_distance canberra
