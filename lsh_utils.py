@@ -1,12 +1,12 @@
 import numpy as np
 from collections import defaultdict
+import heapq as hp
 from scipy.stats import entropy
 from scipy.sparse import lil_matrix
 from scipy.sparse import csr_matrix
 from itertools import izip
 import matplotlib.pyplot as plt
 import random
-from munkres import Munkres
 from sklearn.preprocessing import normalize
 import pandas as pd
 
@@ -150,7 +150,7 @@ def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, thres
     # matching_matrix[remove_id] = 0
     return matching_matrix, pair_computed
 
-def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
+def computeSparseMatchingMat2(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
     combineAB = selectAndCombine(attributesA, attributesB)
     combineAB = combineAB.as_matrix()
     matching_matrix = lil_matrix((len(attributesA), len(attributesB)))
@@ -168,6 +168,35 @@ def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType,
                 pair_computed += 1
                 matching_matrix[pair[0], pair[1]] = Euclidean_sim(combineAB[pair[0]][2:],\
                     combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
+    matching_matrix = matching_matrix.tocsr()
+    matching_matrix = normalize(matching_matrix, norm='l1', axis=1)
+    return matching_matrix, pair_computed
+
+def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold):
+    combineAB = selectAndCombine(attributesA, attributesB)
+    combineAB = combineAB.as_matrix()
+    matching_matrix = lil_matrix((len(attributesA), len(attributesB)))
+    scale = np.mean(combineAB[:,2:], axis=0)
+    node_pairs = defaultdict(list)
+    pair_computed = 0
+
+    for pair, count in pair_count_dict.iteritems():
+        hp.heappush(node_pairs[pair[0]], (-1 * count, pair[1]))   # small to large based on negative count
+
+    if LSHType == 'Cosine':               
+        for row in node_pairs.keys():
+            for _ in range(int(len(node_pairs[row]) * threshold)):
+                pair_computed += 1
+                neg_count, col = hp.heappop(node_pairs[row])
+                matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
+                    combineAB[col+len(attributesA)][2:],scaling=scale)*(-neg_count)
+    elif LSHType == 'Euclidean':
+        for row in node_pairs.keys():
+            for _ in range(int(len(node_pairs[row]) * threshold)):
+                pair_computed += 1
+                neg_count, col = hp.heappop(node_pairs[row])
+                matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
+                    combineAB[col+len(attributesA)][2:],scaling=scale)*(-neg_count)
     matching_matrix = matching_matrix.tocsr()
     matching_matrix = normalize(matching_matrix, norm='l1', axis=1)
     return matching_matrix, pair_computed
@@ -212,9 +241,13 @@ def combineBucketsBySum(buckets, combineAB, Afname):
 
     return pair_count_dict
 
-def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
+def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id, reweight = True):
     pair_count_dict = defaultdict(lambda : defaultdict(int))
     for bucket in buckets:
+	if len(bucket)>1:
+		sorted_bucks = sorted(bucket.items(), key=lambda item: len(item[1]))
+		if len(sorted_bucks[-1][1])>len(stacked_attrs.index)*3/4:
+			bucket = dict(sorted_bucks[:-1])
         for buck, collisions in bucket.items(): # collisions = [(Graph, Id)]
             if len(collisions) <= 1:
                 continue
@@ -230,9 +263,11 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id):
                     & (stacked_attrs['Id'].isin([c[1] for c in collisions if c[0]==g]))]
                 for aid in A_idx.index.values:
                     for bid in B_idx.index.values:
-                        # experimental
-                        pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)
-
+                        if reweight:
+                            # experimental
+                            pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0/len(collisions)*len(stacked_attrs.index)
+                        else:
+                            pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0
     return pair_count_dict
 
 
@@ -287,9 +322,9 @@ def Rank(matching_matrix, P = None, printing = False):
 
     return ranking
 
-def sparseRank(matching_matrix, P = None, printing = False):
-    if P != None:
-        matching_matrix = matching_matrix.dot(P)
+def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
+    if P1 != None and P2 != None:
+        matching_matrix = (P1.T).dot(matching_matrix).dot(P2)
 
     n, d = matching_matrix.shape
     ranking = np.zeros((n))

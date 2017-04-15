@@ -1,6 +1,6 @@
 graph_type Undirected
-noise_level 0.01
-weighted_noise 1.0
+noise_level 0.02
+weighted_noise None
 found_center M3
 number 3
 node_dir None

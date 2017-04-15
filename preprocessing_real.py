@@ -7,6 +7,7 @@ from multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
 import pickle
+import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
 	center_distance = 'canberra', findcenter = 0):
@@ -47,7 +48,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(real_path + '/' + key +'.edges', node_num, 0.01)
+			attributesA = getUndirAttribute(real_path + '/' + key +'.edges', node_num, 0.1)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
@@ -62,7 +63,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, 0.01)
+			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, 0.1)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
@@ -119,7 +120,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
-	preprocessing(edge_dir = 'Data/Dblp', save_dir = 'dblp')
+	preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2])
 
 	
 
