@@ -130,7 +130,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 if __name__ == '__main__':
 	# python prepocessing_syn.py edge_dir [node_dir] save_dir num_graphs
 	if len(sys.argv) == 4:
-		preprocessing(edge_dir = sys.argv[1], number = int(sys.argv[3]), save_dir = sys.argv[2])
+		preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2], number = int(sys.argv[3]))
 	# elif len(sys.argv) == 5:
 	# 	preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], number = int(sys.argv[4]), save_dir = sys.argv[3])
 	elif len(sys.argv) == 5:
