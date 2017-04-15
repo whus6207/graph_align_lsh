@@ -19,7 +19,7 @@ class HashAlign:
 		self.sim_matrix = {}
 		self.Best_Ranking = {}
 		self.Best_correctMatch = {}
-		self.run(fname)
+		self.fname = fname
 
 	def experiment(self, df, filename, bandNumber = 4, LSHType = 'Euclidean',
 		loop_num = 1, cos_num_plane = 50, euc_width = 3, compute_sim = False, compute_netalign = False,
@@ -233,31 +233,20 @@ class HashAlign:
 				}, ignore_index=True)
 		return df
 
-	def run(self, fname):
+	def run(self, band_numbers = [4], cos_num_plane = [25], euc_width = [4], LSHs=['Cosine'], folders=['facebook'], thresholds = [0.2]):
 		
-		bandNumbers = [4]
-		cos_num_plane = [25]
-		euc_width = [4]
-		LSH = ['Cosine', 'Euclidean']
-		folders = ['facebook']
-		reweights = [True]
-		thresholds = [0.2]
 		# center_distance_types = ['canberra', 'manhattan', 'euclidean']
 
-		if os.path.isfile(fname+'.pkl'):
-			with open(fname+'.pkl', 'rb') as f:
+		if os.path.isfile(self.fname+'.pkl'):
+			with open(self.fname+'.pkl', 'rb') as f:
 				df = pickle.load(f)
 		else:
-			df = pd.DataFrame(
-				columns=['filename','nodeAttributeFile', 'noise_level', 'GraphType'\
-					, 'bandNumber', 'LSHType', 'threshold'\
-					, 'rank_score', 'rank_score_upper', 'correct_score', 'correct_score_upper'\
-					, 'center_id', 'found_center', 'avg_derived_rank', 'center_dist', 'pairs_computed', 'matching_time'])
+			df = pd.DataFrame()
 		
 		for fold in folders:
-			for band in bandNumbers:
+			for band in band_numbers:
 				for thres in thresholds:
-					for lsh in LSH:
+					for lsh in LSHs:
 						if lsh == 'Cosine':
 							for c in cos_num_plane:
 								df = self.experiment(df, filename = fold, 
@@ -268,12 +257,12 @@ class HashAlign:
 								df = self.experiment(df, filename = fold, 
 										bandNumber = band, LSHType = lsh, euc_width = e, threshold = thres,
 										compute_sim = False, compute_netalign = False, compute_final = False)
-						pickle.dump(df, open(fname+'.pkl','wb'))
-						df.to_csv(fname+'.csv')
+						pickle.dump(df, open(self.fname+'.pkl','wb'))
+						df.to_csv(self.fname+'.csv')
 			self.sim_matrix = {}
 			self.Best_Ranking = {}
-	        self.Best_correctMatch = {}
+	        	self.Best_correctMatch = {}
 
 if __name__ == '__main__':
-	HashAlign(fname = sys.argv[1])
-
+	ha_runner = HashAlign(fname = sys.argv[1])
+	ha_runner.run()

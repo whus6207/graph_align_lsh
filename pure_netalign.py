@@ -79,7 +79,7 @@ class PureNetalign:
 				print "netalign score: %f" %(netalign_scores[(center_id, g)])
 		avg_netalign_score /=  (len(multi_graphs.keys())**2 - len(multi_graphs.keys()) )
 		matching_time = time.time() - start_match
-
+		print "matching_time: "+str(matching_time)
 		df = df.append({'filename':filename, 'nodeAttributeFile': metadata['node_dir']\
 			, 'noise_level':metadata['noise_level']\
 			, 'avg_netalign_score': avg_netalign_score\
