@@ -10,51 +10,64 @@ import pickle
 import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
-	number = 5, noise_level = 0.02, weighted_noise = None, center_distance = 'canberra', findcenter = 0):
+	number = 5, noise_level = 0.01, weighted_noise = 1.0, center_distance = 'canberra', findcenter = 0,
+	attr_only = False):
+	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
+
 	path = './private_data/' + save_dir
 	if not os.path.exists(path):
 		os.makedirs(path)
 	start_preprocess = time.time()
 
-	multi_graphs, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level, weighted_noise = weighted_noise)
-	node_num, n = multi_graphs['M0'].get_shape()
+	multi_graphs, multi_perm, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level, weighted_noise = weighted_noise)
+	node_num, n = multi_graphs['M0'].get_shape() 
 
 	nodeAttributesValue, nodeAttributesName = [], []
-	P = sparse.lil_matrix((node_num, n))
-	for i in range(node_num):
-		P[i, i] = 1
-	P = P.tocsr()
+	# P = sparse.lil_matrix((node_num, n))
+	# for i in range(node_num):
+	# 	P[i, i] = 1
+	# P = P.tocsr()
 	graph_attrs = {}
+
 
 	if node_dir:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(node_dir)
 		
 	### get graph attributes
+	attributes = []
 	if graph_type == 'Undirected':
+		if not attr_only:
+			attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
+			'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
+			if weighted_noise:
+				attributes += ['WeightedDegree', 'EgoWeightedDegree', 'AvgWeightedNeighborDeg', 'EgonetWeightedConnectivity']
 
-		attributes = ['Degree', 'NodeBetweennessCentrality', 'PageRank', 
-		'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 		attributes += nodeAttributesName
 
+
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num)
+			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
+			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key])
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
 	elif graph_type == 'Directed':
-
-		attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
+		if not attr_only:
+			attributes = ['Degree', 'InDegree', 'OutDegree', 'NodeBetweennessCentrality', 
 					  'PageRank', 'HubsScore', 'AuthoritiesScore',
 					  'EgonetDegree', 'EgonetInDegree', 'EgonetOutDegree',
 					  'AvgNeighborDeg', 'AvgNeighborInDeg', 'AvgNeighborOutDeg','EgonetConnectivity']
+			if weighted_noise:
+				attributes += ['WeightedDegree', 'WeightedInDegree', 'WeightedOutDegree', 'EgoWeightedDegree', 'AvgWeightedNeighborDeg', 'EgonetWeightedConnectivity'\
+				, 'EgoWeightedInDegree', 'EgoWeightedOutDegree', 'AvgWeightedNeighborInDeg', 'AvgWeightedNeighborOutDeg']
+
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num)
+			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
+			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key])
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
 	with open(path + '/attributes', 'w') as f:
@@ -100,13 +113,18 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		f.write('node_dir' + " " + str(node_dir) + '\n')
 		f.write('center_distance' + " " + str(center_distance) + '\n')
 		f.close()
+	# print list(graph_attrs['M1']['Degree'])
 	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
 	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
+	pickle.dump(multi_perm, open(path + '/permutations.pkl', 'wb'))
+	# g = pickle.load(open(path + '/attributes.pkl', 'rb'))
+	# print list(g['M1']['Degree'])
 
 
 	end_preprocess = time.time()
 	preprocess_time = end_preprocess - start_preprocess
 	
+	print 'noise level: '+str(noise_level)	
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
@@ -115,6 +133,9 @@ if __name__ == '__main__':
 		preprocessing(edge_dir = sys.argv[1], number = int(sys.argv[3]), save_dir = sys.argv[2])
 	elif len(sys.argv) == 5:
 		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], number = int(sys.argv[4]), save_dir = sys.argv[3])
+	elif len(sys.argv) == 6:
+		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], number = int(sys.argv[4])
+			, save_dir = sys.argv[3], attr_only = True)
 	
 
 

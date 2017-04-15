@@ -1,5 +1,5 @@
-/metadata/*
-/private_data/*
+metadata/*
+private_data/*
 netalign/
 *.DS_Store
 .ipynb_checkpoints

@@ -1,0 +1,2665 @@
+Graph                                M0
+Id                                    0
+Degree                               16
+NodeBetweennessCentrality       238.218
+PageRank                     0.00276351
+EgonetDegree                        359
+AvgNeighborDeg                  28.5625
+EgonetConnectivity              6.70588
+Name: 0, dtype: objectGraph                               M0
+Id                                   1
+Degree                               9
+NodeBetweennessCentrality      9.71859
+PageRank                     0.0027568
+EgonetDegree                        72
+AvgNeighborDeg                 15.8889
+EgonetConnectivity                   8
+Name: 1, dtype: objectGraph                                M0
+Id                                    2
+Degree                               16
+NodeBetweennessCentrality       282.271
+PageRank                     0.00270186
+EgonetDegree                        497
+AvgNeighborDeg                  40.8125
+EgonetConnectivity              10.1176
+Name: 2, dtype: objectGraph                                M0
+Id                                    3
+Degree                                9
+NodeBetweennessCentrality           630
+PageRank                     0.00325495
+EgonetDegree                          1
+AvgNeighborDeg                  7.77778
+EgonetConnectivity                  7.8
+Name: 3, dtype: objectGraph                                M0
+Id                                    4
+Degree                               12
+NodeBetweennessCentrality       451.596
+PageRank                     0.00252509
+EgonetDegree                        259
+AvgNeighborDeg                  24.9167
+EgonetConnectivity                    4
+Name: 4, dtype: objectGraph                                M0
+Id                                    5
+Degree                                5
+NodeBetweennessCentrality           0.5
+PageRank                     0.00293251
+EgonetDegree                          6
+AvgNeighborDeg                      5.8
+EgonetConnectivity              4.66667
+Name: 5, dtype: objectGraph                                M0
+Id                                    6
+Degree                               19
+NodeBetweennessCentrality       102.277
+PageRank                     0.00320969
+EgonetDegree                        296
+AvgNeighborDeg                  23.2105
+EgonetConnectivity                  8.2
+Name: 6, dtype: objectGraph                                M0
+Id                                    7
+Degree                                7
+NodeBetweennessCentrality           319
+PageRank                     0.00399418
+EgonetDegree                          2
+AvgNeighborDeg                  4.71429
+EgonetConnectivity                 4.75
+Name: 7, dtype: objectGraph                                M0
+Id                                    8
+Degree                               56
+NodeBetweennessCentrality       541.363
+PageRank                     0.00726328
+EgonetDegree                        802
+AvgNeighborDeg                  35.9643
+EgonetConnectivity              22.2456
+Name: 8, dtype: objectGraph                                M0
+Id                                    9
+Degree                                9
+NodeBetweennessCentrality      0.726869
+PageRank                     0.00148092
+EgonetDegree                        370
+AvgNeighborDeg                  48.3333
+EgonetConnectivity                  7.4
+Name: 9, dtype: objectGraph                                M0
+Id                                   10
+Degree                               30
+NodeBetweennessCentrality       79.6464
+PageRank                     0.00389269
+EgonetDegree                        738
+AvgNeighborDeg                     43.8
+EgonetConnectivity              19.5484
+Name: 10, dtype: objectGraph                                M0
+Id                                   11
+Degree                               14
+NodeBetweennessCentrality       32.3235
+PageRank                     0.00407954
+EgonetDegree                         77
+AvgNeighborDeg                  15.6429
+EgonetConnectivity                 10.4
+Name: 11, dtype: objectGraph                                M0
+Id                                   12
+Degree                                8
+NodeBetweennessCentrality       12.0362
+PageRank                     0.00146536
+EgonetDegree                        207
+AvgNeighborDeg                   30.875
+EgonetConnectivity              5.33333
+Name: 12, dtype: objectGraph                                M0
+Id                                   13
+Degree                               12
+NodeBetweennessCentrality       340.938
+PageRank                     0.00372585
+EgonetDegree                         95
+AvgNeighborDeg                  16.4167
+EgonetConnectivity              8.76923
+Name: 13, dtype: objectGraph                               M0
+Id                                  14
+Degree                              15
+NodeBetweennessCentrality       9826.7
+PageRank                     0.0064014
+EgonetDegree                       115
+AvgNeighborDeg                    11.2
+EgonetConnectivity                4.25
+Name: 14, dtype: objectGraph                                M0
+Id                                   15
+Degree                               14
+NodeBetweennessCentrality        20.309
+PageRank                     0.00414869
+EgonetDegree                         70
+AvgNeighborDeg                  14.2857
+EgonetConnectivity                  9.6
+Name: 15, dtype: objectGraph                                M0
+Id                                   16
+Degree                               64
+NodeBetweennessCentrality       1818.71
+PageRank                     0.00848415
+EgonetDegree                        846
+AvgNeighborDeg                  34.9062
+EgonetConnectivity              22.3385
+Name: 16, dtype: objectGraph                                M0
+Id                                   17
+Degree                               10
+NodeBetweennessCentrality       61.5902
+PageRank                     0.00187886
+EgonetDegree                        192
+AvgNeighborDeg                     23.4
+EgonetConnectivity              4.72727
+Name: 17, dtype: objectGraph                                M0
+Id                                   18
+Degree                               16
+NodeBetweennessCentrality       7155.24
+PageRank                     0.00665385
+EgonetDegree                         85
+AvgNeighborDeg                   7.1875
+EgonetConnectivity              2.70588
+Name: 18, dtype: objectGraph                                M0
+Id                                   19
+Degree                               15
+NodeBetweennessCentrality       5.90278
+PageRank                     0.00261781
+EgonetDegree                        103
+AvgNeighborDeg                  20.2667
+EgonetConnectivity                 13.5
+Name: 19, dtype: objectGraph                              M0
+Id                                 20
+Degree                             68
+NodeBetweennessCentrality     4690.35
+PageRank                     0.010073
+EgonetDegree                      848
+AvgNeighborDeg                31.3824
+EgonetConnectivity            19.6232
+Name: 20, dtype: objectGraph                                M0
+Id                                   21
+Degree                               67
+NodeBetweennessCentrality        525.83
+PageRank                     0.00838028
+EgonetDegree                        654
+AvgNeighborDeg                  36.7313
+EgonetConnectivity              27.5588
+Name: 21, dtype: objectGraph                                M0
+Id                                   22
+Degree                                4
+NodeBetweennessCentrality       1.36731
+PageRank                     0.00107118
+EgonetDegree                        108
+AvgNeighborDeg                     30.5
+EgonetConnectivity                  3.6
+Name: 22, dtype: objectGraph                                M0
+Id                                   23
+Degree                               12
+NodeBetweennessCentrality         24.26
+PageRank                     0.00356127
+EgonetDegree                         76
+AvgNeighborDeg                  15.3333
+EgonetConnectivity              9.23077
+Name: 23, dtype: objectGraph                                M0
+Id                                   24
+Degree                               12
+NodeBetweennessCentrality       195.025
+PageRank                     0.00227555
+EgonetDegree                        283
+AvgNeighborDeg                  28.5833
+EgonetConnectivity              5.53846
+Name: 24, dtype: objectGraph                                M0
+Id                                   25
+Degree                               16
+NodeBetweennessCentrality       39.7783
+PageRank                     0.00244835
+EgonetDegree                        524
+AvgNeighborDeg                    40.25
+EgonetConnectivity                    8
+Name: 25, dtype: objectGraph                               M0
+Id                                  26
+Degree                              22
+NodeBetweennessCentrality      935.781
+PageRank                     0.0036462
+EgonetDegree                       584
+AvgNeighborDeg                 35.5455
+EgonetConnectivity             9.56522
+Name: 26, dtype: objectGraph                               M0
+Id                                  27
+Degree                               5
+NodeBetweennessCentrality            0
+PageRank                     0.0019296
+EgonetDegree                        23
+AvgNeighborDeg                     9.6
+EgonetConnectivity                   5
+Name: 27, dtype: objectGraph                              M0
+Id                                 28
+Degree                              1
+NodeBetweennessCentrality           0
+PageRank                     0.003003
+EgonetDegree                        0
+AvgNeighborDeg                      1
+EgonetConnectivity                  1
+Name: 28, dtype: objectGraph                                 M0
+Id                                    29
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000938995
+EgonetDegree                           4
+AvgNeighborDeg                         5
+EgonetConnectivity                     1
+Name: 29, dtype: objectGraph                                 M0
+Id                                    30
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000800423
+EgonetDegree                          10
+AvgNeighborDeg                        11
+EgonetConnectivity                     1
+Name: 30, dtype: objectGraph                                M0
+Id                                   31
+Degree                               10
+NodeBetweennessCentrality          0.25
+PageRank                     0.00207933
+EgonetDegree                         44
+AvgNeighborDeg                       14
+EgonetConnectivity              9.63636
+Name: 31, dtype: objectGraph                                M0
+Id                                   32
+Degree                                8
+NodeBetweennessCentrality       45.8816
+PageRank                     0.00157607
+EgonetDegree                        204
+AvgNeighborDeg                    27.75
+EgonetConnectivity              2.88889
+Name: 32, dtype: objectGraph                                M0
+Id                                   33
+Degree                               14
+NodeBetweennessCentrality       70.0777
+PageRank                     0.00222212
+EgonetDegree                        412
+AvgNeighborDeg                  35.8571
+EgonetConnectivity              6.93333
+Name: 33, dtype: objectGraph                                M0
+Id                                   34
+Degree                               43
+NodeBetweennessCentrality       2929.63
+PageRank                     0.00616718
+EgonetDegree                        878
+AvgNeighborDeg                  37.2326
+EgonetConnectivity              17.4091
+Name: 34, dtype: objectGraph                                M0
+Id                                   35
+Degree                               23
+NodeBetweennessCentrality       2248.63
+PageRank                     0.00701777
+EgonetDegree                         62
+AvgNeighborDeg                   12.913
+EgonetConnectivity                10.75
+Name: 35, dtype: objectGraph                              M0
+Id                                 36
+Degree                              1
+NodeBetweennessCentrality           0
+PageRank                     0.003003
+EgonetDegree                        0
+AvgNeighborDeg                      1
+EgonetConnectivity                  1
+Name: 36, dtype: objectGraph                                M0
+Id                                   37
+Degree                                5
+NodeBetweennessCentrality             0
+PageRank                     0.00176087
+EgonetDegree                         67
+AvgNeighborDeg                     18.4
+EgonetConnectivity                    5
+Name: 37, dtype: objectGraph                                M0
+Id                                   38
+Degree                               11
+NodeBetweennessCentrality         5.102
+PageRank                     0.00177087
+EgonetDegree                        352
+AvgNeighborDeg                  39.7273
+EgonetConnectivity                    8
+Name: 38, dtype: objectGraph                                M0
+Id                                   39
+Degree                                4
+NodeBetweennessCentrality             0
+PageRank                     0.00174931
+EgonetDegree                         30
+AvgNeighborDeg                     11.5
+EgonetConnectivity                    4
+Name: 39, dtype: objectGraph                                M0
+Id                                   40
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00110513
+EgonetDegree                          1
+AvgNeighborDeg                        2
+EgonetConnectivity                    1
+Name: 40, dtype: objectGraph                                M0
+Id                                   41
+Degree                               21
+NodeBetweennessCentrality       419.375
+PageRank                     0.00346547
+EgonetDegree                        463
+AvgNeighborDeg                  28.2857
+EgonetConnectivity              6.90909
+Name: 41, dtype: objectGraph                                M0
+Id                                   42
+Degree                                3
+NodeBetweennessCentrality           643
+PageRank                     0.00404236
+EgonetDegree                          3
+AvgNeighborDeg                        2
+EgonetConnectivity                  1.5
+Name: 42, dtype: objectGraph                                M0
+Id                                   43
+Degree                               10
+NodeBetweennessCentrality       44.4824
+PageRank                     0.00170832
+EgonetDegree                        290
+AvgNeighborDeg                     34.2
+EgonetConnectivity              5.63636
+Name: 43, dtype: objectGraph                                M0
+Id                                   44
+Degree                                6
+NodeBetweennessCentrality       1123.32
+PageRank                     0.00171778
+EgonetDegree                        100
+AvgNeighborDeg                  21.6667
+EgonetConnectivity              5.14286
+Name: 44, dtype: objectGraph                                M0
+Id                                   45
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00132919
+EgonetDegree                          3
+AvgNeighborDeg                        4
+EgonetConnectivity                    1
+Name: 45, dtype: objectGraph                               M0
+Id                                  46
+Degree                              30
+NodeBetweennessCentrality      615.883
+PageRank                     0.0050416
+EgonetDegree                       304
+AvgNeighborDeg                      21
+EgonetConnectivity             11.4839
+Name: 46, dtype: objectGraph                                M0
+Id                                   47
+Degree                                7
+NodeBetweennessCentrality       23.8704
+PageRank                     0.00151046
+EgonetDegree                        172
+AvgNeighborDeg                  28.1429
+EgonetConnectivity                    4
+Name: 47, dtype: objectGraph                                M0
+Id                                   48
+Degree                               16
+NodeBetweennessCentrality       14.0933
+PageRank                     0.00224694
+EgonetDegree                        631
+AvgNeighborDeg                  52.5625
+EgonetConnectivity              13.2941
+Name: 48, dtype: objectGraph                                M0
+Id                                   49
+Degree                               77
+NodeBetweennessCentrality       1083.23
+PageRank                     0.00988321
+EgonetDegree                        620
+AvgNeighborDeg                  34.2468
+EgonetConnectivity              26.8462
+Name: 49, dtype: objectGraph                                M0
+Id                                   50
+Degree                               14
+NodeBetweennessCentrality       412.948
+PageRank                     0.00244999
+EgonetDegree                        245
+AvgNeighborDeg                  24.3571
+EgonetConnectivity              7.33333
+Name: 50, dtype: objectGraph                                M0
+Id                                   51
+Degree                                3
+NodeBetweennessCentrality       9.89179
+PageRank                     0.00168281
+EgonetDegree                          9
+AvgNeighborDeg                  4.66667
+EgonetConnectivity                    2
+Name: 51, dtype: objectGraph                                M0
+Id                                   52
+Degree                               18
+NodeBetweennessCentrality       12.4001
+PageRank                     0.00256552
+EgonetDegree                        481
+AvgNeighborDeg                     40.5
+EgonetConnectivity                   14
+Name: 52, dtype: objectGraph                                M0
+Id                                   53
+Degree                                7
+NodeBetweennessCentrality       1.29874
+PageRank                     0.00126667
+EgonetDegree                        316
+AvgNeighborDeg                  49.5714
+EgonetConnectivity                 4.75
+Name: 53, dtype: objectGraph                                M0
+Id                                   54
+Degree                                2
+NodeBetweennessCentrality           315
+PageRank                     0.00132896
+EgonetDegree                         18
+AvgNeighborDeg                       10
+EgonetConnectivity              1.33333
+Name: 54, dtype: objectGraph                                M0
+Id                                   55
+Degree                               25
+NodeBetweennessCentrality       86.3685
+PageRank                     0.00345526
+EgonetDegree                        668
+AvgNeighborDeg                    39.32
+EgonetConnectivity              13.0769
+Name: 55, dtype: objectGraph                                M0
+Id                                   56
+Degree                                5
+NodeBetweennessCentrality             0
+PageRank                     0.00100542
+EgonetDegree                        230
+AvgNeighborDeg                       51
+EgonetConnectivity                    5
+Name: 56, dtype: objectGraph                               M0
+Id                                  57
+Degree                               6
+NodeBetweennessCentrality     0.366667
+PageRank                     0.0018998
+EgonetDegree                        65
+AvgNeighborDeg                    16.5
+EgonetConnectivity             5.71429
+Name: 57, dtype: objectGraph                                M0
+Id                                   58
+Degree                               11
+NodeBetweennessCentrality        45.374
+PageRank                     0.00179233
+EgonetDegree                        349
+AvgNeighborDeg                  36.7273
+EgonetConnectivity                  5.5
+Name: 58, dtype: objectGraph                                M0
+Id                                   59
+Degree                               14
+NodeBetweennessCentrality       1.27892
+PageRank                     0.00201924
+EgonetDegree                        556
+AvgNeighborDeg                  51.8571
+EgonetConnectivity              12.2667
+Name: 59, dtype: objectGraph                                M0
+Id                                   60
+Degree                               75
+NodeBetweennessCentrality       972.982
+PageRank                     0.00947474
+EgonetDegree                        651
+AvgNeighborDeg                  35.1467
+EgonetConnectivity              27.1053
+Name: 60, dtype: objectGraph                               M0
+Id                                  61
+Degree                               8
+NodeBetweennessCentrality            2
+PageRank                     0.0030493
+EgonetDegree                        32
+AvgNeighborDeg                    10.5
+EgonetConnectivity             6.66667
+Name: 61, dtype: objectGraph                                M0
+Id                                   62
+Degree                                9
+NodeBetweennessCentrality       6.42806
+PageRank                     0.00154901
+EgonetDegree                        345
+AvgNeighborDeg                  43.7778
+EgonetConnectivity                  5.8
+Name: 62, dtype: objectGraph                                 M0
+Id                                    63
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000956612
+EgonetDegree                           7
+AvgNeighborDeg                         8
+EgonetConnectivity                     1
+Name: 63, dtype: objectGraph                              M0
+Id                                 64
+Degree                              2
+NodeBetweennessCentrality           0
+PageRank                     0.001435
+EgonetDegree                        7
+AvgNeighborDeg                    5.5
+EgonetConnectivity                  2
+Name: 64, dtype: objectGraph                                M0
+Id                                   65
+Degree                               23
+NodeBetweennessCentrality       71.3438
+PageRank                     0.00319714
+EgonetDegree                        677
+AvgNeighborDeg                  42.9565
+EgonetConnectivity              13.9167
+Name: 65, dtype: objectGraph                                M0
+Id                                   66
+Degree                                9
+NodeBetweennessCentrality       57.7233
+PageRank                     0.00177664
+EgonetDegree                        160
+AvgNeighborDeg                  22.1111
+EgonetConnectivity                  4.8
+Name: 66, dtype: objectGraph                                M0
+Id                                   67
+Degree                               13
+NodeBetweennessCentrality       7.45314
+PageRank                     0.00198114
+EgonetDegree                        478
+AvgNeighborDeg                  46.3846
+EgonetConnectivity              9.85714
+Name: 67, dtype: objectGraph                                 M0
+Id                                    68
+Degree                                 2
+NodeBetweennessCentrality              0
+PageRank                     0.000876717
+EgonetDegree                          67
+AvgNeighborDeg                      35.5
+EgonetConnectivity                     2
+Name: 68, dtype: objectGraph                               M0
+Id                                  69
+Degree                               5
+NodeBetweennessCentrality      16.6643
+PageRank                     0.0013734
+EgonetDegree                        99
+AvgNeighborDeg                    22.4
+EgonetConnectivity                   3
+Name: 69, dtype: objectGraph                                M0
+Id                                   70
+Degree                                8
+NodeBetweennessCentrality             0
+PageRank                     0.00292863
+EgonetDegree                          3
+AvgNeighborDeg                    8.375
+EgonetConnectivity                    8
+Name: 70, dtype: objectGraph                               M0
+Id                                  71
+Degree                              11
+NodeBetweennessCentrality     0.593274
+PageRank                     0.0017036
+EgonetDegree                       522
+AvgNeighborDeg                 57.7273
+EgonetConnectivity             10.3333
+Name: 71, dtype: objectGraph                                M0
+Id                                   72
+Degree                               22
+NodeBetweennessCentrality        699.83
+PageRank                     0.00398309
+EgonetDegree                        206
+AvgNeighborDeg                  20.3636
+EgonetConnectivity              11.4783
+Name: 72, dtype: objectGraph                                M0
+Id                                   73
+Degree                                2
+NodeBetweennessCentrality           322
+PageRank                     0.00191159
+EgonetDegree                          4
+AvgNeighborDeg                        3
+EgonetConnectivity              1.33333
+Name: 73, dtype: objectGraph                                M0
+Id                                   74
+Degree                               33
+NodeBetweennessCentrality       224.382
+PageRank                     0.00457881
+EgonetDegree                        626
+AvgNeighborDeg                  32.1515
+EgonetConnectivity              13.7647
+Name: 74, dtype: objectGraph                                M0
+Id                                   75
+Degree                                6
+NodeBetweennessCentrality       1123.32
+PageRank                     0.00171778
+EgonetDegree                        100
+AvgNeighborDeg                  21.6667
+EgonetConnectivity              5.14286
+Name: 75, dtype: objectGraph                                M0
+Id                                   76
+Degree                               12
+NodeBetweennessCentrality       213.704
+PageRank                     0.00226372
+EgonetDegree                        283
+AvgNeighborDeg                  28.0833
+EgonetConnectivity              5.07692
+Name: 76, dtype: objectGraph                                M0
+Id                                   77
+Degree                               13
+NodeBetweennessCentrality       14.6949
+PageRank                     0.00207043
+EgonetDegree                        348
+AvgNeighborDeg                  34.8462
+EgonetConnectivity              8.42857
+Name: 77, dtype: objectGraph                                M0
+Id                                   78
+Degree                                5
+NodeBetweennessCentrality             0
+PageRank                     0.00203058
+EgonetDegree                         33
+AvgNeighborDeg                     11.6
+EgonetConnectivity                    5
+Name: 78, dtype: objectGraph                                M0
+Id                                   79
+Degree                               12
+NodeBetweennessCentrality       29.2971
+PageRank                     0.00207403
+EgonetDegree                        259
+AvgNeighborDeg                  28.9167
+EgonetConnectivity              7.69231
+Name: 79, dtype: objectGraph                                M0
+Id                                   80
+Degree                               19
+NodeBetweennessCentrality        295.17
+PageRank                     0.00345525
+EgonetDegree                        435
+AvgNeighborDeg                  28.6316
+EgonetConnectivity                  6.4
+Name: 80, dtype: objectGraph                                M0
+Id                                   81
+Degree                                7
+NodeBetweennessCentrality       950.167
+PageRank                     0.00385901
+EgonetDegree                         14
+AvgNeighborDeg                  6.42857
+EgonetConnectivity                 4.75
+Name: 81, dtype: objectGraph                                M0
+Id                                   82
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00232041
+EgonetDegree                          1
+AvgNeighborDeg                        2
+EgonetConnectivity                    1
+Name: 82, dtype: objectGraph                                M0
+Id                                   83
+Degree                                7
+NodeBetweennessCentrality           319
+PageRank                     0.00399418
+EgonetDegree                          2
+AvgNeighborDeg                  4.71429
+EgonetConnectivity                 4.75
+Name: 83, dtype: objectGraph                                M0
+Id                                   84
+Degree                               20
+NodeBetweennessCentrality       20.9872
+PageRank                     0.00335546
+EgonetDegree                         73
+AvgNeighborDeg                    18.95
+EgonetConnectivity              15.5238
+Name: 84, dtype: objectGraph                                M0
+Id                                   85
+Degree                                7
+NodeBetweennessCentrality       65.8577
+PageRank                     0.00249717
+EgonetDegree                         41
+AvgNeighborDeg                  11.7143
+EgonetConnectivity                    6
+Name: 85, dtype: objectGraph                                M0
+Id                                   86
+Degree                               21
+NodeBetweennessCentrality        558.97
+PageRank                     0.00349674
+EgonetDegree                        198
+AvgNeighborDeg                  23.0952
+EgonetConnectivity                   14
+Name: 86, dtype: objectGraph                                M0
+Id                                   87
+Degree                                5
+NodeBetweennessCentrality      0.666667
+PageRank                     0.00291864
+EgonetDegree                          6
+AvgNeighborDeg                      5.4
+EgonetConnectivity              4.33333
+Name: 87, dtype: objectGraph                                M0
+Id                                   88
+Degree                                8
+NodeBetweennessCentrality       263.232
+PageRank                     0.00168466
+EgonetDegree                        153
+AvgNeighborDeg                   21.625
+EgonetConnectivity              3.11111
+Name: 88, dtype: objectGraph                                M0
+Id                                   89
+Degree                                2
+NodeBetweennessCentrality         160.5
+PageRank                     0.00179743
+EgonetDegree                          8
+AvgNeighborDeg                        5
+EgonetConnectivity              1.33333
+Name: 89, dtype: objectGraph                                M0
+Id                                   90
+Degree                               48
+NodeBetweennessCentrality       207.556
+PageRank                     0.00600217
+EgonetDegree                        799
+AvgNeighborDeg                  41.3542
+EgonetConnectivity              25.1837
+Name: 90, dtype: objectGraph                                M0
+Id                                   91
+Degree                               12
+NodeBetweennessCentrality       166.032
+PageRank                     0.00442551
+EgonetDegree                         28
+AvgNeighborDeg                  9.66667
+EgonetConnectivity              7.69231
+Name: 91, dtype: objectGraph                                M0
+Id                                   92
+Degree                                8
+NodeBetweennessCentrality       36.6803
+PageRank                     0.00239067
+EgonetDegree                        102
+AvgNeighborDeg                    17.25
+EgonetConnectivity              4.88889
+Name: 92, dtype: objectGraph                                M0
+Id                                   93
+Degree                               18
+NodeBetweennessCentrality       23.1706
+PageRank                     0.00308875
+EgonetDegree                         79
+AvgNeighborDeg                  19.1667
+EgonetConnectivity              14.9474
+Name: 93, dtype: objectGraph                                M0
+Id                                   94
+Degree                                5
+NodeBetweennessCentrality             0
+PageRank                     0.00206076
+EgonetDegree                         29
+AvgNeighborDeg                     10.8
+EgonetConnectivity                    5
+Name: 94, dtype: objectGraph                                M0
+Id                                   95
+Degree                               15
+NodeBetweennessCentrality       46.6763
+PageRank                     0.00223665
+EgonetDegree                        549
+AvgNeighborDeg                     44.4
+EgonetConnectivity                 8.25
+Name: 95, dtype: objectGraph                                M0
+Id                                   96
+Degree                               31
+NodeBetweennessCentrality       134.491
+PageRank                     0.00408268
+EgonetDegree                        788
+AvgNeighborDeg                  43.9032
+EgonetConnectivity               18.875
+Name: 96, dtype: objectGraph                                M0
+Id                                   97
+Degree                               13
+NodeBetweennessCentrality       30.2194
+PageRank                     0.00206145
+EgonetDegree                        440
+AvgNeighborDeg                  42.2308
+EgonetConnectivity              8.71429
+Name: 97, dtype: objectGraph                                M0
+Id                                   98
+Degree                                7
+NodeBetweennessCentrality        18.196
+PageRank                     0.00140673
+EgonetDegree                        164
+AvgNeighborDeg                  25.8571
+EgonetConnectivity                    3
+Name: 98, dtype: objectGraph                                M0
+Id                                   99
+Degree                                2
+NodeBetweennessCentrality             0
+PageRank                     0.00124346
+EgonetDegree                          6
+AvgNeighborDeg                        5
+EgonetConnectivity                    2
+Name: 99, dtype: objectGraph                                M0
+Id                                  100
+Degree                               12
+NodeBetweennessCentrality       39.6549
+PageRank                     0.00226411
+EgonetDegree                        143
+AvgNeighborDeg                    21.25
+EgonetConnectivity              9.53846
+Name: 100, dtype: objectGraph                                M0
+Id                                  101
+Degree                               36
+NodeBetweennessCentrality        234.81
+PageRank                     0.00482288
+EgonetDegree                        850
+AvgNeighborDeg                  42.2222
+EgonetConnectivity              19.0811
+Name: 101, dtype: objectGraph                                M0
+Id                                  102
+Degree                                4
+NodeBetweennessCentrality             0
+PageRank                     0.00241988
+EgonetDegree                          9
+AvgNeighborDeg                     6.25
+EgonetConnectivity                    4
+Name: 102, dtype: objectGraph                                M0
+Id                                  103
+Degree                               13
+NodeBetweennessCentrality       337.356
+PageRank                     0.00433461
+EgonetDegree                         84
+AvgNeighborDeg                  13.3077
+EgonetConnectivity              7.28571
+Name: 103, dtype: objectGraph                               M0
+Id                                 104
+Degree                               2
+NodeBetweennessCentrality            0
+PageRank                     0.0013747
+EgonetDegree                        14
+AvgNeighborDeg                       9
+EgonetConnectivity                   2
+Name: 104, dtype: objectGraph                                M0
+Id                                  105
+Degree                               39
+NodeBetweennessCentrality       172.932
+PageRank                     0.00503147
+EgonetDegree                        864
+AvgNeighborDeg                   42.641
+EgonetConnectivity                20.95
+Name: 105, dtype: objectGraph                                M0
+Id                                  106
+Degree                               20
+NodeBetweennessCentrality       2480.11
+PageRank                     0.00657318
+EgonetDegree                         62
+AvgNeighborDeg                     13.3
+EgonetConnectivity              10.6667
+Name: 106, dtype: objectGraph                               M0
+Id                                 107
+Degree                              16
+NodeBetweennessCentrality      1541.19
+PageRank                     0.0046744
+EgonetDegree                        75
+AvgNeighborDeg                 14.9375
+EgonetConnectivity             10.5882
+Name: 107, dtype: objectGraph                                M0
+Id                                  108
+Degree                                5
+NodeBetweennessCentrality       6.89317
+PageRank                     0.00122413
+EgonetDegree                        112
+AvgNeighborDeg                     24.2
+EgonetConnectivity              2.33333
+Name: 108, dtype: objectGraph                                M0
+Id                                  109
+Degree                               35
+NodeBetweennessCentrality       287.828
+PageRank                     0.00477139
+EgonetDegree                        686
+AvgNeighborDeg                  37.9143
+EgonetConnectivity              18.7778
+Name: 109, dtype: objectGraph                                M0
+Id                                  110
+Degree                               61
+NodeBetweennessCentrality       4249.18
+PageRank                     0.00958469
+EgonetDegree                        875
+AvgNeighborDeg                  31.1475
+EgonetConnectivity              17.5161
+Name: 110, dtype: objectGraph                                M0
+Id                                  111
+Degree                                3
+NodeBetweennessCentrality       156.163
+PageRank                     0.00110094
+EgonetDegree                         84
+AvgNeighborDeg                       29
+EgonetConnectivity                  1.5
+Name: 111, dtype: objectGraph                                M0
+Id                                  112
+Degree                               11
+NodeBetweennessCentrality       121.717
+PageRank                     0.00196738
+EgonetDegree                        291
+AvgNeighborDeg                  31.0909
+EgonetConnectivity              5.16667
+Name: 112, dtype: objectGraph                                M0
+Id                                  113
+Degree                               62
+NodeBetweennessCentrality       1250.24
+PageRank                     0.00810965
+EgonetDegree                        807
+AvgNeighborDeg                  36.3065
+EgonetConnectivity              23.9048
+Name: 113, dtype: objectGraph                               M0
+Id                                 114
+Degree                              17
+NodeBetweennessCentrality      7.80462
+PageRank                     0.0023719
+EgonetDegree                       571
+AvgNeighborDeg                 45.0588
+EgonetConnectivity             11.7778
+Name: 114, dtype: objectGraph                               M0
+Id                                 115
+Degree                               3
+NodeBetweennessCentrality      1041.55
+PageRank                     0.0015632
+EgonetDegree                        60
+AvgNeighborDeg                      21
+EgonetConnectivity                 1.5
+Name: 115, dtype: objectGraph                                 M0
+Id                                   116
+Degree                                 3
+NodeBetweennessCentrality        1.51036
+PageRank                     0.000840021
+EgonetDegree                         114
+AvgNeighborDeg                   39.6667
+EgonetConnectivity                     2
+Name: 116, dtype: objectGraph                                M0
+Id                                  117
+Degree                                6
+NodeBetweennessCentrality       8.98069
+PageRank                     0.00142697
+EgonetDegree                        117
+AvgNeighborDeg                  23.8333
+EgonetConnectivity              4.57143
+Name: 117, dtype: objectGraph                               M0
+Id                                 118
+Degree                              15
+NodeBetweennessCentrality      137.025
+PageRank                     0.0028005
+EgonetDegree                       129
+AvgNeighborDeg                 19.3333
+EgonetConnectivity                  11
+Name: 118, dtype: objectGraph                                M0
+Id                                  119
+Degree                               27
+NodeBetweennessCentrality       69.5789
+PageRank                     0.00364874
+EgonetDegree                        808
+AvgNeighborDeg                  45.5926
+EgonetConnectivity              16.0714
+Name: 119, dtype: objectGraph                                M0
+Id                                  120
+Degree                                6
+NodeBetweennessCentrality       4.49841
+PageRank                     0.00135401
+EgonetDegree                         86
+AvgNeighborDeg                  19.6667
+EgonetConnectivity              5.42857
+Name: 120, dtype: objectGraph                                M0
+Id                                  121
+Degree                               15
+NodeBetweennessCentrality       548.399
+PageRank                     0.00273087
+EgonetDegree                        375
+AvgNeighborDeg                  29.7333
+EgonetConnectivity                5.375
+Name: 121, dtype: objectGraph                                M0
+Id                                  122
+Degree                                6
+NodeBetweennessCentrality             0
+PageRank                     0.00238783
+EgonetDegree                         29
+AvgNeighborDeg                  10.8333
+EgonetConnectivity                    6
+Name: 122, dtype: objectGraph                                M0
+Id                                  123
+Degree                               15
+NodeBetweennessCentrality       161.943
+PageRank                     0.00239101
+EgonetDegree                        416
+AvgNeighborDeg                  33.1333
+EgonetConnectivity                    6
+Name: 123, dtype: objectGraph                                M0
+Id                                  124
+Degree                               17
+NodeBetweennessCentrality        359.45
+PageRank                     0.00289993
+EgonetDegree                        471
+AvgNeighborDeg                  37.2941
+EgonetConnectivity                   10
+Name: 124, dtype: objectGraph                               M0
+Id                                 125
+Degree                              18
+NodeBetweennessCentrality      20.8427
+PageRank                     0.0025093
+EgonetDegree                       613
+AvgNeighborDeg                    46.5
+EgonetConnectivity             12.7368
+Name: 125, dtype: objectGraph                                M0
+Id                                  126
+Degree                                9
+NodeBetweennessCentrality             0
+PageRank                     0.00191485
+EgonetDegree                         48
+AvgNeighborDeg                  14.3333
+EgonetConnectivity                    9
+Name: 126, dtype: objectGraph                                M0
+Id                                  127
+Degree                               21
+NodeBetweennessCentrality       209.724
+PageRank                     0.00343159
+EgonetDegree                        555
+AvgNeighborDeg                  35.1429
+EgonetConnectivity              9.27273
+Name: 127, dtype: objectGraph                                M0
+Id                                  128
+Degree                               15
+NodeBetweennessCentrality       364.848
+PageRank                     0.00483636
+EgonetDegree                         72
+AvgNeighborDeg                  12.3333
+EgonetConnectivity                    8
+Name: 128, dtype: objectGraph                                 M0
+Id                                   129
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000813205
+EgonetDegree                          14
+AvgNeighborDeg                        15
+EgonetConnectivity                     1
+Name: 129, dtype: objectGraph                                M0
+Id                                  130
+Degree                                8
+NodeBetweennessCentrality      0.131519
+PageRank                     0.00170924
+EgonetDegree                         61
+AvgNeighborDeg                   15.375
+EgonetConnectivity              7.77778
+Name: 130, dtype: objectGraph                                M0
+Id                                  131
+Degree                               10
+NodeBetweennessCentrality        12.714
+PageRank                     0.00305863
+EgonetDegree                         83
+AvgNeighborDeg                     17.1
+EgonetConnectivity              8.90909
+Name: 131, dtype: objectGraph                                M0
+Id                                  132
+Degree                               27
+NodeBetweennessCentrality       71.0202
+PageRank                     0.00367712
+EgonetDegree                        730
+AvgNeighborDeg                  41.5926
+EgonetConnectivity                   15
+Name: 132, dtype: objectGraph                                M0
+Id                                  133
+Degree                               42
+NodeBetweennessCentrality       164.243
+PageRank                     0.00539828
+EgonetDegree                        795
+AvgNeighborDeg                  40.7381
+EgonetConnectivity              22.2791
+Name: 133, dtype: objectGraph                                M0
+Id                                  134
+Degree                               11
+NodeBetweennessCentrality       364.647
+PageRank                     0.00452882
+EgonetDegree                         22
+AvgNeighborDeg                  8.27273
+EgonetConnectivity              6.66667
+Name: 134, dtype: objectGraph                                M0
+Id                                  135
+Degree                               14
+NodeBetweennessCentrality          1286
+PageRank                     0.00415225
+EgonetDegree                         81
+AvgNeighborDeg                  15.3571
+EgonetConnectivity              9.86667
+Name: 135, dtype: objectGraph                                M0
+Id                                  136
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00232041
+EgonetDegree                          1
+AvgNeighborDeg                        2
+EgonetConnectivity                    1
+Name: 136, dtype: objectGraph                                M0
+Id                                  137
+Degree                                9
+NodeBetweennessCentrality       68.8143
+PageRank                     0.00169917
+EgonetDegree                        222
+AvgNeighborDeg                  28.3333
+EgonetConnectivity                  4.2
+Name: 137, dtype: objectGraph                                M0
+Id                                  138
+Degree                                5
+NodeBetweennessCentrality           0.5
+PageRank                     0.00293251
+EgonetDegree                          6
+AvgNeighborDeg                      5.8
+EgonetConnectivity              4.66667
+Name: 138, dtype: objectGraph                                M0
+Id                                  139
+Degree                               19
+NodeBetweennessCentrality        126.49
+PageRank                     0.00288545
+EgonetDegree                        511
+AvgNeighborDeg                  34.3158
+EgonetConnectivity                    8
+Name: 139, dtype: objectGraph                                M0
+Id                                  140
+Degree                               13
+NodeBetweennessCentrality       21.3819
+PageRank                     0.00379206
+EgonetDegree                         57
+AvgNeighborDeg                  14.3077
+EgonetConnectivity              10.1429
+Name: 140, dtype: objectGraph                                M0
+Id                                  141
+Degree                               10
+NodeBetweennessCentrality       71.1037
+PageRank                     0.00265028
+EgonetDegree                        129
+AvgNeighborDeg                     18.1
+EgonetConnectivity              5.63636
+Name: 141, dtype: objectGraph                               M0
+Id                                 142
+Degree                               6
+NodeBetweennessCentrality      8.55555
+PageRank                     0.0020042
+EgonetDegree                        68
+AvgNeighborDeg                 16.6667
+EgonetConnectivity             5.42857
+Name: 142, dtype: objectGraph                                M0
+Id                                  143
+Degree                                4
+NodeBetweennessCentrality          2826
+PageRank                     0.00151789
+EgonetDegree                         43
+AvgNeighborDeg                    13.25
+EgonetConnectivity                  2.8
+Name: 143, dtype: objectGraph                                 M0
+Id                                   144
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000572113
+EgonetDegree                          41
+AvgNeighborDeg                        42
+EgonetConnectivity                     1
+Name: 144, dtype: objectGraph                                M0
+Id                                  145
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00100049
+EgonetDegree                          4
+AvgNeighborDeg                        5
+EgonetConnectivity                    1
+Name: 145, dtype: objectGraph                                M0
+Id                                  146
+Degree                                2
+NodeBetweennessCentrality       47.1698
+PageRank                     0.00144456
+EgonetDegree                         16
+AvgNeighborDeg                        9
+EgonetConnectivity              1.33333
+Name: 146, dtype: objectGraph                                M0
+Id                                  147
+Degree                               11
+NodeBetweennessCentrality       32.7002
+PageRank                     0.00195117
+EgonetDegree                        298
+AvgNeighborDeg                  32.4545
+EgonetConnectivity              5.83333
+Name: 147, dtype: objectGraph                                M0
+Id                                  148
+Degree                                2
+NodeBetweennessCentrality       20.8018
+PageRank                     0.00150731
+EgonetDegree                          3
+AvgNeighborDeg                      2.5
+EgonetConnectivity              1.33333
+Name: 148, dtype: objectGraph                                M0
+Id                                  149
+Degree                               24
+NodeBetweennessCentrality       295.321
+PageRank                     0.00354638
+EgonetDegree                        661
+AvgNeighborDeg                  35.4583
+EgonetConnectivity                 8.56
+Name: 149, dtype: objectGraph                               M0
+Id                                 150
+Degree                              13
+NodeBetweennessCentrality      376.458
+PageRank                     0.0023244
+EgonetDegree                       243
+AvgNeighborDeg                 26.4615
+EgonetConnectivity             8.14286
+Name: 150, dtype: objectGraph                                 M0
+Id                                   151
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000700261
+EgonetDegree                           6
+AvgNeighborDeg                         7
+EgonetConnectivity                     1
+Name: 151, dtype: objectGraph                                M0
+Id                                  152
+Degree                               24
+NodeBetweennessCentrality       137.231
+PageRank                     0.00328677
+EgonetDegree                        803
+AvgNeighborDeg                   46.125
+EgonetConnectivity                13.12
+Name: 152, dtype: objectGraph                                M0
+Id                                  153
+Degree                                7
+NodeBetweennessCentrality       8.39808
+PageRank                     0.00223018
+EgonetDegree                         69
+AvgNeighborDeg                  15.7143
+EgonetConnectivity                    6
+Name: 153, dtype: objectGraph                                M0
+Id                                  154
+Degree                                5
+NodeBetweennessCentrality       255.752
+PageRank                     0.00169402
+EgonetDegree                         96
+AvgNeighborDeg                     21.4
+EgonetConnectivity              2.66667
+Name: 154, dtype: objectGraph                                 M0
+Id                                   155
+Degree                                 2
+NodeBetweennessCentrality       0.278824
+PageRank                     0.000721534
+EgonetDegree                          63
+AvgNeighborDeg                      32.5
+EgonetConnectivity               1.33333
+Name: 155, dtype: objectGraph                                M0
+Id                                  156
+Degree                               10
+NodeBetweennessCentrality         5.142
+PageRank                     0.00164437
+EgonetDegree                        295
+AvgNeighborDeg                     35.1
+EgonetConnectivity                    6
+Name: 156, dtype: objectGraph                              M0
+Id                                157
+Degree                              3
+NodeBetweennessCentrality         322
+PageRank                     0.002403
+EgonetDegree                        4
+AvgNeighborDeg                      3
+EgonetConnectivity                  2
+Name: 157, dtype: objectGraph                                M0
+Id                                  158
+Degree                                6
+NodeBetweennessCentrality           0.9
+PageRank                     0.00227799
+EgonetDegree                         22
+AvgNeighborDeg                        9
+EgonetConnectivity              5.42857
+Name: 158, dtype: objectGraph                             M0
+Id                               159
+Degree                            10
+NodeBetweennessCentrality    50.0364
+PageRank                      0.0019
+EgonetDegree                     200
+AvgNeighborDeg                  26.6
+EgonetConnectivity           6.90909
+Name: 159, dtype: objectGraph                                M0
+Id                                  160
+Degree                               37
+NodeBetweennessCentrality       466.523
+PageRank                     0.00509823
+EgonetDegree                        865
+AvgNeighborDeg                  39.0811
+EgonetConnectivity              16.2632
+Name: 160, dtype: objectGraph                                M0
+Id                                  161
+Degree                               45
+NodeBetweennessCentrality       1598.08
+PageRank                     0.00628117
+EgonetDegree                        848
+AvgNeighborDeg                  39.5333
+EgonetConnectivity              21.2174
+Name: 161, dtype: objectGraph                                M0
+Id                                  162
+Degree                                7
+NodeBetweennessCentrality       437.978
+PageRank                     0.00260401
+EgonetDegree                         66
+AvgNeighborDeg                  13.5714
+EgonetConnectivity                  4.5
+Name: 162, dtype: objectGraph                                M0
+Id                                  163
+Degree                               40
+NodeBetweennessCentrality       341.087
+PageRank                     0.00526289
+EgonetDegree                        656
+AvgNeighborDeg                    34.25
+EgonetConnectivity              18.3902
+Name: 163, dtype: objectGraph                                M0
+Id                                  164
+Degree                                5
+NodeBetweennessCentrality       495.577
+PageRank                     0.00287372
+EgonetDegree                         27
+AvgNeighborDeg                      6.8
+EgonetConnectivity                    2
+Name: 164, dtype: objectGraph                                M0
+Id                                  165
+Degree                                3
+NodeBetweennessCentrality           0.5
+PageRank                     0.00198172
+EgonetDegree                         12
+AvgNeighborDeg                  6.33333
+EgonetConnectivity                  2.5
+Name: 165, dtype: objectGraph                                M0
+Id                                  166
+Degree                               16
+NodeBetweennessCentrality       13520.8
+PageRank                     0.00576363
+EgonetDegree                         96
+AvgNeighborDeg                    12.25
+EgonetConnectivity              6.82353
+Name: 166, dtype: objectGraph                                M0
+Id                                  167
+Degree                               13
+NodeBetweennessCentrality       8.93834
+PageRank                     0.00199464
+EgonetDegree                        489
+AvgNeighborDeg                  46.7692
+EgonetConnectivity              9.42857
+Name: 167, dtype: objectGraph                                M0
+Id                                  168
+Degree                               10
+NodeBetweennessCentrality       39.5803
+PageRank                     0.00375418
+EgonetDegree                         20
+AvgNeighborDeg                      9.4
+EgonetConnectivity              7.63636
+Name: 168, dtype: objectGraph                                M0
+Id                                  169
+Degree                               12
+NodeBetweennessCentrality       125.994
+PageRank                     0.00219562
+EgonetDegree                        266
+AvgNeighborDeg                  27.1667
+EgonetConnectivity              5.53846
+Name: 169, dtype: objectGraph                                M0
+Id                                  170
+Degree                                2
+NodeBetweennessCentrality             1
+PageRank                     0.00436819
+EgonetDegree                          0
+AvgNeighborDeg                        1
+EgonetConnectivity              1.33333
+Name: 170, dtype: objectGraph                                M0
+Id                                  171
+Degree                               19
+NodeBetweennessCentrality       39.2515
+PageRank                     0.00322939
+EgonetDegree                         99
+AvgNeighborDeg                  19.3684
+EgonetConnectivity                 14.4
+Name: 171, dtype: objectGraph                                M0
+Id                                  172
+Degree                                9
+NodeBetweennessCentrality           630
+PageRank                     0.00325495
+EgonetDegree                          1
+AvgNeighborDeg                  7.77778
+EgonetConnectivity                  7.8
+Name: 172, dtype: objectGraph                                M0
+Id                                  173
+Degree                                2
+NodeBetweennessCentrality           0.5
+PageRank                     0.00197824
+EgonetDegree                          2
+AvgNeighborDeg                        2
+EgonetConnectivity              1.33333
+Name: 173, dtype: objectGraph                                 M0
+Id                                   174
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000595445
+EgonetDegree                          16
+AvgNeighborDeg                        17
+EgonetConnectivity                     1
+Name: 174, dtype: objectGraph                                M0
+Id                                  175
+Degree                               17
+NodeBetweennessCentrality        206.81
+PageRank                     0.00310581
+EgonetDegree                        154
+AvgNeighborDeg                  19.4706
+EgonetConnectivity              10.7778
+Name: 175, dtype: objectGraph                               M0
+Id                                 176
+Degree                              25
+NodeBetweennessCentrality      88.3594
+PageRank                     0.0034918
+EgonetDegree                       723
+AvgNeighborDeg                   41.92
+EgonetConnectivity             13.4615
+Name: 176, dtype: objectGraph                                M0
+Id                                  177
+Degree                               43
+NodeBetweennessCentrality       302.944
+PageRank                     0.00558239
+EgonetDegree                        838
+AvgNeighborDeg                  40.3953
+EgonetConnectivity              21.4091
+Name: 177, dtype: objectGraph                                M0
+Id                                  178
+Degree                               15
+NodeBetweennessCentrality       19.5085
+PageRank                     0.00264958
+EgonetDegree                         97
+AvgNeighborDeg                     19.2
+EgonetConnectivity               12.875
+Name: 178, dtype: objectGraph                             M0
+Id                               179
+Degree                            47
+NodeBetweennessCentrality     340.59
+PageRank                     0.00615
+EgonetDegree                     817
+AvgNeighborDeg               38.2553
+EgonetConnectivity           21.4167
+Name: 179, dtype: objectGraph                               M0
+Id                                 180
+Degree                               6
+NodeBetweennessCentrality     0.366667
+PageRank                     0.0018998
+EgonetDegree                        65
+AvgNeighborDeg                    16.5
+EgonetConnectivity             5.71429
+Name: 180, dtype: objectGraph                                M0
+Id                                  181
+Degree                                3
+NodeBetweennessCentrality       369.963
+PageRank                     0.00120153
+EgonetDegree                         26
+AvgNeighborDeg                  9.66667
+EgonetConnectivity                  1.5
+Name: 181, dtype: objectGraph                                 M0
+Id                                   182
+Degree                                 2
+NodeBetweennessCentrality              0
+PageRank                     0.000748043
+EgonetDegree                          41
+AvgNeighborDeg                      22.5
+EgonetConnectivity                     2
+Name: 182, dtype: objectGraph                                M0
+Id                                  183
+Degree                                4
+NodeBetweennessCentrality          1597
+PageRank                     0.00413605
+EgonetDegree                         21
+AvgNeighborDeg                     6.25
+EgonetConnectivity                  1.6
+Name: 183, dtype: objectGraph                                M0
+Id                                  184
+Degree                                4
+NodeBetweennessCentrality             6
+PageRank                     0.00247044
+EgonetDegree                         13
+AvgNeighborDeg                     5.75
+EgonetConnectivity                  2.8
+Name: 184, dtype: objectGraph                                M0
+Id                                  185
+Degree                               18
+NodeBetweennessCentrality       14.6607
+PageRank                     0.00305718
+EgonetDegree                         88
+AvgNeighborDeg                  19.5556
+EgonetConnectivity              14.8421
+Name: 185, dtype: objectGraph                                M0
+Id                                  186
+Degree                                8
+NodeBetweennessCentrality             0
+PageRank                     0.00292863
+EgonetDegree                          3
+AvgNeighborDeg                    8.375
+EgonetConnectivity                    8
+Name: 186, dtype: objectGraph                                M0
+Id                                  187
+Degree                               12
+NodeBetweennessCentrality       128.457
+PageRank                     0.00211202
+EgonetDegree                        226
+AvgNeighborDeg                  27.1667
+EgonetConnectivity              8.61538
+Name: 187, dtype: objectGraph                               M0
+Id                                 188
+Degree                              15
+NodeBetweennessCentrality      151.175
+PageRank                     0.0028128
+EgonetDegree                       130
+AvgNeighborDeg                 19.5333
+EgonetConnectivity              11.125
+Name: 188, dtype: objectGraph                                M0
+Id                                  189
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00113132
+EgonetDegree                          2
+AvgNeighborDeg                        3
+EgonetConnectivity                    1
+Name: 189, dtype: objectGraph                                M0
+Id                                  190
+Degree                               46
+NodeBetweennessCentrality       301.287
+PageRank                     0.00598891
+EgonetDegree                        795
+AvgNeighborDeg                  38.4565
+EgonetConnectivity              21.7021
+Name: 190, dtype: objectGraph                                M0
+Id                                  191
+Degree                               56
+NodeBetweennessCentrality       407.536
+PageRank                     0.00714733
+EgonetDegree                        782
+AvgNeighborDeg                  37.7143
+EgonetConnectivity              24.3158
+Name: 191, dtype: objectGraph                                M0
+Id                                  192
+Degree                                3
+NodeBetweennessCentrality             0
+PageRank                     0.00190561
+EgonetDegree                         12
+AvgNeighborDeg                        7
+EgonetConnectivity                    3
+Name: 192, dtype: objectGraph                                M0
+Id                                  193
+Degree                                3
+NodeBetweennessCentrality       518.372
+PageRank                     0.00177302
+EgonetDegree                         32
+AvgNeighborDeg                  12.3333
+EgonetConnectivity                    2
+Name: 193, dtype: objectGraph                                M0
+Id                                  194
+Degree                               56
+NodeBetweennessCentrality       637.695
+PageRank                     0.00732134
+EgonetDegree                        813
+AvgNeighborDeg                  37.9464
+EgonetConnectivity                   24
+Name: 194, dtype: objectGraph                                M0
+Id                                  195
+Degree                               21
+NodeBetweennessCentrality       893.097
+PageRank                     0.00349424
+EgonetDegree                        220
+AvgNeighborDeg                  22.4286
+EgonetConnectivity              12.3636
+Name: 195, dtype: objectGraph                                M0
+Id                                  196
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00132919
+EgonetDegree                          3
+AvgNeighborDeg                        4
+EgonetConnectivity                    1
+Name: 196, dtype: objectGraph                               M0
+Id                                 197
+Degree                               3
+NodeBetweennessCentrality      4.86825
+PageRank                     0.0010078
+EgonetDegree                        27
+AvgNeighborDeg                      10
+EgonetConnectivity                 1.5
+Name: 197, dtype: objectGraph                                 M0
+Id                                   198
+Degree                                 2
+NodeBetweennessCentrality              0
+PageRank                     0.000676809
+EgonetDegree                         144
+AvgNeighborDeg                        74
+EgonetConnectivity                     2
+Name: 198, dtype: objectGraph                                M0
+Id                                  199
+Degree                                6
+NodeBetweennessCentrality      0.676324
+PageRank                     0.00116718
+EgonetDegree                        265
+AvgNeighborDeg                  49.1667
+EgonetConnectivity              5.14286
+Name: 199, dtype: objectGraph                                M0
+Id                                  200
+Degree                               29
+NodeBetweennessCentrality        77.906
+PageRank                     0.00387892
+EgonetDegree                        575
+AvgNeighborDeg                  36.8276
+EgonetConnectivity                 17.4
+Name: 200, dtype: objectGraph                                M0
+Id                                  201
+Degree                               17
+NodeBetweennessCentrality       24.0474
+PageRank                     0.00244874
+EgonetDegree                        568
+AvgNeighborDeg                       45
+EgonetConnectivity              11.8889
+Name: 201, dtype: objectGraph                                M0
+Id                                  202
+Degree                               38
+NodeBetweennessCentrality       983.175
+PageRank                     0.00550361
+EgonetDegree                        786
+AvgNeighborDeg                  31.5263
+EgonetConnectivity              11.5385
+Name: 202, dtype: objectGraph                                M0
+Id                                  203
+Degree                               16
+NodeBetweennessCentrality        768.75
+PageRank                     0.00510382
+EgonetDegree                         92
+AvgNeighborDeg                   14.375
+EgonetConnectivity              9.05882
+Name: 203, dtype: objectGraph                                 M0
+Id                                   204
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000793524
+EgonetDegree                           6
+AvgNeighborDeg                         7
+EgonetConnectivity                     1
+Name: 204, dtype: objectGraph                                M0
+Id                                  205
+Degree                                7
+NodeBetweennessCentrality       10.3329
+PageRank                     0.00206839
+EgonetDegree                         84
+AvgNeighborDeg                  17.5714
+EgonetConnectivity                 5.75
+Name: 205, dtype: objectGraph                                M0
+Id                                  206
+Degree                                8
+NodeBetweennessCentrality             0
+PageRank                     0.00292863
+EgonetDegree                          3
+AvgNeighborDeg                    8.375
+EgonetConnectivity                    8
+Name: 206, dtype: objectGraph                                M0
+Id                                  207
+Degree                                5
+NodeBetweennessCentrality           322
+PageRank                     0.00323528
+EgonetDegree                          8
+AvgNeighborDeg                        5
+EgonetConnectivity              3.66667
+Name: 207, dtype: objectGraph                                M0
+Id                                  208
+Degree                                3
+NodeBetweennessCentrality             0
+PageRank                     0.00138829
+EgonetDegree                         39
+AvgNeighborDeg                       16
+EgonetConnectivity                    3
+Name: 208, dtype: objectGraph                                M0
+Id                                  209
+Degree                                7
+NodeBetweennessCentrality       4.22787
+PageRank                     0.00129059
+EgonetDegree                        295
+AvgNeighborDeg                       48
+EgonetConnectivity                    6
+Name: 209, dtype: objectGraph                                M0
+Id                                  210
+Degree                               10
+NodeBetweennessCentrality       325.432
+PageRank                     0.00188165
+EgonetDegree                        289
+AvgNeighborDeg                     36.1
+EgonetConnectivity              7.45455
+Name: 210, dtype: objectGraph                              M0
+Id                                211
+Degree                             26
+NodeBetweennessCentrality     20.6323
+PageRank                     0.003379
+EgonetDegree                      727
+AvgNeighborDeg                46.4231
+EgonetConnectivity            18.7407
+Name: 211, dtype: objectGraph                                M0
+Id                                  212
+Degree                               27
+NodeBetweennessCentrality       110.795
+PageRank                     0.00375806
+EgonetDegree                        737
+AvgNeighborDeg                  40.8889
+EgonetConnectivity              14.0714
+Name: 212, dtype: objectGraph                                M0
+Id                                  213
+Degree                                9
+NodeBetweennessCentrality       37.8303
+PageRank                     0.00338211
+EgonetDegree                         24
+AvgNeighborDeg                  10.1111
+EgonetConnectivity                  7.6
+Name: 213, dtype: objectGraph                                M0
+Id                                  214
+Degree                               13
+NodeBetweennessCentrality       21.6566
+PageRank                     0.00378131
+EgonetDegree                         67
+AvgNeighborDeg                  15.5385
+EgonetConnectivity              10.5714
+Name: 214, dtype: objectGraph                                M0
+Id                                  215
+Degree                               14
+NodeBetweennessCentrality       622.932
+PageRank                     0.00513517
+EgonetDegree                         34
+AvgNeighborDeg                  9.57143
+EgonetConnectivity                  7.6
+Name: 215, dtype: objectGraph                                 M0
+Id                                   216
+Degree                                 2
+NodeBetweennessCentrality              0
+PageRank                     0.000848183
+EgonetDegree                          16
+AvgNeighborDeg                        10
+EgonetConnectivity                     2
+Name: 216, dtype: objectGraph                                M0
+Id                                  217
+Degree                                5
+NodeBetweennessCentrality       186.094
+PageRank                     0.00128584
+EgonetDegree                        135
+AvgNeighborDeg                     29.2
+EgonetConnectivity              2.66667
+Name: 217, dtype: objectGraph                                M0
+Id                                  218
+Degree                                8
+NodeBetweennessCentrality        2631.7
+PageRank                     0.00476361
+EgonetDegree                         53
+AvgNeighborDeg                    8.125
+EgonetConnectivity              2.22222
+Name: 218, dtype: objectGraph                               M0
+Id                                 219
+Degree                              20
+NodeBetweennessCentrality      164.061
+PageRank                     0.0031665
+EgonetDegree                       557
+AvgNeighborDeg                   36.35
+EgonetConnectivity             9.04762
+Name: 219, dtype: objectGraph                                M0
+Id                                  220
+Degree                               24
+NodeBetweennessCentrality       37.4555
+PageRank                     0.00329466
+EgonetDegree                        710
+AvgNeighborDeg                  44.0833
+EgonetConnectivity                14.88
+Name: 220, dtype: objectGraph                              M0
+Id                                221
+Degree                              1
+NodeBetweennessCentrality           0
+PageRank                     0.003003
+EgonetDegree                        0
+AvgNeighborDeg                      1
+EgonetConnectivity                  1
+Name: 221, dtype: objectGraph                                 M0
+Id                                   222
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000563181
+EgonetDegree                          57
+AvgNeighborDeg                        58
+EgonetConnectivity                     1
+Name: 222, dtype: objectGraph                                M0
+Id                                  223
+Degree                                4
+NodeBetweennessCentrality       1.77708
+PageRank                     0.00100394
+EgonetDegree                        137
+AvgNeighborDeg                    37.25
+EgonetConnectivity                  3.2
+Name: 223, dtype: objectGraph                                M0
+Id                                  224
+Degree                               36
+NodeBetweennessCentrality       200.151
+PageRank                     0.00490017
+EgonetDegree                        786
+AvgNeighborDeg                       36
+EgonetConnectivity              14.7568
+Name: 224, dtype: objectGraph                                M0
+Id                                  225
+Degree                                6
+NodeBetweennessCentrality       1123.32
+PageRank                     0.00171778
+EgonetDegree                        100
+AvgNeighborDeg                  21.6667
+EgonetConnectivity              5.14286
+Name: 225, dtype: objectGraph                                M0
+Id                                  226
+Degree                               22
+NodeBetweennessCentrality       42.5438
+PageRank                     0.00306915
+EgonetDegree                        496
+AvgNeighborDeg                       38
+EgonetConnectivity              15.7391
+Name: 226, dtype: objectGraph                                M0
+Id                                  227
+Degree                               58
+NodeBetweennessCentrality       805.752
+PageRank                     0.00769235
+EgonetDegree                        803
+AvgNeighborDeg                  37.5345
+EgonetConnectivity              24.2712
+Name: 227, dtype: objectGraph                                 M0
+Id                                   228
+Degree                                 2
+NodeBetweennessCentrality        177.331
+PageRank                     0.000963883
+EgonetDegree                          24
+AvgNeighborDeg                        13
+EgonetConnectivity               1.33333
+Name: 228, dtype: objectGraph                                M0
+Id                                  229
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00159631
+EgonetDegree                          2
+AvgNeighborDeg                        3
+EgonetConnectivity                    1
+Name: 229, dtype: objectGraph                               M0
+Id                                 230
+Degree                              23
+NodeBetweennessCentrality      269.542
+PageRank                     0.0037202
+EgonetDegree                       208
+AvgNeighborDeg                 22.3913
+EgonetConnectivity               13.75
+Name: 230, dtype: objectGraph                                M0
+Id                                  231
+Degree                                7
+NodeBetweennessCentrality       373.096
+PageRank                     0.00282533
+EgonetDegree                         61
+AvgNeighborDeg                  12.8571
+EgonetConnectivity                  4.5
+Name: 231, dtype: objectGraph                              M0
+Id                                232
+Degree                              1
+NodeBetweennessCentrality           0
+PageRank                     0.003003
+EgonetDegree                        0
+AvgNeighborDeg                      1
+EgonetConnectivity                  1
+Name: 232, dtype: objectGraph                               M0
+Id                                 233
+Degree                               4
+NodeBetweennessCentrality         1890
+PageRank                     0.0022591
+EgonetDegree                        27
+AvgNeighborDeg                    9.25
+EgonetConnectivity                 2.8
+Name: 233, dtype: objectGraph                                M0
+Id                                  234
+Degree                               13
+NodeBetweennessCentrality       50.9359
+PageRank                     0.00216556
+EgonetDegree                        369
+AvgNeighborDeg                  35.6923
+EgonetConnectivity              7.71429
+Name: 234, dtype: objectGraph                                 M0
+Id                                   235
+Degree                                 2
+NodeBetweennessCentrality        1.83483
+PageRank                     0.000923564
+EgonetDegree                          13
+AvgNeighborDeg                       7.5
+EgonetConnectivity               1.33333
+Name: 235, dtype: objectGraph                                M0
+Id                                  236
+Degree                               20
+NodeBetweennessCentrality         126.8
+PageRank                     0.00289724
+EgonetDegree                        648
+AvgNeighborDeg                       42
+EgonetConnectivity              10.0952
+Name: 236, dtype: objectGraph                                M0
+Id                                  237
+Degree                               23
+NodeBetweennessCentrality       284.061
+PageRank                     0.00384713
+EgonetDegree                        189
+AvgNeighborDeg                  22.2609
+EgonetConnectivity              14.4167
+Name: 237, dtype: objectGraph                                 M0
+Id                                   238
+Degree                                 4
+NodeBetweennessCentrality        1.51953
+PageRank                     0.000915454
+EgonetDegree                         186
+AvgNeighborDeg                      49.5
+EgonetConnectivity                   3.2
+Name: 238, dtype: objectGraph                                M0
+Id                                  239
+Degree                               13
+NodeBetweennessCentrality       129.612
+PageRank                     0.00249819
+EgonetDegree                        142
+AvgNeighborDeg                  20.8462
+EgonetConnectivity              10.1429
+Name: 239, dtype: objectGraph                                M0
+Id                                  240
+Degree                               64
+NodeBetweennessCentrality       585.597
+PageRank                     0.00812846
+EgonetDegree                        750
+AvgNeighborDeg                  36.9375
+EgonetConnectivity              25.8154
+Name: 240, dtype: objectGraph                                M0
+Id                                  241
+Degree                                2
+NodeBetweennessCentrality         160.5
+PageRank                     0.00179743
+EgonetDegree                          8
+AvgNeighborDeg                        5
+EgonetConnectivity              1.33333
+Name: 241, dtype: objectGraph                                M0
+Id                                  242
+Degree                               16
+NodeBetweennessCentrality       4.78644
+PageRank                     0.00275397
+EgonetDegree                         86
+AvgNeighborDeg                    19.75
+EgonetConnectivity              14.4706
+Name: 242, dtype: objectGraph                                M0
+Id                                  243
+Degree                                1
+NodeBetweennessCentrality             0
+PageRank                     0.00159631
+EgonetDegree                          2
+AvgNeighborDeg                        3
+EgonetConnectivity                    1
+Name: 243, dtype: objectGraph                              M0
+Id                                244
+Degree                              1
+NodeBetweennessCentrality           0
+PageRank                     0.003003
+EgonetDegree                        0
+AvgNeighborDeg                      1
+EgonetConnectivity                  1
+Name: 244, dtype: objectGraph                                M0
+Id                                  245
+Degree                               17
+NodeBetweennessCentrality       69.4509
+PageRank                     0.00259019
+EgonetDegree                        480
+AvgNeighborDeg                  36.2941
+EgonetConnectivity              8.55556
+Name: 245, dtype: objectGraph                                M0
+Id                                  246
+Degree                               14
+NodeBetweennessCentrality       26.7245
+PageRank                     0.00217518
+EgonetDegree                        337
+AvgNeighborDeg                  30.3571
+EgonetConnectivity                  6.8
+Name: 246, dtype: objectGraph                                M0
+Id                                  247
+Degree                                7
+NodeBetweennessCentrality           319
+PageRank                     0.00399418
+EgonetDegree                          2
+AvgNeighborDeg                  4.71429
+EgonetConnectivity                 4.75
+Name: 247, dtype: objectGraph                                M0
+Id                                  248
+Degree                                7
+NodeBetweennessCentrality        462.23
+PageRank                     0.00205728
+EgonetDegree                        167
+AvgNeighborDeg                       26
+EgonetConnectivity                 2.75
+Name: 248, dtype: objectGraph                                M0
+Id                                  249
+Degree                               37
+NodeBetweennessCentrality       137.208
+PageRank                     0.00488513
+EgonetDegree                        638
+AvgNeighborDeg                  34.2973
+EgonetConnectivity              17.5789
+Name: 249, dtype: objectGraph                                M0
+Id                                  250
+Degree                                3
+NodeBetweennessCentrality             0
+PageRank                     0.00138829
+EgonetDegree                         39
+AvgNeighborDeg                       16
+EgonetConnectivity                    3
+Name: 250, dtype: objectGraph                                M0
+Id                                  251
+Degree                                6
+NodeBetweennessCentrality           0.2
+PageRank                     0.00239571
+EgonetDegree                         27
+AvgNeighborDeg                  10.1667
+EgonetConnectivity              5.71429
+Name: 251, dtype: objectGraph                                M0
+Id                                  252
+Degree                                4
+NodeBetweennessCentrality             0
+PageRank                     0.00241988
+EgonetDegree                          9
+AvgNeighborDeg                     6.25
+EgonetConnectivity                    4
+Name: 252, dtype: objectGraph                                M0
+Id                                  253
+Degree                               26
+NodeBetweennessCentrality       56.6915
+PageRank                     0.00350982
+EgonetDegree                        602
+AvgNeighborDeg                  39.4615
+EgonetConnectivity              16.6667
+Name: 253, dtype: objectGraph                                M0
+Id                                  254
+Degree                               17
+NodeBetweennessCentrality       5.79755
+PageRank                     0.00291091
+EgonetDegree                         80
+AvgNeighborDeg                  19.5882
+EgonetConnectivity                   15
+Name: 254, dtype: objectGraph                                 M0
+Id                                   255
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000803945
+EgonetDegree                          15
+AvgNeighborDeg                        16
+EgonetConnectivity                     1
+Name: 255, dtype: objectGraph                                M0
+Id                                  256
+Degree                               10
+NodeBetweennessCentrality       1.69396
+PageRank                     0.00158919
+EgonetDegree                        313
+AvgNeighborDeg                     40.3
+EgonetConnectivity              9.09091
+Name: 256, dtype: objectGraph                                M0
+Id                                  257
+Degree                                5
+NodeBetweennessCentrality       843.296
+PageRank                     0.00228043
+EgonetDegree                         94
+AvgNeighborDeg                     20.6
+EgonetConnectivity              2.33333
+Name: 257, dtype: objectGraph                                M0
+Id                                  258
+Degree                                3
+NodeBetweennessCentrality       3.21088
+PageRank                     0.00106009
+EgonetDegree                        119
+AvgNeighborDeg                       42
+EgonetConnectivity                  2.5
+Name: 258, dtype: objectGraph                                M0
+Id                                  259
+Degree                               72
+NodeBetweennessCentrality       822.782
+PageRank                     0.00903509
+EgonetDegree                        628
+AvgNeighborDeg                  35.9722
+EgonetConnectivity               27.863
+Name: 259, dtype: objectGraph                                M0
+Id                                  260
+Degree                               44
+NodeBetweennessCentrality       1184.78
+PageRank                     0.00604127
+EgonetDegree                        905
+AvgNeighborDeg                  35.4773
+EgonetConnectivity              15.5556
+Name: 260, dtype: objectGraph                                M0
+Id                                  261
+Degree                                8
+NodeBetweennessCentrality             0
+PageRank                     0.00292863
+EgonetDegree                          3
+AvgNeighborDeg                    8.375
+EgonetConnectivity                    8
+Name: 261, dtype: objectGraph                                M0
+Id                                  262
+Degree                               13
+NodeBetweennessCentrality       36.2571
+PageRank                     0.00208991
+EgonetDegree                        352
+AvgNeighborDeg                  33.9231
+EgonetConnectivity              7.28571
+Name: 262, dtype: objectGraph                                M0
+Id                                  263
+Degree                                9
+NodeBetweennessCentrality           630
+PageRank                     0.00325495
+EgonetDegree                          1
+AvgNeighborDeg                  7.77778
+EgonetConnectivity                  7.8
+Name: 263, dtype: objectGraph                                M0
+Id                                  264
+Degree                               17
+NodeBetweennessCentrality       11.0521
+PageRank                     0.00245388
+EgonetDegree                        590
+AvgNeighborDeg                  47.2353
+EgonetConnectivity              12.7778
+Name: 264, dtype: objectGraph                                M0
+Id                                  265
+Degree                               64
+NodeBetweennessCentrality       14607.8
+PageRank                     0.00896648
+EgonetDegree                        901
+AvgNeighborDeg                  35.6094
+EgonetConnectivity              22.1846
+Name: 265, dtype: objectGraph                                M0
+Id                                  266
+Degree                                9
+NodeBetweennessCentrality       38.6303
+PageRank                     0.00342573
+EgonetDegree                         24
+AvgNeighborDeg                  9.66667
+EgonetConnectivity                  7.2
+Name: 266, dtype: objectGraph                                 M0
+Id                                   267
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000733866
+EgonetDegree                          12
+AvgNeighborDeg                        13
+EgonetConnectivity                     1
+Name: 267, dtype: objectGraph                                M0
+Id                                  268
+Degree                               42
+NodeBetweennessCentrality        731.47
+PageRank                     0.00601166
+EgonetDegree                        851
+AvgNeighborDeg                  39.3571
+EgonetConnectivity              19.6279
+Name: 268, dtype: objectGraph                                M0
+Id                                  269
+Degree                               15
+NodeBetweennessCentrality       178.475
+PageRank                     0.00277307
+EgonetDegree                        163
+AvgNeighborDeg                  21.7333
+EgonetConnectivity               11.125
+Name: 269, dtype: objectGraph                              M0
+Id                                270
+Degree                              1
+NodeBetweennessCentrality           0
+PageRank                     0.003003
+EgonetDegree                        0
+AvgNeighborDeg                      1
+EgonetConnectivity                  1
+Name: 270, dtype: objectGraph                                M0
+Id                                  271
+Degree                                4
+NodeBetweennessCentrality       66.4618
+PageRank                     0.00119624
+EgonetDegree                        113
+AvgNeighborDeg                    30.25
+EgonetConnectivity                  2.4
+Name: 271, dtype: objectGraph                                M0
+Id                                  272
+Degree                               15
+NodeBetweennessCentrality       186.001
+PageRank                     0.00280757
+EgonetDegree                        158
+AvgNeighborDeg                  20.7333
+EgonetConnectivity                 10.5
+Name: 272, dtype: objectGraph                                M0
+Id                                  273
+Degree                               46
+NodeBetweennessCentrality       752.213
+PageRank                     0.00630532
+EgonetDegree                        913
+AvgNeighborDeg                  39.1957
+EgonetConnectivity              19.9149
+Name: 273, dtype: objectGraph                               M0
+Id                                 274
+Degree                               1
+NodeBetweennessCentrality            0
+PageRank                     0.0012629
+EgonetDegree                         1
+AvgNeighborDeg                       2
+EgonetConnectivity                   1
+Name: 274, dtype: objectGraph                                 M0
+Id                                   275
+Degree                                 3
+NodeBetweennessCentrality       0.172885
+PageRank                     0.000802689
+EgonetDegree                         162
+AvgNeighborDeg                   56.3333
+EgonetConnectivity                   2.5
+Name: 275, dtype: objectGraph                               M0
+Id                                 276
+Degree                               3
+NodeBetweennessCentrality      63.9529
+PageRank                     0.0013584
+EgonetDegree                        39
+AvgNeighborDeg                 15.3333
+EgonetConnectivity                 2.5
+Name: 276, dtype: objectGraph                                M0
+Id                                  277
+Degree                               13
+NodeBetweennessCentrality       9.98998
+PageRank                     0.00196402
+EgonetDegree                        533
+AvgNeighborDeg                  51.5385
+EgonetConnectivity              10.7143
+Name: 277, dtype: objectGraph                                M0
+Id                                  278
+Degree                               35
+NodeBetweennessCentrality       458.211
+PageRank                     0.00491118
+EgonetDegree                        786
+AvgNeighborDeg                  35.1714
+EgonetConnectivity              13.3333
+Name: 278, dtype: objectGraph                               M0
+Id                                 279
+Degree                               2
+NodeBetweennessCentrality            0
+PageRank                     0.0013747
+EgonetDegree                        14
+AvgNeighborDeg                       9
+EgonetConnectivity                   2
+Name: 279, dtype: objectGraph                                M0
+Id                                  280
+Degree                                2
+NodeBetweennessCentrality       16.6888
+PageRank                     0.00080301
+EgonetDegree                         67
+AvgNeighborDeg                     34.5
+EgonetConnectivity              1.33333
+Name: 280, dtype: objectGraph                                M0
+Id                                  281
+Degree                                9
+NodeBetweennessCentrality       5.95022
+PageRank                     0.00154033
+EgonetDegree                        268
+AvgNeighborDeg                  34.1111
+EgonetConnectivity                  4.8
+Name: 281, dtype: objectGraph                                M0
+Id                                  282
+Degree                                6
+NodeBetweennessCentrality           0.2
+PageRank                     0.00239571
+EgonetDegree                         27
+AvgNeighborDeg                  10.1667
+EgonetConnectivity              5.71429
+Name: 282, dtype: objectGraph                                M0
+Id                                  283
+Degree                               24
+NodeBetweennessCentrality       30.0288
+PageRank                     0.00324302
+EgonetDegree                        824
+AvgNeighborDeg                  51.3333
+EgonetConnectivity                17.28
+Name: 283, dtype: objectGraph                                M0
+Id                                  284
+Degree                               10
+NodeBetweennessCentrality      0.345833
+PageRank                     0.00158894
+EgonetDegree                        341
+AvgNeighborDeg                     43.5
+EgonetConnectivity              9.45455
+Name: 284, dtype: objectGraph                                M0
+Id                                  285
+Degree                               19
+NodeBetweennessCentrality       40.6681
+PageRank                     0.00326468
+EgonetDegree                        111
+AvgNeighborDeg                  18.5263
+EgonetConnectivity                   13
+Name: 285, dtype: objectGraph                                M0
+Id                                  286
+Degree                                6
+NodeBetweennessCentrality       5.11212
+PageRank                     0.00134069
+EgonetDegree                         97
+AvgNeighborDeg                     20.5
+EgonetConnectivity              4.57143
+Name: 286, dtype: objectGraph                                M0
+Id                                  287
+Degree                                2
+NodeBetweennessCentrality           322
+PageRank                     0.00154041
+EgonetDegree                         24
+AvgNeighborDeg                       13
+EgonetConnectivity              1.33333
+Name: 287, dtype: objectGraph                                M0
+Id                                  288
+Degree                               19
+NodeBetweennessCentrality       71.9952
+PageRank                     0.00316223
+EgonetDegree                        139
+AvgNeighborDeg                  21.3684
+EgonetConnectivity                 14.3
+Name: 288, dtype: objectGraph                                M0
+Id                                  289
+Degree                               20
+NodeBetweennessCentrality       31.3242
+PageRank                     0.00292189
+EgonetDegree                        541
+AvgNeighborDeg                    38.25
+EgonetConnectivity               11.619
+Name: 289, dtype: objectGraph                                M0
+Id                                  290
+Degree                               54
+NodeBetweennessCentrality       744.432
+PageRank                     0.00707067
+EgonetDegree                        905
+AvgNeighborDeg                  37.0556
+EgonetConnectivity              20.9091
+Name: 290, dtype: objectGraph                                 M0
+Id                                   291
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000715565
+EgonetDegree                          24
+AvgNeighborDeg                        25
+EgonetConnectivity                     1
+Name: 291, dtype: objectGraph                                M0
+Id                                  292
+Degree                                8
+NodeBetweennessCentrality             0
+PageRank                     0.00292863
+EgonetDegree                          3
+AvgNeighborDeg                    8.375
+EgonetConnectivity                    8
+Name: 292, dtype: objectGraph                               M0
+Id                                 293
+Degree                               3
+NodeBetweennessCentrality      2204.29
+PageRank                     0.0016884
+EgonetDegree                        48
+AvgNeighborDeg                 17.6667
+EgonetConnectivity                   2
+Name: 293, dtype: objectGraph                                M0
+Id                                  294
+Degree                               23
+NodeBetweennessCentrality       150.973
+PageRank                     0.00335735
+EgonetDegree                        631
+AvgNeighborDeg                  37.8261
+EgonetConnectivity              10.9167
+Name: 294, dtype: objectGraph                                M0
+Id                                  295
+Degree                                9
+NodeBetweennessCentrality             0
+PageRank                     0.00191485
+EgonetDegree                         48
+AvgNeighborDeg                  14.3333
+EgonetConnectivity                    9
+Name: 295, dtype: objectGraph                              M0
+Id                                296
+Degree                             12
+NodeBetweennessCentrality     137.801
+PageRank                     0.003914
+EgonetDegree                       56
+AvgNeighborDeg                10.6667
+EgonetConnectivity            6.46154
+Name: 296, dtype: objectGraph                                M0
+Id                                  297
+Degree                                6
+NodeBetweennessCentrality       19.2863
+PageRank                     0.00120497
+EgonetDegree                        155
+AvgNeighborDeg                     28.5
+EgonetConnectivity              3.14286
+Name: 297, dtype: objectGraph                               M0
+Id                                 298
+Degree                              25
+NodeBetweennessCentrality      1438.45
+PageRank                     0.0077975
+EgonetDegree                        43
+AvgNeighborDeg                   11.84
+EgonetConnectivity             10.6923
+Name: 298, dtype: objectGraph                                M0
+Id                                  299
+Degree                               36
+NodeBetweennessCentrality       388.223
+PageRank                     0.00490263
+EgonetDegree                        719
+AvgNeighborDeg                  37.5278
+EgonetConnectivity              18.0541
+Name: 299, dtype: objectGraph                                M0
+Id                                  300
+Degree                               12
+NodeBetweennessCentrality       26.5246
+PageRank                     0.00193358
+EgonetDegree                        328
+AvgNeighborDeg                  31.8333
+EgonetConnectivity              5.07692
+Name: 300, dtype: objectGraph                                M0
+Id                                  301
+Degree                               55
+NodeBetweennessCentrality       1782.01
+PageRank                     0.00748441
+EgonetDegree                       1019
+AvgNeighborDeg                  35.2364
+EgonetConnectivity              17.3929
+Name: 301, dtype: objectGraph                                 M0
+Id                                   302
+Degree                                 1
+NodeBetweennessCentrality              0
+PageRank                     0.000629309
+EgonetDegree                          11
+AvgNeighborDeg                        12
+EgonetConnectivity                     1
+Name: 302, dtype: objectGraph                                M0
+Id                                  303
+Degree                                6
+NodeBetweennessCentrality       53.8668
+PageRank                     0.00128262
+EgonetDegree                        123
+AvgNeighborDeg                  23.1667
+EgonetConnectivity              3.14286
+Name: 303, dtype: objectGraph                               M0
+Id                                 304
+Degree                              10
+NodeBetweennessCentrality      7.60265
+PageRank                     0.0016201
+EgonetDegree                       328
+AvgNeighborDeg                    37.6
+EgonetConnectivity             5.27273
+Name: 304, dtype: objectGraph                                M0
+Id                                  305
+Degree                                7
+NodeBetweennessCentrality       950.167
+PageRank                     0.00385901
+EgonetDegree                         14
+AvgNeighborDeg                  6.42857
+EgonetConnectivity                 4.75
+Name: 305, dtype: objectGraph                                M0
+Id                                  306
+Degree                               20
+NodeBetweennessCentrality       318.003
+PageRank                     0.00362019
+EgonetDegree                        152
+AvgNeighborDeg                     16.7
+EgonetConnectivity              9.61905
+Name: 306, dtype: objectGraph                                M0
+Id                                  307
+Degree                                2
+NodeBetweennessCentrality             0
+PageRank                     0.00110663
+EgonetDegree                         23
+AvgNeighborDeg                     13.5
+EgonetConnectivity                    2
+Name: 307, dtype: objectGraph                                M0
+Id                                  308
+Degree                               71
+NodeBetweennessCentrality       2371.42
+PageRank                     0.00979493
+EgonetDegree                        848
+AvgNeighborDeg                  31.9577
+EgonetConnectivity              20.7222
+Name: 308, dtype: objectGraph                                M0
+Id                                  309
+Degree                               38
+NodeBetweennessCentrality       377.675
+PageRank                     0.00519866
+EgonetDegree                        821
+AvgNeighborDeg                     39.5
+EgonetConnectivity              18.4103
+Name: 309, dtype: objectGraph                               M0
+Id                                 310
+Degree                              25
+NodeBetweennessCentrality      1020.42
+PageRank                     0.0044297
+EgonetDegree                       649
+AvgNeighborDeg                   34.48
+EgonetConnectivity             9.15385
+Name: 310, dtype: objectGraph                                M0
+Id                                  311
+Degree                               38
+NodeBetweennessCentrality       197.814
+PageRank                     0.00490006
+EgonetDegree                        769
+AvgNeighborDeg                  42.7105
+EgonetConnectivity              22.8718
+Name: 311, dtype: objectGraph                                M0
+Id                                  312
+Degree                               18
+NodeBetweennessCentrality       53.5098
+PageRank                     0.00513606
+EgonetDegree                         53
+AvgNeighborDeg                  14.6111
+EgonetConnectivity                   12
+Name: 312, dtype: objectGraph                                M0
+Id                                  313
+Degree                                3
+NodeBetweennessCentrality             0
+PageRank                     0.00188391
+EgonetDegree                         10
+AvgNeighborDeg                  6.33333
+EgonetConnectivity                    3
+Name: 313, dtype: objectGraph                                M0
+Id                                  314
+Degree                                8
+NodeBetweennessCentrality             0
+PageRank                     0.00292863
+EgonetDegree                          3
+AvgNeighborDeg                    8.375
+EgonetConnectivity                    8
+Name: 314, dtype: objectGraph                                M0
+Id                                  315
+Degree                               29
+NodeBetweennessCentrality       1754.72
+PageRank                     0.00522532
+EgonetDegree                        588
+AvgNeighborDeg                  26.0345
+EgonetConnectivity              6.53333
+Name: 315, dtype: objectGraph                                M0
+Id                                  316
+Degree                               15
+NodeBetweennessCentrality       8.45665
+PageRank                     0.00260768
+EgonetDegree                        125
+AvgNeighborDeg                  20.5333
+EgonetConnectivity               12.375
+Name: 316, dtype: objectGraph                                M0
+Id                                  317
+Degree                               19
+NodeBetweennessCentrality       70.0425
+PageRank                     0.00280784
+EgonetDegree                        553
+AvgNeighborDeg                  38.6316
+EgonetConnectivity                   10
+Name: 317, dtype: objectGraph                                M0
+Id                                  318
+Degree                               42
+NodeBetweennessCentrality       643.204
+PageRank                     0.00578588
+EgonetDegree                        931
+AvgNeighborDeg                  39.2619
+EgonetConnectivity              17.6744
+Name: 318, dtype: objectGraph                                M0
+Id                                  319
+Degree                                7
+NodeBetweennessCentrality       3.07642
+PageRank                     0.00225048
+EgonetDegree                         52
+AvgNeighborDeg                  12.7143
+EgonetConnectivity                  5.5
+Name: 319, dtype: objectGraph                                M0
+Id                                  320
+Degree                               27
+NodeBetweennessCentrality       267.376
+PageRank                     0.00376244
+EgonetDegree                        702
+AvgNeighborDeg                  39.2963
+EgonetConnectivity              13.7857
+Name: 320, dtype: objectGraph                                 M0
+Id                                   321
+Degree                                 2
+NodeBetweennessCentrality              0
+PageRank                     0.000730936
+EgonetDegree                          83
+AvgNeighborDeg                      43.5
+EgonetConnectivity                     2
+Name: 321, dtype: objectGraph                                M0
+Id                                  322
+Degree                                8
+NodeBetweennessCentrality       67.5577
+PageRank                     0.00284155
+EgonetDegree                         38
+AvgNeighborDeg                       11
+EgonetConnectivity              6.44444
+Name: 322, dtype: objectGraph                                M0
+Id                                  323
+Degree                                6
+NodeBetweennessCentrality       5.70329
+PageRank                     0.00120839
+EgonetDegree                        213
+AvgNeighborDeg                  39.1667
+EgonetConnectivity                    4
+Name: 323, dtype: objectGraph                                M0
+Id                                  324
+Degree                               26
+NodeBetweennessCentrality       3596.74
+PageRank                     0.00444041
+EgonetDegree                        438
+AvgNeighborDeg                  22.8462
+EgonetConnectivity              6.74074
+Name: 324, dtype: objectGraph                                M0
+Id                                  325
+Degree                                5
+NodeBetweennessCentrality       9.13425
+PageRank                     0.00115451
+EgonetDegree                        104
+AvgNeighborDeg                     24.2
+EgonetConnectivity              3.66667
+Name: 325, dtype: objectGraph                                M0
+Id                                  326
+Degree                               11
+NodeBetweennessCentrality       3.54951
+PageRank                     0.00172009
+EgonetDegree                        434
+AvgNeighborDeg                  47.7273
+EgonetConnectivity                  8.5
+Name: 326, dtype: objectGraph                               M0
+Id                                 327
+Degree                              33
+NodeBetweennessCentrality       161.71
+PageRank                     0.0043185
+EgonetDegree                       772
+AvgNeighborDeg                 42.0303
+EgonetConnectivity             19.0588
+Name: 327, dtype: objectGraph                               M0
+Id                                 328
+Degree                              17
+NodeBetweennessCentrality      471.137
+PageRank                     0.0050131
+EgonetDegree                        65
+AvgNeighborDeg                 14.2353
+EgonetConnectivity             10.7778
+Name: 328, dtype: objectGraph                                M0
+Id                                  329
+Degree                                8
+NodeBetweennessCentrality       9.05751
+PageRank                     0.00143504
+EgonetDegree                        263
+AvgNeighborDeg                   36.375
+EgonetConnectivity                    4
+Name: 329, dtype: objectGraph                                M0
+Id                                  330
+Degree                               15
+NodeBetweennessCentrality         24.84
+PageRank                     0.00226251
+EgonetDegree                        512
+AvgNeighborDeg                  43.5333
+EgonetConnectivity                 9.75
+Name: 330, dtype: objectGraph                                M0
+Id                                  331
+Degree                               26
+NodeBetweennessCentrality       255.676
+PageRank                     0.00428714
+EgonetDegree                        144
+AvgNeighborDeg                  18.8462
+EgonetConnectivity              13.7778
+Name: 331, dtype: objectGraph                                M0
+Id                                  332
+Degree                                6
+NodeBetweennessCentrality       3.86666
+PageRank                     0.00136351
+EgonetDegree                         97
+AvgNeighborDeg                  20.8333
+EgonetConnectivity              4.85714
+Name: 332, dtype: object

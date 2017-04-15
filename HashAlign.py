@@ -18,11 +18,9 @@ sim_matrix = {}
 Best_Ranking = {}
 Best_correctMatch = {}
 
-def experiment(df, filename, is_perm = False, noise_level = 0.05, 
-	bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
-	loop_num = 1, cos_num_plane = 25, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
-	threshold = 0.003, reweight = True,
-	findcenter = 0): #findcenter = 1: find and check that one and original center; 0: check all, -1: original only
+def experiment(df, filename, bandNumber = 2, adaptiveLSH = True, LSHType = 'Euclidean',
+	loop_num = 1, cos_num_plane = 200, euc_width = 2, compute_hungarian = False, compute_sim = False, compute_netalign = False,
+	threshold = 3.5, reweight = True): 
 	"""
 	Experiment on two graphs with multiple setting
 
@@ -37,6 +35,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 	centers = []
 	found_center = None
 	graph_attrs = {}
+	graph_perm = {}
 	# Load synthetic graph information
 	with open('./private_data/' + filename + '/metadata') as f:
 		for line in f:
@@ -54,10 +53,12 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 	# Load all graph attributes
 	graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
+	graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))
 	multi_graphs = {}
-	# if compute_netalign:
+
+	#if compute_netalign:
 	multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-	#print multi_graphs
+
 	# Load attributes name
 	attributes = []
 	with open('./private_data/' + filename + '/attributes') as f:
@@ -68,7 +69,6 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 	# Load permutation matrix 
 	P = identity(len(graph_attrs['M0'])) # Should handle permutation case!!!!!!!!!!!
-
 
 	for center_id in centers:
 		rank_score = 0
@@ -90,7 +90,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 					print '!!! computed sim_matrix !!!'
 					sim_matrix[(center_id, g)] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 				if (center_id, g) not in Best_Ranking and g != center_id:
-                			Best_Ranking[(center_id, g)], Best_correctMatch[(center_id, g)] = sparseRank(sim_matrix[(center_id, g)], P)
+                			Best_Ranking[(center_id, g)], Best_correctMatch[(center_id, g)] = sparseRank(sim_matrix[(center_id, g)], graph_perm[center_id], graph_perm[g])
 		end_sim = time.time()
 		print 'sim_time: '+str(end_sim-start_sim)
 		start_matching = time.time()
@@ -205,8 +205,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				matching_matrix[g], this_pair_computed[g]\
 					= computeSparseMatchingMat(graph_attrs[center_id], graph_attrs[g], pair_count_dict[g], LSHType, threshold)
 			
-
-				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], P)
+				Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], graph_perm[center_id], graph_perm[g])
 				
 				if not compute_sim:
 					Best_Ranking[(center_id, g)] = Ranking[g]
@@ -218,7 +217,7 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				# 	Best_correctMatch[g] = argmaxMatch(sim_matrix[g], graph_attrs[center_id], graph_attrs[g], P)
 				hung_score[g] = correctMatch[g]
 				if compute_hungarian:
-					hung_score[g] = hungarianMatch(sim_matrix[(center_id, g)], P)
+					hung_score[g] = hungarianMatch(sim_matrix[(center_id, g)], graph_perm[g])
 
 
 				rank_score += sum(Ranking[g])/len(Ranking[g])
@@ -236,7 +235,8 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 					correct_score_hungarian += 0
 				pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
 				if compute_netalign:
-					netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g])
+					netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g]
+											,graph_perm[center_id], graph_perm[g])
 					netalign_score += netalign_scores[g]
 				print "=========================================================="
 				print filename + ' ' + g + ', center:' + center_id + ', center_dist: '+ metadata['center_distance']
@@ -263,20 +263,22 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 				for i in xrange(len(non_center)):
 					for j in xrange(i+1, len(non_center)):
 						derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
-						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], P , printing=False)
+						Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]] , printing=False) # handle!!!!!!!! P1, P2
 						derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
-						derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])])
+						if compute_netalign:
+							derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+				
 				print 'derived rank score: '
 				print derived_rank
 				tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
 				avg_derived_rank += tmp_avg_derived_rank
 				print 'avg derived rank score: ' + str(tmp_avg_derived_rank)
-				
-				print 'derived netalign score: '
-				print derived_netalign
-				tmp_avg_netalign = np.mean(derived_netalign.values())
-				avg_derived_netalign += tmp_avg_netalign
-				print 'avg derived netalign score: ' + str(np.mean(tmp_avg_netalign))	
+				if compute_netalign:
+					print 'derived netalign score: '
+					print derived_netalign
+					tmp_avg_netalign = np.mean(derived_netalign.values())
+					avg_derived_netalign += tmp_avg_netalign
+					print 'avg derived netalign score: ' + str(np.mean(tmp_avg_netalign))	
 		
 		rank_score /= loop_num * len(pair_count_dict.keys())
 		rank_score_upper /= loop_num * len(pair_count_dict.keys())
@@ -314,16 +316,18 @@ def experiment(df, filename, is_perm = False, noise_level = 0.05,
 
 if __name__ == '__main__':
 	adaptiveLSH = [False]
-	bandNumbers = [1, 2, 4, 6]
-	thresholds = [1, 2, 4] 
+	bandNumbers = [4]
+	cos_num_plane = [25]
+	euc_width = [4]
 	LSH = ['Cosine', 'Euclidean']
 	folders = ['facebook']
-	reweights = [True, False]
+	reweights = [True]
+	thresholds = [0.01]
 	# center_distance_types = ['canberra', 'manhattan', 'euclidean']
-	fname = 'exp_band_thres_no_weight.pkl'
+	fname = 'exp_against_netalign'
 
-	if os.path.isfile(fname):
-		with open(fname, 'rb') as f:
+	if os.path.isfile(fname+'.pkl'):
+		with open(fname+'.pkl', 'rb') as f:
 			df = pickle.load(f)
 	else:
 		df = pd.DataFrame(
@@ -343,24 +347,21 @@ if __name__ == '__main__':
 						df = experiment(df, filename = fold, loop_num = 1, bandNumber = band, threshold = thres/100.0,\
 							compute_netalign = False, compute_sim = True, reweight = rew,\
 							adaptiveLSH = False, LSHType = 'Cosine')
-					pickle.dump(df, open(fname,'wb'))
-					df.to_csv('exp_band_thres_no_weight.csv')
+					pickle.dump(df, open(fname+'.pkl','wb'))
+					df.to_csv(fname+'.csv')
 		sim_matrix = {}
 		Best_Ranking = {}
         Best_correctMatch = {}
 		
-		# df = experiment(df, filename = 'Data/phys.edges', nodeAttributeFile = None, 
-		# 		GraphType = 'Directed', bandNumber = 2, 
-		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.001,
-		# 		center_distance = dist_type, findcenter = 0)
-		# df = experiment(df, filename = 'Data/email.edges', nodeAttributeFile = None, 
-		# 		has_noise = True, GraphType = 'Undirected', bandNumber = 2, 
-		# 		adaptiveLSH = False, LSHType = 'Cosine', noise_level = 0.01,
-		# 		center_distance = dist_type, findcenter = 0)
+	# for dist_type in center_distance_types:
+	# for b in bandNumber:
+	# 	for lsh in LSH:
+	# 		if lsh == 'Cosine':
+	# 			for c in cos_num_plane:
+	# 				df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh, cos_num_plane = c)
+	# 		else:
+	# 			for e in euc_width:
+	# 				df = experiment(df, filename = 'facebook', bandNumber = b, adaptiveLSH = False, LSHType = lsh, euc_width = e)
+	# 		pickle.dump(df, open(fname,'wb'))
+	# 		df.to_csv('exp_pair_band_lsh.xlsx')
 
-	#pickle.dump(df, open(fname,'wb'))
-	
-	#writer = pd.ExcelWriter('exp_band_thres.xlsx')
-	#df.to_csv('exp_band_thres.csv') 
-	#df.to_excel('exp_band_thres.xlsx', sheet_name='Sheet1', index=False, engine='xlsxwriter')
-	#writer.save()
