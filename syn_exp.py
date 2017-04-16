@@ -14,6 +14,7 @@ if __name__ == '__main__':
 	for data, c, e in testdata:
 		if data == 'dblp':
 			b = 2
+			noise_level = [0.001, 0.01, 0.05, 0.1]
 		for noise in noise_level:
 			preprocessing('Data/' + data + '.edges', 'Data/' + data + '.nodes', data, number = 1, noise_level = noise)
 			# HashAlign
