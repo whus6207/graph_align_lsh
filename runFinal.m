@@ -1,4 +1,4 @@
-function accuracy = runFinal()
+function [accuracy, row, col] = runFinal()
 clear;
 load temp_final;
 addpath('../final')
