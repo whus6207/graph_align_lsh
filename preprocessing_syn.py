@@ -2,8 +2,8 @@ import time
 import os
 import pandas as pd
 import numpy as np
-from attr_utils import *
-from multi_sparse_utils import *
+from utils.attr_utils import *
+from utils.multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
 import pickle
@@ -112,6 +112,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		f.write('number' + " " + str(number) + '\n')
 		f.write('node_dir' + " " + str(node_dir) + '\n')
 		f.write('center_distance' + " " + str(center_distance) + '\n')
+		f.write('node_attribute_number' + " " + str(len(nodeAttributesName)) + '\n')
 		f.close()
 	# print list(graph_attrs['M1']['Degree'])
 	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))

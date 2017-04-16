@@ -1,11 +1,10 @@
-import matplotlib.pyplot as plt
 import numpy as np 
-from attr_utils import *
-from lsh_utils import *
-from io_sparse_utils import *
-from multi_sparse_utils import *
+from utils.attr_utils import *
+from utils.lsh_utils import *
+from utils.io_sparse_utils import *
+from utils.multi_sparse_utils import *
 from scipy.sparse import identity
-from baseline_utils import *
+from utils.baseline_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -19,7 +18,7 @@ class HashAlign:
 		self.sim_matrix = {}
 		self.Best_Ranking = {}
 		self.Best_correctMatch = {}
-		self.fname = fname
+		self.fname = 'exp_result/' + fname
 
 	def experiment(self, df, filename, bandNumber = 4, LSHType = 'Euclidean',
 		loop_num = 1, cos_num_plane = 50, euc_width = 3, compute_sim = False, compute_netalign = False,
@@ -237,7 +236,8 @@ class HashAlign:
 				}, ignore_index=True)
 		return df
 
-	def run(self, band_numbers = [4], cos_num_plane = [25], euc_width = [4], LSHs=['Cosine'], folders=['facebook'], thresholds = [0.2]):
+	def run(self, band_numbers = [4], cos_num_plane = [25], euc_width = [4], LSHs=['Cosine'], 
+		folders=['facebook'], thresholds = [0.2], compute_netalign = False, compute_final = False):
 		
 		# center_distance_types = ['canberra', 'manhattan', 'euclidean']
 
@@ -255,12 +255,13 @@ class HashAlign:
 							for c in cos_num_plane:
 								df = self.experiment(df, filename = fold, 
 										bandNumber = band, LSHType = lsh, cos_num_plane = c, threshold = thres,
-										compute_sim = False, compute_netalign = True, compute_final = False)
+										compute_sim = False, compute_netalign = compute_netalign, compute_final = compute_final)
 						else:
 							for e in euc_width:
 								df = self.experiment(df, filename = fold, 
 										bandNumber = band, LSHType = lsh, euc_width = e, threshold = thres,
-										compute_sim = False, compute_netalign = True, compute_final = False)
+										compute_sim = False, compute_netalign = compute_netalign, compute_final = compute_final)
+
 						pickle.dump(df, open(self.fname+'.pkl','wb'))
 						df.to_csv(self.fname+'.csv')
 			self.sim_matrix = {}

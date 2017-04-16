@@ -1,9 +1,9 @@
 import numpy as np 
-from attr_utils import *
-from lsh_utils import *
-from io_sparse_utils import *
-from multi_sparse_utils import *
-from baseline_utils import *
+from utils.attr_utils import *
+from utils.lsh_utils import *
+from utils.io_sparse_utils import *
+from utils.multi_sparse_utils import *
+from utils.baseline_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -11,7 +11,7 @@ import time
 
 class PureBaseline:
 	def __init__(self, fname):
-		self.fname = fname
+		self.fname = 'exp_result/' + fname
 		self.metadata = {}
 		self.centers = []
 		self.graph_attrs = {}
@@ -40,10 +40,16 @@ class PureBaseline:
 		else:
 			raise RuntimeError("Need two graphs to align")
 
+		node_att_num = int(self.metadata['node_attribute_number'])
+
 		# Load all graph attributes
 		self.graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
+		if node_att_num > 0:
+			for g, att in self.graph_attrs.iteritems():
+				self.graph_attrs[g] = att.iloc[:, -node_att_num:]
 		self.graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))	
 		self.multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
+		
 
 
 	def sim_baseline(self, df, filename, LSHType):
@@ -76,12 +82,13 @@ class PureBaseline:
 				print "GraphType = " + self.metadata['graph_type'] 
 				print "noise_level = " + self.metadata['noise_level'] + ", nodeAttributeFile = " + self.metadata['node_dir']
 				self.print_baseline_score(self.baseline_scores[(center_id, g)])
+				temp = self.baseline_scores[(center_id, g)]
 				# print "netalign score: %f" %(self.baseline_scores[(center_id, g)])
 		self.avg_baseline_score /=  (len(self.multi_graphs.keys())**2 - len(self.multi_graphs.keys()) )
 		self.matching_time = time.time() - start_match
 		print "matching_time: "+str(self.matching_time)
 
-		df = self.append_df(df, filename)
+		df = self.append_df(df, filename, LSHType, temp)
 
 		# df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
 		# 	, 'noise_level':self.metadata['noise_level']\
@@ -96,7 +103,7 @@ class PureBaseline:
 	
 	def print_baseline_score(self, baseline_score):
 		pass
-	def append_df(self, df, filename):
+	def append_df(self, df, filename, baseline_score):
 		return
 
 	def filter_sim_to_match(self, sim_matrix, percentage):
@@ -132,14 +139,17 @@ class PureNetAlign(PureBaseline):
 		PureBaseline.__init__(self, fname)
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
-		return getNetalignScore(A, B, M, Pa, Pb)
+		return getNetalignScore(A, B, M, Pa, Pb)[0]
 
 	def print_baseline_score(self, baseline_score):
 		print "netalign score: %f" %(baseline_score)
 
-	def append_df(self, df, filename):
-		df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+	def append_df(self, df, LSHType, filename, baseline_score):
+		df = df.append({'filename':filename
+			, 'nodeAttributeFile': self.metadata['node_dir']\
 			, 'noise_level':self.metadata['noise_level']\
+			, 'LSHType':LSHType\
+			, 'netalign_score': baseline_score\
 			, 'avg_netalign_score': self.avg_baseline_score\
 			, 'matching_time': self.matching_time\
 			}, ignore_index=True)
@@ -156,9 +166,12 @@ class PureIsoRank(PureBaseline):
 	def print_baseline_score(self, baseline_score):
 		print "IsoRank score: %f" %(baseline_score)
 
-	def append_df(self, df, filename):
-		df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+	def append_df(self, df, LSHType, filename, baseline_score):
+		df = df.append({'filename':filename\
+			, 'nodeAttributeFile': self.metadata['node_dir']\
 			, 'noise_level':self.metadata['noise_level']\
+			, 'LSHType':LSHType\
+			, 'isorank_score': baseline_score\
 			, 'avg_isorank_score': self.avg_baseline_score\
 			, 'matching_time': self.matching_time\
 			}, ignore_index=True)
@@ -175,9 +188,12 @@ class PureFinal(PureBaseline):
 	def print_baseline_score(self, baseline_score):
 		print "FINAL score: %f" %(baseline_score)
 
-	def append_df(self, df, filename):
-		df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+	def append_df(self, df, LSHType, filename, baseline_score):
+		df = df.append({'filename':filename
+			, 'nodeAttributeFile': self.metadata['node_dir']\
 			, 'noise_level':self.metadata['noise_level']\
+			, 'LSHType':LSHType\
+			, 'final_score': baseline_score\
 			, 'avg_final_score': self.avg_baseline_score\
 			, 'matching_time': self.matching_time\
 			}, ignore_index=True)
