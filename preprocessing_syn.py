@@ -112,6 +112,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		f.write('number' + " " + str(number) + '\n')
 		f.write('node_dir' + " " + str(node_dir) + '\n')
 		f.write('center_distance' + " " + str(center_distance) + '\n')
+		f.write('node_attribute_number' + " " + str(len(nodeAttributesName)) + '\n')
 		f.close()
 	# print list(graph_attrs['M1']['Degree'])
 	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
