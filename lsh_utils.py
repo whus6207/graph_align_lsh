@@ -185,14 +185,14 @@ def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType,
 
     if LSHType == 'Cosine':               
         for row in node_pairs.keys():
-            for _ in range(int(len(node_pairs[row]) * threshold)):
+            for _ in xrange(min(len(node_pairs[row]), int(attributesA.shape[0]*threshold))):
                 pair_computed += 1
                 neg_count, col = hp.heappop(node_pairs[row])
                 matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
                     combineAB[col+len(attributesA)][2:],scaling=scale)*(-neg_count)
     elif LSHType == 'Euclidean':
         for row in node_pairs.keys():
-            for _ in range(int(len(node_pairs[row]) * threshold)):
+            for _ in xrange(min(len(node_pairs[row]), int(attributesA.shape[0]*threshold))):
                 pair_computed += 1
                 neg_count, col = hp.heappop(node_pairs[row])
                 matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
@@ -246,8 +246,8 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id, reweight
     for bucket in buckets:
 	if len(bucket)>1:
 		sorted_bucks = sorted(bucket.items(), key=lambda item: len(item[1]))
-		if len(sorted_bucks[-1][1])>len(stacked_attrs.index)*3/4:
-			bucket = dict(sorted_bucks[:-1])
+		# if len(sorted_bucks[-1][1])>len(stacked_attrs.index)*3/4:
+		# 	bucket = dict(sorted_bucks[:-1])
         for buck, collisions in bucket.items(): # collisions = [(Graph, Id)]
             if len(collisions) <= 1:
                 continue

@@ -5,7 +5,7 @@ from lsh_utils import *
 from io_sparse_utils import *
 from multi_sparse_utils import *
 from scipy.sparse import identity
-# from baseline_utils import *
+from baseline_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -114,6 +114,7 @@ class HashAlign:
 				Ranking = {}
 				correctMatch = {}
 				netalign_scores = {}
+				netaligned_matrix = {}
 				final_scores = {}
 
 				for g in pair_count_dict.keys():
@@ -121,7 +122,7 @@ class HashAlign:
 						continue
 					matching_matrix[g], this_pair_computed[g]\
 						= computeSparseMatchingMat(graph_attrs[center_id], graph_attrs[g], pair_count_dict[g], LSHType, threshold)
-				
+					print "!!! % of non-zero entry in matching matrix: {}".format(len(matching_matrix[g].nonzero()[0])/float(multi_graphs[g].shape[0]**2))
 					Ranking[g], correctMatch[g] = sparseRank(matching_matrix[g], graph_perm[center_id], graph_perm[g])
 					rank_score += sum(Ranking[g])/len(Ranking[g])
 					correct_score += sum(correctMatch[g]) / float(len(correctMatch[g]))
@@ -137,7 +138,7 @@ class HashAlign:
 					pairs_computed += this_pair_computed[g]/float(matching_matrix[g].shape[0]*matching_matrix[g].shape[1])
 					
 					if compute_netalign:
-						netalign_scores[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g]
+						netalign_scores[g], netaligned_matrix[g] = getNetalignScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g]
 												,graph_perm[center_id], graph_perm[g])
 						netalign_score += netalign_scores[g]
 					if compute_final:
@@ -171,11 +172,14 @@ class HashAlign:
 					for i in xrange(len(non_center)):
 						for j in xrange(i+1, len(non_center)):
 							derived_matching_matrix[(non_center[i],non_center[j])] = matching_matrix[non_center[i]].T.dot(matching_matrix[non_center[j]])
-							Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]] , printing=False) # handle!!!!!!!! P1, P2
+							Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 							derived_rank[(non_center[i],non_center[j])] = sum(Ranking)/len(Ranking)
 
 							if compute_netalign:
-								derived_netalign[(non_center[i],non_center[j])] = getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+								derived_matching_matrix[(non_center[i],non_center[j])] = netaligned_matrix[non_center[i]].T.dot(netaligned_matrix[non_center[j]])
+									#getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+								Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+								derived_netalign[(non_center[i],non_center[j])] = sum(correct_match)/len(correct_match)
 							if compute_final:	
 								derived_final[(non_center[i],non_center[j])] = getFinalScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 					print 'derived rank score: '
@@ -251,12 +255,12 @@ class HashAlign:
 							for c in cos_num_plane:
 								df = self.experiment(df, filename = fold, 
 										bandNumber = band, LSHType = lsh, cos_num_plane = c, threshold = thres,
-										compute_sim = False, compute_netalign = False, compute_final = False)
+										compute_sim = False, compute_netalign = True, compute_final = False)
 						else:
 							for e in euc_width:
 								df = self.experiment(df, filename = fold, 
 										bandNumber = band, LSHType = lsh, euc_width = e, threshold = thres,
-										compute_sim = False, compute_netalign = False, compute_final = False)
+										compute_sim = False, compute_netalign = True, compute_final = False)
 						pickle.dump(df, open(self.fname+'.pkl','wb'))
 						df.to_csv(self.fname+'.csv')
 			self.sim_matrix = {}
