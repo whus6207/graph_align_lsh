@@ -2,8 +2,8 @@ import time
 import os
 import pandas as pd
 import numpy as np
-from attr_utils import *
-from multi_sparse_utils import *
+from utils.attr_utils import *
+from utils.multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
 import pickle

@@ -1,4 +1,4 @@
-function accuracy = runNetalign()
+function [accuracy, ma, mb] = runNetalign()
 clear;
 load temp;
 addpath('../netalign/matlab')

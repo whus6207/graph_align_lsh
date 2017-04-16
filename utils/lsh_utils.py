@@ -5,7 +5,6 @@ from scipy.stats import entropy
 from scipy.sparse import lil_matrix
 from scipy.sparse import csr_matrix
 from itertools import izip
-import matplotlib.pyplot as plt
 import random
 from sklearn.preprocessing import normalize
 import pandas as pd
@@ -40,24 +39,6 @@ def generateEuclideanBuckets(attributes, bin_wid):
         dic[hashVec[i]].append((attributes.ix[i]['Graph'], attributes.ix[i]['Id']))
     return dic
 
-def generateNodeBuckets(LSHType, attributesA, attributesB, bandNode):
-    bucketNode = []
-    if len(bandNode) > 0:
-        if LSHType == 'Cosine':
-            bucketNode = generateCosineBuckets(selectAndCombine(attributesA, attributesB, bandNode), 20)
-        elif LSHType == 'Euclidean':
-            bucketNode = generateEuclideanBuckets(selectAndCombine(attributesA, attributesB, bandNode), 20)
-    return bucketNode
-
-def generateNodeBucketsMulti(LSHType, graph_attrs, bandNode, cos_num_plane, euc_width):
-    bucketNode = []
-    if len(bandNode) > 0:
-        if LSHType == 'Cosine':
-            bucketNode = generateCosineBuckets(selectAndCombineMulti(graph_attrs, bandNode), cos_num_plane)
-        elif LSHType == 'Euclidean':
-            bucketNode = generateEuclideanBuckets(selectAndCombineMulti(graph_attrs, bandNode), euc_width)
-    return bucketNode
-
 def selectAndCombine(A, B, cols = None):
     if cols is not None:
         return A[cols + ['Graph', 'Id']].append(B[cols + ['Graph', 'Id']], ignore_index=True)
@@ -85,17 +66,11 @@ def cos_sim(v1, v2, scaling=None):
     if scaling is None:
         scaling = np.ones((len(v1),))
     if sum(v1) == 0 or sum(v2) == 0:
-        #print 'caught!!'
         return 0
     v1 = np.multiply(v1, 1/scaling)
     v2 = np.multiply(v2, 1/scaling)
 
     return v1.dot(v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
-    # except FloatingPointError:
-    #     print 'caught!!'
-    #     print FloatingPointError
-    #     print v1, v2
-    #     return
 
 def KL_sim(distribution1, distribution2):
     v1, bin1 = np.histogram(distribution1, 30)
@@ -114,41 +89,6 @@ def Euclidean_sim(v1,v2, scaling = None):
     v2 = np.multiply(v2, 1 / scaling)
     eucDis = sum((v1 - v2) ** 2) ** 0.5
     return 1/(1+eucDis)
-
-
-def computeEulideanMatchingMat(attributesA, attributesB, pair_count_dict):
-    matching_matrix = np.zeros((len(attributesA), len(attributesB)))
-    for i in range(len(a)):
-        for j in range(len(b)):
-            matching_matrix[i,j] = Euclidean_Sim(a[i],b[j])
-    return retMat
-
-def computeMatchingMat(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
-    combineAB = selectAndCombine(attributesA, attributesB)
-    combineAB = combineAB.as_matrix()
-    matching_matrix = np.zeros((len(attributesA), len(attributesB)))
-    scale = np.mean(combineAB[:,2:], axis=0) # Still taking mean?
-    pair_computed = 0
-    if LSHType == 'Cosine':               
-        for pair, count in pair_count_dict.items():
-            if count >= threshold:
-                pair_computed += 1
-                # matching_matrix[pair[0]][pair[1]] = count
-                # experimental
-                matching_matrix[pair[0]][pair[1]] = cos_sim(combineAB[pair[0]][2:],\
-                    combineAB[pair[1]+len(attributesA)][2:],scaling=None)*count
-    elif LSHType == 'Euclidean':
-        for pair, count in pair_count_dict.items():
-            if count >= threshold:
-                pair_computed += 1
-                matching_matrix[pair[0]][pair[1]] = Euclidean_sim(combineAB[pair[0]][2:],\
-                    combineAB[pair[1]+len(attributesA)][2:],scaling=scale)*count
-    
-    ## experimental !!
-    # matching_matrix =  matching_matrix/matching_matrix.sum(axis=1)[:, np.newaxis]
-    # remove_id = matching_matrix < 1.0/matching_matrix.shape[0]
-    # matching_matrix[remove_id] = 0
-    return matching_matrix, pair_computed
 
 def computeSparseMatchingMat2(attributesA, attributesB, pair_count_dict, LSHType, threshold = 1):
     combineAB = selectAndCombine(attributesA, attributesB)
@@ -185,14 +125,14 @@ def computeSparseMatchingMat(attributesA, attributesB, pair_count_dict, LSHType,
 
     if LSHType == 'Cosine':               
         for row in node_pairs.keys():
-            for _ in range(int(len(node_pairs[row]) * threshold)):
+            for _ in xrange(min(len(node_pairs[row]), int(attributesA.shape[0]*threshold))):
                 pair_computed += 1
                 neg_count, col = hp.heappop(node_pairs[row])
                 matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
                     combineAB[col+len(attributesA)][2:],scaling=scale)*(-neg_count)
     elif LSHType == 'Euclidean':
         for row in node_pairs.keys():
-            for _ in range(int(len(node_pairs[row]) * threshold)):
+            for _ in xrange(min(len(node_pairs[row]), int(attributesA.shape[0]*threshold))):
                 pair_computed += 1
                 neg_count, col = hp.heappop(node_pairs[row])
                 matching_matrix[row, col] = cos_sim(combineAB[row][2:],\
@@ -215,31 +155,7 @@ def computeWholeSimMat(attributesA, attributesB, LSHType):
             vec = [Euclidean_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
             sim_vec.append(vec)
 
-    #return np.array(sim_vec)
     return csr_matrix(sim_vec)
-
-
-def combineBucketsBySum(buckets, combineAB, Afname):
-    pair_count_dict = defaultdict(int)
-
-    for bucket in buckets:
-        for buck, collisions in bucket.items(): # collisions = [(Graph, Id)]
-            if len(collisions) <= 1:
-                continue
-            
-            A_idx = combineAB[(combineAB['Graph'] == Afname)\
-                & (combineAB['Id'].isin([c[1] for c in collisions if c[0]==Afname]))]
-            B_idx = combineAB[(combineAB['Graph'] != Afname)\
-                & (combineAB['Id'].isin([c[1] for c in collisions if c[0]!=Afname]))]
-            
-            if len(collisions) == len(A_idx):    # We don't want all in A 
-                continue
-                
-            for aid in A_idx.index.values:
-                for bid in B_idx.index.values:
-                    pair_count_dict[(combineAB['Id'][aid], combineAB['Id'][bid])] += 1
-
-    return pair_count_dict
 
 def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id, reweight = True):
     pair_count_dict = defaultdict(lambda : defaultdict(int))
@@ -269,58 +185,6 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id, reweight
                         else:
                             pair_count_dict[g][(stacked_attrs['Id'][aid], stacked_attrs['Id'][bid])] += 1.0
     return pair_count_dict
-
-
-def plotBucketDistribution(bucket):
-    plt.bar(range(len(bucket))
-            , sorted([len(values) for key, values in bucket.items()])
-            , align='center')
-    plt.show()
-
-
-# plot bucket correctness
-def plotBucketCorrectness(d, n):
-    correct = {}
-    for v, k in d.items():
-        cnt = 0
-        for i in k:
-            if (i < n):
-                if (i + n in k):
-                    cnt += 2
-            else:
-                break
-        correct[v] = cnt
-    plt.clf
-    plt.figure()
-    plt.bar(range(len(d)), [len(v) for k,v in d.items()], alpha=0.5, label='bucket', color='blue')
-    plt.bar(range(len(correct)), [correct[k] for k,v in d.items()], alpha=0.5, label='correct', color='green')
-    plt.xlabel('bucket')
-    plt.ylabel('number')
-    plt.legend(loc='best')
-    plt.show()
-
-def Rank(matching_matrix, P = None, printing = False):
-    if P is not None:
-        matching_matrix = matching_matrix.dot(P)
-    n, d = matching_matrix.shape
-    
-    ranking = np.zeros((n))
-    for i in range(n):      
-        #rank = n - matching_matrix[i, :].argsort().tolist().index(i)
-        try:
-            if matching_matrix[i,i] != 0:
-                if printing:
-                    print "{}: ".format(i)
-                    ranks = [ (val,idx) for idx, val in enumerate(matching_matrix[i,:]) ]
-                    print sorted(ranks, key = lambda x: x[0], reverse=True)
-                rank = sorted(matching_matrix[i, :], reverse = True).index(matching_matrix[i, i]) + 1
-                ranking[i] = 1.0 / rank
-        except ValueError:
-            print ValueError
-            print i
-            print matching_matrix[i,i]
-
-    return ranking
 
 def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
     if P1 != None and P2 != None:
@@ -353,19 +217,6 @@ def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
             ranking[i] = 1.0 / (sorted_row[i].index(i) + 1)
             correct_match[i] = (i == sorted_row[i][0]) # max matching score at node i
     return ranking, correct_match
-
-def argmaxMatch(matching_matrix, attributesA, attributesB, P = None):
-    if P is not None:
-        matching_matrix = matching_matrix.dot(P)
-    score =[]
-    for i in range(matching_matrix.shape[0]):
-        # print '{} :'.format(i)
-        # print sorted([(j, matching_matrix[i][j])for j in range(len(matching_matrix[i]))], key = lambda k: matching_matrix[i][k[0]])
-        # print 'equal?'
-        # print attributesB['Id'][matching_matrix[i].argsort()[-1]], attributesA['Id'][i]
-        score.append(attributesB['Id'][matching_matrix[i].argsort()[-1]] == attributesA['Id'][i])
-    # print 'sum: {}'.format(sum(score))
-    return score
 
 def sparseArgmaxMatch(matching_matrix, attributesA, attributesB, P = None):
     if P is not None:

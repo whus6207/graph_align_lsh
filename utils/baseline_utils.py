@@ -2,17 +2,22 @@ import matlab.engine as mateng
 import matlab
 import numpy as np
 from scipy  import io
+from scipy.sparse import csr_matrix
 
 def getNetalignScore(A, B, L, Pa, Pb):
   eng = mateng.start_matlab()
   # eng.saveMat(matlab.double(A.tolist()), matlab.double(B.tolist()), matlab.double(L.tolist()), s, nargout=0)
   io.savemat('temp.mat', dict(A=A, B=B, L=L, Pa=Pa, Pb=Pb))
-  accuracy = eng.runNetalign(nargout=1)
+  accuracy, ma, mb = eng.runNetalign(nargout=3)
+  row = np.array([x-1 for x in map(list, zip(*ma))[0]])
+  col = np.array([x-1 for x in map(list, zip(*mb))[0]])
+  data = len(row)*[1]
+  matching_matrix = csr_matrix((data, (row, col)), shape=A.shape)
   print "netalign: " + str(accuracy)
 
   eng.quit()
 
-  return accuracy
+  return accuracy, matching_matrix
 
 def getFinalScore(A, B, H, Pa, Pb, node_A = None, node_B = None):
 	eng = mateng.start_matlab()

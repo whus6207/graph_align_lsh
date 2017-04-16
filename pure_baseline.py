@@ -1,9 +1,9 @@
 import numpy as np 
-from attr_utils import *
-from lsh_utils import *
-from io_sparse_utils import *
-from multi_sparse_utils import *
-from baseline_utils import *
+from utils.attr_utils import *
+from utils.lsh_utils import *
+from utils.io_sparse_utils import *
+from utils.multi_sparse_utils import *
+from utils.baseline_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -11,7 +11,7 @@ import time
 
 class PureBaseline:
 	def __init__(self, fname):
-		self.fname = fname
+		self.fname = 'exp_result/' + fname
 		self.metadata = {}
 		self.centers = []
 		self.graph_attrs = {}
@@ -139,7 +139,7 @@ class PureNetAlign(PureBaseline):
 		PureBaseline.__init__(self, fname)
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
-		return getNetalignScore(A, B, M, Pa, Pb)
+		return getNetalignScore(A, B, M, Pa, Pb)[0]
 
 	def print_baseline_score(self, baseline_score):
 		print "netalign score: %f" %(baseline_score)

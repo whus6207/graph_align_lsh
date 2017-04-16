@@ -5,15 +5,15 @@ from pure_baseline import *
 from random import shuffle
 
 if __name__ == '__main__':
-	testdata = [('facebook', [25], [4]), ('email', [50], [4]), ('dblp-A', [100], [4])]
-	b = 4
+	testdata = [('facebook', [25], [4]), ('email', [50], [4]), ('dblp', [100], [4])]
+	b = [4]
 	LSHs = ['Cosine', 'Euclidean']
 	fname = 'exp_syn_all'
 	noise_level = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]
 
 	for data, c, e in testdata:
 		if data == 'dblp':
-			b = 2
+			b = [2]
 			noise_level = [0.001, 0.01, 0.05, 0.1]
 		for noise in noise_level:
 			preprocessing('Data/' + data + '.edges', 'Data/' + data + '.nodes', data, number = 1, noise_level = noise)
