@@ -81,7 +81,7 @@ class HashAlign:
 						print '!!! computed self.sim_matrix !!!'
 						self.sim_matrix[(center_id, g)] = computeWholeSimMat(graph_attrs[center_id], graph_attrs[g], LSHType)
 					if (center_id, g) not in self.Best_Ranking and g != center_id:
-	                			self.Best_Ranking[(center_id, g)], self.Best_correctMatch[(center_id, g)] = sparseRank(self.sim_matrix[(center_id, g)], graph_perm[center_id], graph_perm[g])
+								self.Best_Ranking[(center_id, g)], self.Best_correctMatch[(center_id, g)] = sparseRank(self.sim_matrix[(center_id, g)], graph_perm[center_id], graph_perm[g])
 			end_sim = time.time()
 			print 'sim_time: '+str(end_sim-start_sim)
 
@@ -261,7 +261,7 @@ class HashAlign:
 						df.to_csv(self.fname+'.csv')
 			self.sim_matrix = {}
 			self.Best_Ranking = {}
-	        	self.Best_correctMatch = {}
+			self.Best_correctMatch = {}
 
 if __name__ == '__main__':
 	ha_runner = HashAlign(fname = sys.argv[1])

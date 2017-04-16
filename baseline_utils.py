@@ -28,3 +28,16 @@ def getFinalScore(A, B, H, Pa, Pb, node_A = None, node_B = None):
 	eng.quit()
 
 	return accuracy
+
+def getIsoRankScore(A, B, L, Pa, Pb):
+	eng = mateng.start_matlab()
+	# eng.saveMat(matlab.double(A.tolist()), matlab.double(B.tolist()), matlab.double(L.tolist()), s, nargout=0)
+	io.savemat('temp_iso.mat', dict(A=A, B=B, L=L, Pa=Pa, Pb=Pb))
+	
+	accuracy = eng.runIsoRank(nargout=1)
+
+	print "isorank: " + str(accuracy)
+
+	eng.quit()
+
+	return accuracy

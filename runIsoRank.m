@@ -1,9 +1,9 @@
-function accuracy = runNetalign()
+function accuracy = runIsoRank()
 clear;
-load temp;
+load temp_iso;
 addpath('../netalign/matlab')
 [S,w,li,lj] = netalign_setup(A,B,L);
-x = netalignbp(S,w,0,1,li,lj);
+x = isorank(S,w,0,1,li,lj)
 [ma, mb, ~, ~, ~] = mwmround(x,S,w,li,lj);
 
 [m, n] = size(Pa);

@@ -1,0 +1,189 @@
+import numpy as np 
+from attr_utils import *
+from lsh_utils import *
+from io_sparse_utils import *
+from multi_sparse_utils import *
+from baseline_utils import *
+import pandas as pd
+import os.path
+import pickle
+import time
+
+class PureBaseline:
+	def __init__(self, fname):
+		self.fname = fname
+		self.metadata = {}
+		self.centers = []
+		self.graph_attrs = {}
+		self.graph_perm = {}
+		self.multi_graphs = {}
+		self.sim_matrix = {}
+		self.matching_matrix = {}
+
+		self.avg_baseline_score = 0
+		self.matching_time = 0
+		self.baseline_scores = {}
+
+	def load_data(self, filename):
+		# Load synthetic graph information
+		with open('./private_data/' + filename + '/metadata') as f:
+			for line in f:
+				line = line.strip().split()
+				self.metadata[line[0]] = line[1]
+
+		# Check multiple graphs
+		if self.metadata['number'] >= 1:	
+			with open('./private_data/' + filename + '/centers') as f:
+				for line in f:
+					self.centers.append(line.strip().split()[0])
+				f.close()
+		else:
+			raise RuntimeError("Need two graphs to align")
+
+		# Load all graph attributes
+		self.graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
+		self.graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))	
+		self.multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
+
+
+	def sim_baseline(self, df, filename, LSHType):
+		
+		self.load_data(filename)
+
+		start_match = time.time()
+		for center_id in self.centers:
+			for g in self.graph_attrs.keys():
+				if (center_id, g) not in self.sim_matrix and (g, center_id) not in self.sim_matrix and g != center_id:
+					if (g, center_id) in self.sim_matrix:
+						self.sim_matrix[(center_id, g)] = self.sim_matrix[(g, center_id)]
+					else:
+						print '!!! computed sim_matrix !!!'
+						self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
+					self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], 0.2)	
+
+			for g in self.multi_graphs.keys():
+				if g == center_id:
+					continue
+				if (g, center_id) not in self.baseline_scores:
+					self.baseline_scores[(center_id, g)] = self.get_baseline_score(self.multi_graphs[center_id], self.multi_graphs[g], self.matching_matrix[(center_id, g)]
+														, self.graph_perm[center_id], self.graph_perm[g])
+				else:
+					self.baseline_scores[(center_id, g)] = self.baseline_scores[(g, center_id)]
+				self.avg_baseline_score += self.baseline_scores[(center_id, g)]
+
+				print "=========================================================="
+				print filename + ' ' + g 
+				print "GraphType = " + self.metadata['graph_type'] 
+				print "noise_level = " + self.metadata['noise_level'] + ", nodeAttributeFile = " + self.metadata['node_dir']
+				self.print_baseline_score(self.baseline_scores[(center_id, g)])
+				# print "netalign score: %f" %(self.baseline_scores[(center_id, g)])
+		self.avg_baseline_score /=  (len(self.multi_graphs.keys())**2 - len(self.multi_graphs.keys()) )
+		self.matching_time = time.time() - start_match
+		print "matching_time: "+str(self.matching_time)
+
+		df = self.append_df(df, filename)
+
+		# df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+		# 	, 'noise_level':self.metadata['noise_level']\
+		# 	, 'avg_netalign_score': self.avg_baseline_score\
+		# 	, 'matching_time': self.matching_time\
+		# 	}, ignore_index=True)
+
+		return df
+
+	def get_baseline_score(self, A, B, M, Pa, Pb):
+		pass
+	
+	def print_baseline_score(self, baseline_score):
+		pass
+	def append_df(self, df, filename):
+		return
+
+	def filter_sim_to_match(self, sim_matrix, percentage):
+		sim_lil = sim_matrix.tolil()
+		def max_n_percent(row_data, row_id, n):
+			if not n:
+				n = 1
+			id = row_data.argsort()[-n:]
+			top_vals = row_data[id]
+			top_ids = row_id[id]
+			return top_vals, top_ids, id
+		for i in xrange(sim_lil.shape[0]):
+			d, r = max_n_percent(np.array(sim_lil.data[i])
+					, np.array(sim_lil.rows[i]), int(percentage*sim_lil.shape[1]))[:2]
+			sim_lil.data[i]=d.tolist()
+			sim_lil.rows[i]=r.tolist()
+		sim_matrix = sim_lil.tocsr()
+		return sim_matrix
+
+	def run(self, filename = 'facebook', LSHType = 'Cosine'):
+		if os.path.isfile(self.fname+'.pkl'):
+			with open(self.fname+'.pkl', 'rb') as f:
+				df = pickle.load(f)
+		else:
+			df = pd.DataFrame()
+		df = self.sim_baseline(df, filename = filename, LSHType=LSHType)
+		pickle.dump(df, open(self.fname+'.pkl','wb'))
+		df.to_csv(self.fname+'.csv')
+
+class PureNetAlign(PureBaseline):
+
+	def __init__(self, fname):
+		PureBaseline.__init__(self, fname)
+
+	def get_baseline_score(self, A, B, M, Pa, Pb):
+		return getNetalignScore(A, B, M, Pa, Pb)
+
+	def print_baseline_score(self, baseline_score):
+		print "netalign score: %f" %(baseline_score)
+
+	def append_df(self, df, filename):
+		df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+			, 'noise_level':self.metadata['noise_level']\
+			, 'avg_netalign_score': self.avg_baseline_score\
+			, 'matching_time': self.matching_time\
+			}, ignore_index=True)
+		return df
+
+class PureIsoRank(PureBaseline):
+
+	def __init__(self, fname):
+		PureBaseline.__init__(self, fname)
+
+	def get_baseline_score(self, A, B, M, Pa, Pb):
+		return getIsoRankScore(A, B, M, Pa, Pb)
+
+	def print_baseline_score(self, baseline_score):
+		print "IsoRank score: %f" %(baseline_score)
+
+	def append_df(self, df, filename):
+		df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+			, 'noise_level':self.metadata['noise_level']\
+			, 'avg_isorank_score': self.avg_baseline_score\
+			, 'matching_time': self.matching_time\
+			}, ignore_index=True)
+		return df
+
+class PureFinal(PureBaseline):
+
+	def __init__(self, fname):
+		PureBaseline.__init__(self, fname)
+
+	def get_baseline_score(self, A, B, M, Pa, Pb):
+		return getFinalScore(A, B, M, Pa, Pb, node_A = None, node_B = None)
+
+	def print_baseline_score(self, baseline_score):
+		print "FINAL score: %f" %(baseline_score)
+
+	def append_df(self, df, filename):
+		df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
+			, 'noise_level':self.metadata['noise_level']\
+			, 'avg_final_score': self.avg_baseline_score\
+			, 'matching_time': self.matching_time\
+			}, ignore_index=True)
+		return df
+
+
+if __name__ == '__main__':
+	netalign_runner = PureNetAlign(sys.argv[1])
+	netalign_runner.run()
