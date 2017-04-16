@@ -10,5 +10,6 @@ netalign/
 *.o
 *.csv
 temp.mat
+temp_final.mat
 _snap.so
 snap.py

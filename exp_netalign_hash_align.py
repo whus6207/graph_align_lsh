@@ -15,7 +15,7 @@ if __name__ == '__main__':
 	for f in folders:
 		for noise_level in noise_levels:
 			preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level
-				, node_dir = 'Data/'+f+'.nodes', attr_only = True)
+				, node_dir = 'Data/'+f+'.nodes')
 			netalign_runner = PureNetAlign(fname)
 			for lsh in LSHs:
 				for t in thresholds:
