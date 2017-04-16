@@ -107,21 +107,22 @@ class PureBaseline:
 		return
 
 	def filter_sim_to_match(self, sim_matrix, percentage):
+		print "[before] sim_matrix non zero %: {}".format(len(sim_matrix.nonzero()[0])/float(sim_matrix.shape[0]**2))
 		sim_lil = sim_matrix.tolil()
 		def max_n_percent(row_data, row_id, n):
 			if not n:
 				n = 1
-			id = row_data.argsort()[-n:]
-			top_vals = row_data[id]
-			top_ids = row_id[id]
-			return top_vals, top_ids, id
+			idx = row_data.argsort()[-n:]
+			top_vals = row_data[idx]
+			top_ids = row_id[idx]
+			return top_vals, top_ids, idx
 		for i in xrange(sim_lil.shape[0]):
 			d, r = max_n_percent(np.array(sim_lil.data[i])
-					, np.array(sim_lil.rows[i]), int(percentage*sim_lil.shape[1]))[:2]
+					, np.array(sim_lil.rows[i]), int(percentage*sim_matrix.shape[0]))[:2]
 			sim_lil.data[i]=d.tolist()
 			sim_lil.rows[i]=r.tolist()
 		sim_matrix = sim_lil.tocsr()
-		print "sim_matrix non zero %: {}".format(len(sim_matrix.nonzero())/float(sim_matrix.shape[0]**2))
+		print "[after] sim_matrix non zero %: {}".format(len(sim_matrix.nonzero()[0])/float(sim_matrix.shape[0]**2))
 		return sim_matrix
 
 	def run(self, filename = 'facebook', LSHType = 'Cosine', threshold = 0.2):

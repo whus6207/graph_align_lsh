@@ -276,4 +276,4 @@ class HashAlign:
 
 if __name__ == '__main__':
 	ha_runner = HashAlign(fname = sys.argv[1])
-	ha_runner.run()
+	ha_runner.run(compute_final=True)
