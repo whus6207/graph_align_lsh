@@ -1,4 +1,4 @@
-function accuracy = runFinal()
+function [accuracy, row, col] = runFinal()
 clear;
 load temp_final;
 addpath('../final')
@@ -8,6 +8,6 @@ S1 = final_NE(A, B, H, node_A, node_B,...
 [M1, ~] = greedy_match(S1);
 [row, col] = find(M1 == 1);
 
-row = Pa*row;
-col = Pb*col;
-accuracy = sum(row == col) / size(row, 1);
+row_ = Pa*row;
+col_ = Pb*col;
+accuracy = sum(row_ == col_) / size(row_, 1);

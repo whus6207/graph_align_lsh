@@ -115,6 +115,7 @@ class HashAlign:
 				netalign_scores = {}
 				netaligned_matrix = {}
 				final_scores = {}
+				finaled_matrix = {}
 
 				for g in pair_count_dict.keys():
 					if g == center_id:
@@ -141,7 +142,7 @@ class HashAlign:
 												,graph_perm[center_id], graph_perm[g])
 						netalign_score += netalign_scores[g]
 					if compute_final:
-						final_scores[g] = getFinalScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g], graph_perm[center_id], graph_perm[g])
+						final_scores[g], finaled_matrix[g] = getFinalScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g], graph_perm[center_id], graph_perm[g])
 						final_score += final_scores[g]
 
 
@@ -176,11 +177,14 @@ class HashAlign:
 
 							if compute_netalign:
 								derived_matching_matrix[(non_center[i],non_center[j])] = netaligned_matrix[non_center[i]].T.dot(netaligned_matrix[non_center[j]])
-									#getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+								#getNetalignScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 								Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 								derived_netalign[(non_center[i],non_center[j])] = sum(correct_match)/len(correct_match)
-							if compute_final:	
-								derived_final[(non_center[i],non_center[j])] = getFinalScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+							if compute_final:
+								derived_matching_matrix[(non_center[i],non_center[j])] = finaled_matrix[non_center[i]].T.dot(finaled_matrix[non_center[j]])
+								Ranking, correct_match = sparseRank(derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
+								derived_final[(non_center[i],non_center[j])] = sum(correct_match)/len(correct_match)
+								#getFinalScore(multi_graphs[non_center[i]], multi_graphs[non_center[j]], derived_matching_matrix[(non_center[i],non_center[j])], graph_perm[non_center[i]], graph_perm[non_center[j]])
 					print 'derived rank score: '
 					print derived_rank
 					tmp_avg_derived_rank = sum([v for k,v in derived_rank.iteritems()])/len(derived_rank)
@@ -218,6 +222,8 @@ class HashAlign:
 				, 'GraphType':metadata['graph_type']\
 				, 'bandNumber':bandNumber\
 				, 'LSHType':LSHType\
+				, 'cos_num_plane': cos_num_plane\
+				, 'euc_width': euc_width\
 				, 'threshold':threshold\
 				, 'rank_score' : rank_score\
 				, 'rank_score_upper' : rank_score_upper\
@@ -270,4 +276,4 @@ class HashAlign:
 
 if __name__ == '__main__':
 	ha_runner = HashAlign(fname = sys.argv[1])
-	ha_runner.run()
+	ha_runner.run(compute_final=True)

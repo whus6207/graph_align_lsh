@@ -145,14 +145,14 @@ def computeWholeSimMat(attributesA, attributesB, LSHType):
     combineAB = selectAndCombine(attributesA, attributesB)
     combineAB = combineAB.as_matrix()
     sim_vec = []
-    scale = np.mean(combineAB[:,2:], axis=0)
+    scale = np.mean(combineAB[:,:], axis=0)
     if LSHType == 'Cosine':
         for j in range(len(attributesA)):
-            vec = [cos_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
+            vec = [cos_sim(combineAB[j,:], combineAB[len(attributesA)+i,:], scale) for i in range(len(attributesB)) ]
             sim_vec.append(vec)
     elif LSHType == 'Euclidean':
         for j in range(len(attributesA)):
-            vec = [Euclidean_sim(combineAB[j,2:], combineAB[len(attributesA)+i,2:], scale) for i in range(len(attributesB)) ]
+            vec = [Euclidean_sim(combineAB[j,:], combineAB[len(attributesA)+i,:], scale) for i in range(len(attributesB)) ]
             sim_vec.append(vec)
 
     return csr_matrix(sim_vec)

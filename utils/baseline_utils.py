@@ -4,20 +4,23 @@ import numpy as np
 from scipy  import io
 from scipy.sparse import csr_matrix
 
+def getCSRMatrix(shape, ma, mb):
+	row = np.array([x-1 for x in map(list, zip(*ma))[0]])
+	col = np.array([x-1 for x in map(list, zip(*mb))[0]])
+	data = len(row)*[1]
+	return csr_matrix((data, (row, col)), shape=shape)
+
 def getNetalignScore(A, B, L, Pa, Pb):
-  eng = mateng.start_matlab()
-  # eng.saveMat(matlab.double(A.tolist()), matlab.double(B.tolist()), matlab.double(L.tolist()), s, nargout=0)
-  io.savemat('temp.mat', dict(A=A, B=B, L=L, Pa=Pa, Pb=Pb))
-  accuracy, ma, mb = eng.runNetalign(nargout=3)
-  row = np.array([x-1 for x in map(list, zip(*ma))[0]])
-  col = np.array([x-1 for x in map(list, zip(*mb))[0]])
-  data = len(row)*[1]
-  matching_matrix = csr_matrix((data, (row, col)), shape=A.shape)
-  print "netalign: " + str(accuracy)
+	eng = mateng.start_matlab()
+	# eng.saveMat(matlab.double(A.tolist()), matlab.double(B.tolist()), matlab.double(L.tolist()), s, nargout=0)
+	io.savemat('temp.mat', dict(A=A, B=B, L=L, Pa=Pa, Pb=Pb))
+	accuracy, ma, mb = eng.runNetalign(nargout=3)
+	matching_matrix = getCSRMatrix(A.shape, ma, mb)
+	print "netalign: " + str(accuracy)
 
-  eng.quit()
+	eng.quit()
 
-  return accuracy, matching_matrix
+	return accuracy, matching_matrix
 
 def getFinalScore(A, B, H, Pa, Pb, node_A = None, node_B = None):
 	eng = mateng.start_matlab()
@@ -27,12 +30,14 @@ def getFinalScore(A, B, H, Pa, Pb, node_A = None, node_B = None):
 		node_B = np.ones((B.get_shape()[0], 1));
 	io.savemat('temp_final.mat', dict(A = A, B = B, H = H, Pa = Pa, Pb = Pb, node_A = node_A, node_B = node_B))
 
-	accuracy = eng.runFinal(nargout=1)
+	accuracy, ma, mb = eng.runFinal(nargout=3)
+	matching_matrix = getCSRMatrix(A.shape, ma, mb)
+
 	print "final: " + str(accuracy)
 
 	eng.quit()
 
-	return accuracy
+	return accuracy, matching_matrix
 
 def getIsoRankScore(A, B, L, Pa, Pb):
 	eng = mateng.start_matlab()

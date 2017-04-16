@@ -52,7 +52,7 @@ class PureBaseline:
 		
 
 
-	def sim_baseline(self, df, filename, LSHType):
+	def sim_baseline(self, df, filename, LSHType, threshold = 0.2):
 		
 		self.load_data(filename)
 
@@ -65,7 +65,7 @@ class PureBaseline:
 					else:
 						print '!!! computed sim_matrix !!!'
 						self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
-					self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], 0.2)	
+					self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], threshold)	
 
 			for g in self.multi_graphs.keys():
 				if g == center_id:
@@ -107,29 +107,31 @@ class PureBaseline:
 		return
 
 	def filter_sim_to_match(self, sim_matrix, percentage):
+		print "[before] sim_matrix non zero %: {}".format(len(sim_matrix.nonzero()[0])/float(sim_matrix.shape[0]**2))
 		sim_lil = sim_matrix.tolil()
 		def max_n_percent(row_data, row_id, n):
 			if not n:
 				n = 1
-			id = row_data.argsort()[-n:]
-			top_vals = row_data[id]
-			top_ids = row_id[id]
-			return top_vals, top_ids, id
+			idx = row_data.argsort()[-n:]
+			top_vals = row_data[idx]
+			top_ids = row_id[idx]
+			return top_vals, top_ids, idx
 		for i in xrange(sim_lil.shape[0]):
 			d, r = max_n_percent(np.array(sim_lil.data[i])
-					, np.array(sim_lil.rows[i]), int(percentage*sim_lil.shape[1]))[:2]
+					, np.array(sim_lil.rows[i]), int(percentage*sim_matrix.shape[0]))[:2]
 			sim_lil.data[i]=d.tolist()
 			sim_lil.rows[i]=r.tolist()
 		sim_matrix = sim_lil.tocsr()
+		print "[after] sim_matrix non zero %: {}".format(len(sim_matrix.nonzero()[0])/float(sim_matrix.shape[0]**2))
 		return sim_matrix
 
-	def run(self, filename = 'facebook', LSHType = 'Cosine'):
+	def run(self, filename = 'facebook', LSHType = 'Cosine', threshold = 0.2):
 		if os.path.isfile(self.fname+'.pkl'):
 			with open(self.fname+'.pkl', 'rb') as f:
 				df = pickle.load(f)
 		else:
 			df = pd.DataFrame()
-		df = self.sim_baseline(df, filename = filename, LSHType=LSHType)
+		df = self.sim_baseline(df, filename = filename, LSHType=LSHType, threshold = threshold)
 		pickle.dump(df, open(self.fname+'.pkl','wb'))
 		df.to_csv(self.fname+'.csv')
 
@@ -183,7 +185,7 @@ class PureFinal(PureBaseline):
 		PureBaseline.__init__(self, fname)
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
-		return getFinalScore(A, B, M, Pa, Pb, node_A = None, node_B = None)
+		return getFinalScore(A, B, M, Pa, Pb, node_A = None, node_B = None)[0]
 
 	def print_baseline_score(self, baseline_score):
 		print "FINAL score: %f" %(baseline_score)
