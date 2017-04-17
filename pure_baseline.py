@@ -71,7 +71,7 @@ class PureBaseline:
 							self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
 					if all_1 and self.baseline_type == 'final':
 						print '!!! use all 1 matrix !!!'
-						self.matching_matrix[(center_id, g)] = csr_matrix(np.ones(self.multi_graphs.shape))
+						self.matching_matrix[(center_id, g)] = csr_matrix(np.ones((self.multi_graphs[center_id].shape[0], self.multi_graphs[g].shape[0])))
 					else:
 						self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], threshold)	
 

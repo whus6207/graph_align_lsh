@@ -216,6 +216,7 @@ class HashAlign:
 			avg_derived_final /= loop_num	
 			end_matching = time.time()
 			matching_time = end_matching - start_matching		
+			print "matching_time: {}".format(matching_time)
 
 			df = df.append({'filename':filename, 'nodeAttributeFile': metadata['node_dir']\
 				, 'noise_level':metadata['noise_level']\
