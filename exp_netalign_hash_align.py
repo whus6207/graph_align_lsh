@@ -3,7 +3,7 @@ from HashAlign import *
 from pure_baseline import *
 
 if __name__ == '__main__':
-	folders = ['dblp-A']
+	folders = ['facebook' ,'dblp-A']
 	euc_widths = {'facebook':[4], 'dblp-A':[0.5]}
 	cos_num_planes = {'facebook':[25], 'dblp-A':[40]}
 	thresholds = [0.10]
@@ -15,7 +15,7 @@ if __name__ == '__main__':
 	for f in folders:
 		for noise_level in noise_levels:
 			preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level
-				, node_dir = 'Data/'+f+'.nodes', attr_only = True)
+				, node_dir = 'Data/'+f+'.nodes')
 			#netalign_runner = PureNetAlign(fname)
 			#for lsh in LSHs:
 			#	for t in thresholds:
