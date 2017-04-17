@@ -52,7 +52,7 @@ class PureBaseline:
 				self.graph_attrs[g] = att.iloc[:, -node_att_num:]
 		self.graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))	
 		self.multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-		if os.path.exists('./private_data/' + filename + '/node_label.pkl'):
+		if int(metadata['node_label']) == 1 and os.path.exists('./private_data/' + filename + '/node_label.pkl'):
 			self.node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
 		else:
 			self.node_label = None			
