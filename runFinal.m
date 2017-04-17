@@ -11,3 +11,4 @@ S1 = final_NE(A, B, H, node_A, node_B,...
 row_ = Pa*row;
 col_ = Pb*col;
 accuracy = sum(row_ == col_) / size(row_, 1);
+

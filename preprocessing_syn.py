@@ -11,7 +11,7 @@ import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
 	number = 5, noise_level = 0.01, weighted_noise = 1.0, center_distance = 'canberra', findcenter = 0,
-	attr_only = False):
+	attr_only = False, weighted = False, node_label = False, is_perm = True):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 
 	path = './private_data/' + save_dir
@@ -19,7 +19,8 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		os.makedirs(path)
 	start_preprocess = time.time()
 
-	multi_graphs, multi_perm, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number, noise_level = noise_level, weighted_noise = weighted_noise)
+	multi_graphs, multi_perm, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number
+			, noise_level = noise_level, weighted_noise = weighted_noise, weighted = weighted, is_perm = is_perm)
 	node_num, n = multi_graphs['M0'].get_shape() 
 
 	nodeAttributesValue, nodeAttributesName = [], []
@@ -28,7 +29,6 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	# 	P[i, i] = 1
 	# P = P.tocsr()
 	graph_attrs = {}
-
 
 	if node_dir:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(node_dir)
@@ -114,6 +114,10 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
 	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
 	pickle.dump(multi_perm, open(path + '/permutations.pkl', 'wb'))
+	if node_label:
+		pickle.dump(np.array(nodeAttributesValue)[:,0], open(path + '/node_label.pkl', 'wb'))
+	else:
+		pickle.dump(None, open(path + '/node_label.pkl', 'wb'))
 	# g = pickle.load(open(path + '/attributes.pkl', 'rb'))
 	# print list(g['M1']['Degree'])
 
