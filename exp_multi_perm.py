@@ -1,7 +1,7 @@
 import sys
 from preprocessing_syn import *
 from HashAlign import *
-from pure_baseline import *
+# from pure_baseline import *
 from random import shuffle
 
 if __name__ == '__main__':

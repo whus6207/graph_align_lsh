@@ -52,8 +52,10 @@ class PureBaseline:
 				self.graph_attrs[g] = att.iloc[:, -node_att_num:]
 		self.graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))	
 		self.multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-		
-
+		if os.path.exists('./private_data/' + filename + '/node_label.pkl'):
+			self.node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
+		else:
+			self.node_label = None			
 
 	def sim_baseline(self, df, filename, LSHType, threshold = 0.2, all_1 = False):
 		
@@ -86,7 +88,7 @@ class PureBaseline:
 				self.avg_baseline_score += self.baseline_scores[(center_id, g)]
 
 				print "=========================================================="
-				print filename + ' ' + g 
+				print filename + ' ' + g + 'center: '+center_id
 				print "GraphType = " + self.metadata['graph_type'] 
 				print "noise_level = " + self.metadata['noise_level'] + ", nodeAttributeFile = " + self.metadata['node_dir']
 				self.print_baseline_score(self.baseline_scores[(center_id, g)])
@@ -193,7 +195,7 @@ class PureFinal(PureBaseline):
 		PureBaseline.__init__(self, fname, 'final')
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
-		return getFinalScore(A, B, M, Pa, Pb, node_A = None, node_B = None)[0]
+		return getFinalScore(A, B, M, Pa, Pb, node_A = self.node_label, node_B = self.node_label)[0]
 
 	def print_baseline_score(self, baseline_score):
 		print "FINAL score: %f" %(baseline_score)

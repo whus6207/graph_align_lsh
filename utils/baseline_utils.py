@@ -25,9 +25,20 @@ def getNetalignScore(A, B, L, Pa, Pb):
 def getFinalScore(A, B, H, Pa, Pb, node_A = None, node_B = None):
 	eng = mateng.start_matlab()
 
-	if not node_A and not node_B:	
-		node_A = np.ones((A.get_shape()[0], 1));
-		node_B = np.ones((B.get_shape()[0], 1));
+	if node_A is None and node_B is None:	
+		node_A = np.ones((A.get_shape()[0], 1))
+		node_B = np.ones((B.get_shape()[0], 1))
+	else:
+		node_A = node_A.reshape((node_A.shape[0], 1))
+		if np.array_equal(node_A, Pa.dot(node_A)):
+			print "node_A == Pa.dot(node_A)"
+		node_A = Pa.dot(node_A)
+
+		node_B = node_B.reshape((node_B.shape[0], 1))
+		if np.array_equal(node_B, Pa.dot(node_B)):
+			print "node_B == Pb.dot(node_B)"
+		node_B = Pb.dot(node_B)
+
 	io.savemat('temp_final.mat', dict(A = A, B = B, H = H, Pa = Pa, Pb = Pb, node_A = node_A, node_B = node_B))
 
 	accuracy, ma, mb = eng.runFinal(nargout=3)
