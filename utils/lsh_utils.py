@@ -191,8 +191,8 @@ def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
         matching_matrix = (P1.T).dot(matching_matrix).dot(P2)
 
     n, d = matching_matrix.shape
-    ranking = np.zeros((n))
-    correct_match = np.zeros((n))
+    ranking = np.zeros(min(n, d))
+    correct_match = np.zeros(min(n, d))
     sorted_row = defaultdict(list)
 
     matching_matrix = matching_matrix.tocoo() # For .row and .col
@@ -212,7 +212,7 @@ def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
 
     # Find position of same index
     matching_matrix = matching_matrix.tocsr() # For [i, i]
-    for i in range(n):
+    for i in range(min(n, d)):
         if i in sorted_row and matching_matrix[i, i] != 0:
             ranking[i] = 1.0 / (sorted_row[i].index(i) + 1)
             correct_match[i] = (i == sorted_row[i][0]) # max matching score at node i

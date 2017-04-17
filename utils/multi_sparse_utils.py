@@ -23,6 +23,7 @@ def permuteMultiSparse(A, number, graph_type, level, is_perm = True, weighted_no
 	noise = noise[: int(len(noise) * level // 2) * number] # total number of noise / 2
 	# Noise (edges) for each graph
 	multi_noise = [noise[len(noise) * i // number: len(noise) * (i+1) // number]for i in range(number)]
+	P = identity(m)
 	for n in multi_noise:
 		P = identity(m)
 		# Dealing with existing edges
