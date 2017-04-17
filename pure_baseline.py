@@ -86,7 +86,7 @@ class PureBaseline:
 				self.avg_baseline_score += self.baseline_scores[(center_id, g)]
 
 				print "=========================================================="
-				print filename + ' ' + g 
+				print filename + ' ' + g + 'center: '+center_id
 				print "GraphType = " + self.metadata['graph_type'] 
 				print "noise_level = " + self.metadata['noise_level'] + ", nodeAttributeFile = " + self.metadata['node_dir']
 				self.print_baseline_score(self.baseline_scores[(center_id, g)])

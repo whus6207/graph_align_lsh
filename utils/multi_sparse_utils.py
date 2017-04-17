@@ -62,12 +62,12 @@ def permuteMultiSparse(A, number, graph_type, level, is_perm = True, weighted_no
 
 # Load original graph from edge file and create multiple synthetic graphs with noise
 # Write sparse matrixes to edge file for later use
-def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', number = 5, noise_level = 0.02, weighted_noise = None):
+def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', weighted = False, number = 5, noise_level = 0.02, weighted_noise = None):
 	path = 'metadata/multigraph/'
 	graph_info = {} # {graph name: sparse adjacency matrix}
 	perm_info = {} # {graph name: permutation} lenth =  number + 1 
 	if filename:
-		A = loadSparseGraph(filename, graph_type)
+		A = loadSparseGraph(filename, graph_type, weighted)
 	else:
 		raise RuntimeError("Need an input file")
 	# Remove Isolated nodes in A
