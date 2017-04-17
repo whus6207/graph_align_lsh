@@ -94,16 +94,12 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print "check for center graph: {}".format(centers)
 
 	# Save 
-	# np.savez(path + '/Permutation.npz', data = P.data ,indices = P.indices, indptr = P.indptr, shape = P.shape )
 	# save centers
 	with open(path + '/centers', 'w') as f:
 		for c in centers:
 			f.write(c + '\n')
 		f.close()
-	# with open(path + '/found_center', 'w') as f:
-	# 	f.write(found_center)
-	# 	f.close()
-	metadata = [graph_type, noise_level, weighted_noise, found_center, number]
+
 	with open(path + '/metadata', 'w') as f:
 		f.write('graph_type' + " " + str(graph_type) + '\n')
 		f.write('noise_level' + " " + str(noise_level) + '\n')
