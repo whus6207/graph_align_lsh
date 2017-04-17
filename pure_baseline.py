@@ -52,8 +52,10 @@ class PureBaseline:
 				self.graph_attrs[g] = att.iloc[:, -node_att_num:]
 		self.graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))	
 		self.multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-		
-
+		if os.path.exists('./private_data/' + filename + '/node_label.pkl'):
+			self.node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
+		else:
+			self.node_label = None			
 
 	def sim_baseline(self, df, filename, LSHType, threshold = 0.2, all_1 = False):
 		
@@ -71,7 +73,7 @@ class PureBaseline:
 							self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
 					if all_1 and self.baseline_type == 'final':
 						print '!!! use all 1 matrix !!!'
-						self.matching_matrix[(center_id, g)] = csr_matrix(np.ones(self.multi_graphs.shape))
+						self.matching_matrix[(center_id, g)] = csr_matrix(np.ones((self.multi_graphs[center_id].shape[0], self.multi_graphs[g].shape[0])))
 					else:
 						self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], threshold)	
 
@@ -193,7 +195,7 @@ class PureFinal(PureBaseline):
 		PureBaseline.__init__(self, fname, 'final')
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
-		return getFinalScore(A, B, M, Pa, Pb, node_A = None, node_B = None)[0]
+		return getFinalScore(A, B, M, Pa, Pb, node_A = self.node_label, node_B = self.node_label)[0]
 
 	def print_baseline_score(self, baseline_score):
 		print "FINAL score: %f" %(baseline_score)

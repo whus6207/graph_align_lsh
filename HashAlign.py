@@ -4,7 +4,7 @@ from utils.lsh_utils import *
 from utils.io_sparse_utils import *
 from utils.multi_sparse_utils import *
 from scipy.sparse import identity
-# from utils.baseline_utils import *
+from utils.baseline_utils import *
 import pandas as pd
 import os.path
 import pickle
@@ -53,7 +53,7 @@ class HashAlign:
 		graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
 		graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))
 		multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-
+		node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
 		# Load attributes name
 		attributes = []
 		with open('./private_data/' + filename + '/attributes') as f:
@@ -143,6 +143,7 @@ class HashAlign:
 						netalign_score += netalign_scores[g]
 					if compute_final:
 						final_scores[g], finaled_matrix[g] = getFinalScore(multi_graphs[center_id], multi_graphs[g], matching_matrix[g], graph_perm[center_id], graph_perm[g])
+																#, node_label, node_label)
 						final_score += final_scores[g]
 
 
