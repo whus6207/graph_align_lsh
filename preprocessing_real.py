@@ -10,7 +10,8 @@ import pickle
 import sys
 
 def preprocessing(edge_dir, node_dir = None, perm = False, save_dir = "", graph_type = 'Undirected',
-	center_distance = 'canberra', findcenter = 0):
+	center_distance = 'canberra', findcenter = 1):
+	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	path = './private_data/' + save_dir
 	if not os.path.exists(path):
 		os.makedirs(path)
