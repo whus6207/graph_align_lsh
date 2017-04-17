@@ -8,9 +8,10 @@ import pandas as pd
 import os.path
 import pickle
 import time
+from scipy.sparse import csr_matrix
 
 class PureBaseline:
-	def __init__(self, fname):
+	def __init__(self, fname, baseline_type):
 		self.fname = 'exp_result/' + fname
 		self.metadata = {}
 		self.centers = []
@@ -23,6 +24,8 @@ class PureBaseline:
 		self.avg_baseline_score = 0
 		self.matching_time = 0
 		self.baseline_scores = {}
+
+		self.baseline_type = baseline_type
 
 	def load_data(self, filename):
 		# Load synthetic graph information
@@ -52,7 +55,7 @@ class PureBaseline:
 		
 
 
-	def sim_baseline(self, df, filename, LSHType, threshold = 0.2):
+	def sim_baseline(self, df, filename, LSHType, threshold = 0.2, all_1 = False):
 		
 		self.load_data(filename)
 
@@ -63,9 +66,14 @@ class PureBaseline:
 					if (g, center_id) in self.sim_matrix:
 						self.sim_matrix[(center_id, g)] = self.sim_matrix[(g, center_id)]
 					else:
-						print '!!! computed sim_matrix !!!'
-						self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
-					self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], threshold)	
+						if not all_1:
+							print '!!! computed sim_matrix !!!'
+							self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
+					if all_1 and self.baseline_type == 'final':
+						print '!!! use all 1 matrix !!!'
+						self.matching_matrix[(center_id, g)] = csr_matrix(np.ones(self.multi_graphs.shape))
+					else:
+						self.matching_matrix[(center_id, g)] = self.filter_sim_to_match(self.sim_matrix[(center_id, g)], threshold)	
 
 			for g in self.multi_graphs.keys():
 				if g == center_id:
@@ -88,7 +96,7 @@ class PureBaseline:
 		self.matching_time = time.time() - start_match
 		print "matching_time: "+str(self.matching_time)
 
-		df = self.append_df(df, filename, LSHType, temp)
+		df = self.append_df(df, LSHType, filename, temp)
 
 		# df = df.append({'filename':filename, 'nodeAttributeFile': self.metadata['node_dir']\
 		# 	, 'noise_level':self.metadata['noise_level']\
@@ -125,20 +133,20 @@ class PureBaseline:
 		print "[after] sim_matrix non zero %: {}".format(len(sim_matrix.nonzero()[0])/float(sim_matrix.shape[0]**2))
 		return sim_matrix
 
-	def run(self, filename = 'facebook', LSHType = 'Cosine', threshold = 0.2):
+	def run(self, filename = 'facebook', LSHType = 'Cosine', threshold = 0.2, all_1 = False):
 		if os.path.isfile(self.fname+'.pkl'):
 			with open(self.fname+'.pkl', 'rb') as f:
 				df = pickle.load(f)
 		else:
 			df = pd.DataFrame()
-		df = self.sim_baseline(df, filename = filename, LSHType=LSHType, threshold = threshold)
+		df = self.sim_baseline(df, filename = filename, LSHType=LSHType, threshold = threshold, all_1 = all_1)
 		pickle.dump(df, open(self.fname+'.pkl','wb'))
 		df.to_csv(self.fname+'.csv')
 
 class PureNetAlign(PureBaseline):
 
 	def __init__(self, fname):
-		PureBaseline.__init__(self, fname)
+		PureBaseline.__init__(self, fname, 'netalign')
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
 		return getNetalignScore(A, B, M, Pa, Pb)[0]
@@ -160,7 +168,7 @@ class PureNetAlign(PureBaseline):
 class PureIsoRank(PureBaseline):
 
 	def __init__(self, fname):
-		PureBaseline.__init__(self, fname)
+		PureBaseline.__init__(self, fname, 'isorank')
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
 		return getIsoRankScore(A, B, M, Pa, Pb)
@@ -182,7 +190,7 @@ class PureIsoRank(PureBaseline):
 class PureFinal(PureBaseline):
 
 	def __init__(self, fname):
-		PureBaseline.__init__(self, fname)
+		PureBaseline.__init__(self, fname, 'final')
 
 	def get_baseline_score(self, A, B, M, Pa, Pb):
 		return getFinalScore(A, B, M, Pa, Pb, node_A = None, node_B = None)[0]

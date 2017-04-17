@@ -1,8 +1,0 @@
-graph_type Undirected
-noise_level 0.02
-weighted_noise 1.0
-found_center M2
-number 2
-node_dir Data/dblp-A.nodes
-center_distance canberra
-node_attribute_number 1

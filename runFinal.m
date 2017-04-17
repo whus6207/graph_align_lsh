@@ -4,7 +4,7 @@ load temp_final;
 addpath('../final')
 S1 = final_NE(A, B, H, node_A, node_B,...
     A, B,...
-    1, 1, 0.6, 40, 0);
+    1, 1, 0.6, 40, 1);
 [M1, ~] = greedy_match(S1);
 [row, col] = find(M1 == 1);
 
