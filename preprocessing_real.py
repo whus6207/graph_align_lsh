@@ -2,14 +2,14 @@ import time
 import os
 import pandas as pd
 import numpy as np
-from attr_utils import *
-from multi_sparse_utils import *
+from utils.attr_utils import *
+from utils.multi_sparse_utils import *
 from scipy.sparse import identity
 import scipy.sparse as sparse
 import pickle
 import sys
 
-def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
+def preprocessing(edge_dir, node_dir = None, perm = False, save_dir = "", graph_type = 'Undirected',
 	center_distance = 'canberra', findcenter = 0):
 	path = './private_data/' + save_dir
 	if not os.path.exists(path):
@@ -17,24 +17,31 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	start_preprocess = time.time()
 	real_path = 'metadata/realgraph/' + graph_type 
 	multi_graphs = {}
+	multi_perm = {}
 	# Preprocess real graph
 	i = 0
 	for f in os.listdir(edge_dir):
 		if not f.startswith('.'):
-			A = loadSparseGraph(edge_dir + '/' + f, graph_type)
-			A, rest_idx = removeIsolatedSparse(A)
-			multi_graphs['M' + str(i)] = A
+			A = loadSparseGraph(edge_dir + '/' + f, graph_type, weighted = True)
+			# A, rest_idx = removeIsolatedSparse(A)
+			if perm:
+				p_graph, p = permuteMultiSparse(A, 1, graph_type, 0)
+				multi_perm['M' + str(i)] = p[0]
+				multi_graphs['M' + str(i)] = p_graph[0]
+				A = p_graph[0]
+			else:
+				multi_graphs['M' + str(i)] = A
 			writeSparseToFile(real_path + '/M'+ str(i) + '.edges', A)
 			i += 1
 	number = i - 1
 
-	node_num, n = multi_graphs['M0'].get_shape()
+	
+
+			
+
 
 	nodeAttributesValue, nodeAttributesName = [], []
-	P = sparse.lil_matrix((node_num, n))
-	for i in range(node_num):
-		P[i, i] = 1
-	P = P.tocsr()
+
 	graph_attrs = {}
 
 	if node_dir:
@@ -48,7 +55,8 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getUndirAttribute(real_path + '/' + key +'.edges', node_num, 0.1)
+			node_num, n = multi_graphs[key].get_shape()
+			attributesA = getUndirAttribute(real_path + '/' + key +'.edges', node_num)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
@@ -63,7 +71,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		attributes += nodeAttributesName
 
 		for key in multi_graphs.keys():
-			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, 0.1)
+			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
 			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue)
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
@@ -92,15 +100,12 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print "check for center graph: {}".format(centers)
 
 	# Save 
-	# np.savez(path + '/Permutation.npz', data = P.data ,indices = P.indices, indptr = P.indptr, shape = P.shape )
 	# save centers
 	with open(path + '/centers', 'w') as f:
 		for c in centers:
 			f.write(c + '\n')
 		f.close()
-	# with open(path + '/found_center', 'w') as f:
-	# 	f.write(found_center)
-	# 	f.close()
+
 	with open(path + '/metadata', 'w') as f:
 		f.write('graph_type' + " " + str(graph_type) + '\n')
 		f.write('noise_level' + " " + str(0) + '\n')
@@ -109,9 +114,12 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		f.write('number' + " " + str(number) + '\n')
 		f.write('node_dir' + " " + str(node_dir) + '\n')
 		f.write('center_distance' + " " + str(center_distance) + '\n')
+		f.write('node_attribute_number' + " " + str(len(nodeAttributesName)) + '\n')
 		f.close()
 
 	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
+	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
+	pickle.dump(multi_perm, open(path + '/permutations.pkl', 'wb'))
 
 
 	end_preprocess = time.time()
@@ -120,7 +128,13 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	print 'Pre-processing time: ' + str(preprocess_time)
 
 if __name__ == '__main__':
-	preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2])
+	if len(sys.argv) == 3:
+		preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2])
+	elif len(sys.argv) == 4:
+		preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2], perm =True)
+	elif len(sys.argv) == 5:
+		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], save_dir = sys.argv[3], perm = True)
+
 
 	
 
