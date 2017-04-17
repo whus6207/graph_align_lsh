@@ -9,7 +9,7 @@ import scipy.sparse as sparse
 import pickle
 import sys
 
-def preprocessing(edge_dir, node_dir = None, perm = False, save_dir = "", graph_type = 'Undirected',
+def preprocessing(edge_dir, node_dir = None, perm_dir = None, save_dir = "", graph_type = 'Undirected',
 	center_distance = 'canberra', findcenter = 1):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 	path = './private_data/' + save_dir
@@ -19,27 +19,23 @@ def preprocessing(edge_dir, node_dir = None, perm = False, save_dir = "", graph_
 	real_path = 'metadata/realgraph/' + graph_type 
 	multi_graphs = {}
 	multi_perm = {}
+
 	# Preprocess real graph
 	i = 0
 	for f in os.listdir(edge_dir):
 		if not f.startswith('.'):
 			A = loadSparseGraph(edge_dir + '/' + f, graph_type, weighted = True)
 			# A, rest_idx = removeIsolatedSparse(A)
-			if perm:
-				p_graph, p = permuteMultiSparse(A, 1, graph_type, 0)
-				multi_perm['M' + str(i)] = p[0]
-				multi_graphs['M' + str(i)] = p_graph[0]
-				A = p_graph[0]
-			else:
-				multi_graphs['M' + str(i)] = A
+			A, p = permuteMultiSparse(A, 1, graph_type, 0, is_perm = False)
+			multi_graphs['M' + str(i)] = A 
+			multi_perm['M' + str(i)] = p
 			writeSparseToFile(real_path + '/M'+ str(i) + '.edges', A)
 			i += 1
 	number = i - 1
 
-	
-
-			
-
+	if perm_dir:
+		P = loadSparseGraph(perm_dir)
+		multi_perm['M1'] = P
 
 	nodeAttributesValue, nodeAttributesName = [], []
 
@@ -132,9 +128,8 @@ if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2])
 	elif len(sys.argv) == 4:
-		preprocessing(edge_dir = sys.argv[1], save_dir = sys.argv[2], perm =True)
-	elif len(sys.argv) == 5:
-		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], save_dir = sys.argv[3], perm = True)
+		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], save_dir = sys.argv[3])
+
 
 
 	
