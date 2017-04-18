@@ -14,16 +14,16 @@ if __name__ == '__main__':
 	fname = 'exp_brain'
 	for f in folders:
 		for noise_level in noise_levels:
-			preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level
-				, weighted_noise = 1.0, weighted = True)
-			final_runner = PureFinal(fname)
-			for lsh in LSHs:
-				for t in thresholds:
-					final_runner.run(f,lsh,1)
-			netalign_runner = PureNetAlign(fname)
-			for lsh in LSHs:
-				for t in thresholds:
-					netalign_runner.run(f,lsh,t)
+			#preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level
+			#	, weighted_noise = 1.0, weighted = True)
+			#final_runner = PureFinal(fname)
+			#for lsh in LSHs:
+			#	for t in thresholds:
+			#		final_runner.run(f,lsh,1)
+			#netalign_runner = PureNetAlign(fname)
+			#for lsh in LSHs:
+			#	for t in thresholds:
+			#		netalign_runner.run(f,lsh,t)
 
 			#preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level)
 			hashalign_runner = HashAlign(fname)
