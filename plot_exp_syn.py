@@ -46,7 +46,7 @@ def plot_exp(exp_path, filename, name, lsh):
 
 	
 	plt.legend(loc='best')
-	plt.ylim([0, 1.0])
+	plt.ylim([-0.1, 1.1])
 	# ax1.legend(loc='best')
 	# ax1.tick_params('y', colors='b')
 

@@ -50,7 +50,7 @@ def permuteMultiSparse(A, number, graph_type, level, is_perm = True, weighted_no
 
 		if is_perm:
 			perm = scipy.random.permutation(m)
-			P = P.tocsr()[perm, :]
+			P = P.tocsr()[perm, perm]
 		B = P.dot(B).dot(P.T)
 
 		B = B.tocsr()
@@ -68,12 +68,12 @@ def permuteEdgeMultiSparse(A, number, graph_type, level, is_perm = True):
 	B = A.copy()
 	# Noise (edges) for each graph
 	P = identity(m)
-	for _ in number:
+	for _ in range(number):
 		noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v]	 # No duplicate edges
 		P = identity(m)
 		# Dealing with existing edges
 		B = B.tolil()
-		for i, j in noise
+		for i, j in noise:
 			B[i, j]  = B[i, j] + np.random.uniform(0, level) # 0 ~ 2
 			if graph_type == 'Undirected':
 				B[j, i] = B[i, j]
