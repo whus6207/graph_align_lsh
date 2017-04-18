@@ -11,7 +11,7 @@ import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
 	number = 5, noise_level = 0.01, weighted_noise = 1.0, center_distance = 'canberra', findcenter = 0,
-	attr_only = False, edge_noise_only = False, weighted = False, node_label = False, is_perm = True):
+	attr_only = False, edge_noise_only = False, weighted = False, node_label = True, is_perm = True):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 
 	path = './private_data/' + save_dir

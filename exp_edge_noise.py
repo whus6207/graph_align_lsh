@@ -6,10 +6,10 @@ from random import shuffle
 
 if __name__ == '__main__':
 	# testdata = [('facebook', [25], [4]), ('email', [50], [4]), ('dblp-A', [100], [4])]
-	testdata = [('email', [50], [4])]
+	testdata = [('dblp-A', [100], [4])]
 	b = [4]
 	LSHs = ['Cosine']
-	fname = 'exp_email_syn_all'
+	fname = 'exp_edge_syn_all'
 	noise_level = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]
 
 	for data, c, e in testdata:
@@ -17,7 +17,8 @@ if __name__ == '__main__':
 			b = [2]
 			noise_level = [0.1, 0.2, 0.3, 0.5]
 		for noise in noise_level:
-			preprocessing('Data/' + data + '.edges', 'Data/' + data + '.nodes', data, number = 1, noise_level = noise, node_label = True)
+			preprocessing('Data/' + data + '.edges', 'Data/' + data + '.nodes', data, number = 1, 
+				edge_noise_only = True, noise_level = noise, weighted = True, node_label = True)
 			# HashAlign
 			ha = HashAlign(fname)
 			ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, LSHs = LSHs, folders = [data])

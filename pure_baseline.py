@@ -56,7 +56,9 @@ class PureBaseline:
 		if int(self.metadata['node_label']) == 1 and os.path.exists('./private_data/' + filename + '/node_label.pkl'):
 			self.node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
 		else:
-			self.node_label = None			
+			self.node_label = None
+			
+
 
 	def sim_baseline(self, df, filename, LSHType, threshold = 0.2, all_1 = False):
 		
@@ -216,5 +218,5 @@ class PureFinal(PureBaseline):
 
 
 if __name__ == '__main__':
-	netalign_runner = PureNetAlign(sys.argv[1])
-	netalign_runner.run()
+	netalign_runner = PureFinal(sys.argv[1])
+	netalign_runner.run(filename = 'DBLP-A')
