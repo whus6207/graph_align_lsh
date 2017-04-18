@@ -53,7 +53,8 @@ class HashAlign:
 		graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
 		graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))
 		multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-		node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
+		if os.path.exists('./private_data/' + filename + '/node_label.pkl'):
+			node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
 		# Load attributes name
 		attributes = []
 		with open('./private_data/' + filename + '/attributes') as f:

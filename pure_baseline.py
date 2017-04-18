@@ -49,10 +49,11 @@ class PureBaseline:
 		self.graph_attrs = pickle.load(open('./private_data/' + filename + '/attributes.pkl', 'rb'))
 		if node_att_num > 0:
 			for g, att in self.graph_attrs.iteritems():
-				self.graph_attrs[g] = att.iloc[:, -node_att_num:]
+				cols = list(att.iloc[:, :2])+list(att.iloc[:, -node_att_num:])
+				self.graph_attrs[g] = att[cols]
 		self.graph_perm = pickle.load(open('./private_data/' + filename + '/permutations.pkl', 'rb'))	
 		self.multi_graphs = pickle.load(open('./private_data/' + filename + '/multi_graphs.pkl', 'rb'))
-		if int(metadata['node_label']) == 1 and os.path.exists('./private_data/' + filename + '/node_label.pkl'):
+		if int(self.metadata['node_label']) == 1 and os.path.exists('./private_data/' + filename + '/node_label.pkl'):
 			self.node_label = pickle.load(open('./private_data/' + filename + '/node_label.pkl', 'rb'))
 		else:
 			self.node_label = None			
@@ -60,7 +61,9 @@ class PureBaseline:
 	def sim_baseline(self, df, filename, LSHType, threshold = 0.2, all_1 = False):
 		
 		self.load_data(filename)
-
+		node_att_num = int(self.metadata['node_attribute_number'])
+		if node_att_num == 0:
+			all_1 = True
 		start_match = time.time()
 		for center_id in self.centers:
 			for g in self.graph_attrs.keys():
@@ -71,7 +74,7 @@ class PureBaseline:
 						if not all_1:
 							print '!!! computed sim_matrix !!!'
 							self.sim_matrix[(center_id, g)] = computeWholeSimMat(self.graph_attrs[center_id], self.graph_attrs[g], LSHType)
-					if all_1 and self.baseline_type == 'final':
+					if all_1:
 						print '!!! use all 1 matrix !!!'
 						self.matching_matrix[(center_id, g)] = csr_matrix(np.ones((self.multi_graphs[center_id].shape[0], self.multi_graphs[g].shape[0])))
 					else:

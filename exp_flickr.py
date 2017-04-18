@@ -10,4 +10,4 @@ if __name__ == '__main__':
 	for f in folders:
 		hashalign_runner = HashAlign(fname)
 		hashalign_runner.run(folders = [f], band_numbers = band_numbers[f], cos_num_plane = cos_num_planes[f]
-				, LSHs = LSHs, thresholds = thresholds, compute_netalign = False)
+				, LSHs = LSHs, thresholds = thresholds, compute_netalign = True)
