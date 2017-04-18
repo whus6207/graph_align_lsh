@@ -49,7 +49,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key])
+			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key], noise_level = noise_level)
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
 	elif graph_type == 'Directed':
@@ -67,7 +67,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 		for key in multi_graphs.keys():
 			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key])
+			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key], noise_level = noise_level)
 			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
 
 	with open(path + '/attributes', 'w') as f:

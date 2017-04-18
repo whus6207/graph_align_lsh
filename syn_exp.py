@@ -9,7 +9,7 @@ if __name__ == '__main__':
 	testdata = [('email', [50], [4])]
 	b = [4]
 	LSHs = ['Cosine']
-	fname = 'exp_email_syn_all'
+	fname = 'test'
 	noise_level = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]
 
 	for data, c, e in testdata:

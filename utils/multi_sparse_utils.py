@@ -50,10 +50,10 @@ def permuteMultiSparse(A, number, graph_type, level, is_perm = True, weighted_no
 
 		if is_perm:
 			perm = scipy.random.permutation(m)
-			P = P.tocsr()[perm, perm]
-		B = P.dot(B).dot(P.T)
+			P = P.tocsr()[perm, :]
 
 		B = B.tocsr()
+		B = P.dot(B).dot(P.T)
 		multi_graph_w_permutation.append(B)
 		permutation.append(P)
 		B = A.copy()

@@ -215,8 +215,16 @@ def getDirAttribute(filename, node_num, weighted = None, param = 1.0):
 
     return attributes
 
-def addNodeAttribute(structAttributes, nodeAttributeNames = None, nodeAttributeValues = None, P = None):
+def addNodeAttribute(structAttributes, nodeAttributeNames = None, nodeAttributeValues = None, P = None, noise_level = None):
     if len(nodeAttributeNames) > 0 and len(nodeAttributeValues) > 0:
+        if noise_level:
+            visited = set()
+            m, n = np.array(nodeAttributeValues).shape
+            for _ in range(int(m * n * noise_level)):
+                add1, add2 = np.random.choice(m), np.random.choice(n)
+                while ((add1, add2) in visited):
+                    add1, add2 = np.random.choice(m), np.random.choice(n)
+                nodeAttributeValues[add1][add2] = nodeAttributeValues[add1][add2] + np.random.choice([1, -1])
         if P is not None:
             nodeAttributeValues = P.dot(np.array(nodeAttributeValues))
             nodeAttributes = pd.DataFrame(nodeAttributeValues.astype(int), columns = nodeAttributeNames)
