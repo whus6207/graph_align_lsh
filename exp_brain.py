@@ -10,7 +10,7 @@ if __name__ == '__main__':
 	LSHs = ['Cosine']
 	band_numbers = {'facebook':[4], 'dblp-A':[2], 'brain':[2]}
 	noise_levels = [0.02]
-	num_graph = 4
+	num_graph = 5
 	fname = 'exp_brain'
 	for f in folders:
 		for noise_level in noise_levels:
