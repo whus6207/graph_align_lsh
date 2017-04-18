@@ -15,18 +15,18 @@ if __name__ == '__main__':
 	for data, c, e in testdata:
 		if data == 'dblp-A':
 			b = [2]
-			noise_level = [0.001, 0.01, 0.05, 0.1]
+			noise_level = [0.1, 0.2, 0.3, 0.5]
 		for noise in noise_level:
-			preprocessing('Data/' + data + '.edges', 'Data/' + data + '.nodes', data, number = 1, noise_level = noise)
+			preprocessing('Data/' + data + '.edges', 'Data/' + data + '.nodes', data, number = 1, noise_level = noise, edge_noise_only = True)
 			# HashAlign
-			# ha = HashAlign(fname)
-			# ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, LSHs = LSHs, folders = [data])
+			ha = HashAlign(fname)
+			ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, LSHs = LSHs, folders = [data])
 			# HashAlign + NetAlign
-			# ha = HashAlign(fname)
-			# ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, compute_netalign = True, LSHs = LSHs, folders = [data])
+			ha = HashAlign(fname)
+			ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, compute_netalign = True, LSHs = LSHs, folders = [data])
 			# HasAlign + Final
-			# ha = HashAlign(fname)
-			# ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, compute_final = True, LSHs = LSHs, folders = [data])
+			ha = HashAlign(fname)
+			ha.run(band_numbers = b, cos_num_plane = c, euc_width = e, compute_final = True, LSHs = LSHs, folders = [data])
 			for lsh in LSHs:
 				# NetAlign
 				# na = PureNetAlign(fname)
@@ -36,5 +36,5 @@ if __name__ == '__main__':
 				# ir.run(filename = data, LSHType = lsh)
 				# Final
 				fn = PureFinal(fname)
-				fn.run(filename = data, LSHType = lsh)
+				fn.run(filename = data, LSHType = lsh, threshold = 1.0)
 

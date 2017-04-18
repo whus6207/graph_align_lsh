@@ -11,7 +11,7 @@ import sys
 
 def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
 	number = 5, noise_level = 0.01, weighted_noise = 1.0, center_distance = 'canberra', findcenter = 0,
-	attr_only = False, weighted = False, node_label = False, is_perm = True):
+	attr_only = False, edge_noise_only = False, weighted = False, node_label = False, is_perm = True):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
 
 	path = './private_data/' + save_dir
@@ -20,7 +20,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	start_preprocess = time.time()
 
 	multi_graphs, multi_perm, syn_path = generate_multi_graph_synthetic(filename = edge_dir, graph_type = graph_type, number = number
-			, noise_level = noise_level, weighted_noise = weighted_noise, weighted = weighted, is_perm = is_perm)
+			, edge_noise_only = edge_noise_only, noise_level = noise_level, weighted_noise = weighted_noise, weighted = weighted, is_perm = is_perm)
 	node_num, n = multi_graphs['M0'].get_shape() 
 
 	nodeAttributesValue, nodeAttributesName = [], []
@@ -142,7 +142,8 @@ if __name__ == '__main__':
 			, noise_level = float(sys.argv[4]), number = int(sys.argv[5]))
 	elif len(sys.argv) == 7:
 		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], save_dir = sys.argv[3]
-			, noise_level = float(sys.argv[4]), number = int(sys.argv[5]) ,attr_only = True)
+			, noise_level = float(sys.argv[4]), number = int(sys.argv[5]), edge_noise_only = True)
+
 
 	
 
