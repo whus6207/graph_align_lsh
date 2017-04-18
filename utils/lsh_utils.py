@@ -188,7 +188,7 @@ def combineBucketsBySumMulti(buckets, stacked_attrs, graphs, center_id, reweight
 
 def sparseRank(matching_matrix, P1 = None, P2 = None, printing = False):
     if P1 != None and P2 != None:
-        matching_matrix = (P1.T).dot(matching_matrix).dot(P2)
+        matching_matrix = (P1).dot(matching_matrix).dot(P2.T)
 
     n, d = matching_matrix.shape
     ranking = np.zeros(min(n, d))

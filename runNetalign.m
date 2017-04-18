@@ -13,10 +13,10 @@ for i = ma
 end
 
 [m_, n_] = size(Pb);
-M2 = -1 * ones(n_, 1);
+M2 = zeros(n_, 1);
 for j = mb
 	M2(j) = 1;
 end
 M1 = Pa*M1;
 M2 = Pb*M2;
-accuracy = sum(M1 == M2) / m;
+accuracy = sum(M1.*M2) / m;
