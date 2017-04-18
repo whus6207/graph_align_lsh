@@ -224,7 +224,7 @@ def addNodeAttribute(structAttributes, nodeAttributeNames = None, nodeAttributeV
                 add1, add2 = np.random.choice(m), np.random.choice(n)
                 while ((add1, add2) in visited):
                     add1, add2 = np.random.choice(m), np.random.choice(n)
-                nodeAttributeValues[add1][add2] = nodeAttributeValues[add1][add2] + np.random.choice([1, -1])
+                nodeAttributeValues[add1][add2] = nodeAttributeValues[add1][add2] + np.random.choice([1, 2])
         if P is not None:
             nodeAttributeValues = P.dot(np.array(nodeAttributeValues))
             nodeAttributes = pd.DataFrame(nodeAttributeValues.astype(int), columns = nodeAttributeNames)
