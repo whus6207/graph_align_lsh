@@ -73,7 +73,7 @@ def permuteEdgeMultiSparse(A, number, graph_type, level, is_perm = True):
 		P = identity(m)
 		# Dealing with existing edges
 		B = B.tolil()
-		for i, j in noise
+		for i, j in noise:
 			B[i, j]  = B[i, j] + np.random.uniform(0, level) # 0 ~ 2
 			if graph_type == 'Undirected':
 				B[j, i] = B[i, j]

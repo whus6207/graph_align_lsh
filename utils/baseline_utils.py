@@ -35,7 +35,7 @@ def getFinalScore(A, B, H, Pa, Pb, node_A = None, node_B = None):
 		node_A = Pa.dot(node_A)
 
 		node_B = node_B.reshape((node_B.shape[0], 1))
-		if np.array_equal(node_B, Pa.dot(node_B)):
+		if np.array_equal(node_B, Pb.dot(node_B)):
 			print "node_B == Pb.dot(node_B)"
 		node_B = Pb.dot(node_B)
 
