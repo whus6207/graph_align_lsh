@@ -61,9 +61,39 @@ def permuteMultiSparse(A, number, graph_type, level, is_perm = True, weighted_no
 
 	return multi_graph_w_permutation, permutation
 
+def permuteEdgeMultiSparse(A, number, graph_type, level, is_perm = True):
+	m, n = A.get_shape()
+	multi_graph_w_permutation = []
+	permutation = []
+	B = A.copy()
+	# Noise (edges) for each graph
+	P = identity(m)
+	for _ in number:
+		noise = [(k, v) for k, v in zip(B.nonzero()[0], B.nonzero()[1]) if k <= v]	 # No duplicate edges
+		P = identity(m)
+		# Dealing with existing edges
+		B = B.tolil()
+		for i, j in noise
+			B[i, j]  = B[i, j] + np.random.uniform(0, level) # 0 ~ 2
+			if graph_type == 'Undirected':
+				B[j, i] = B[i, j]
+		if is_perm:
+			perm = scipy.random.permutation(m)
+			P = P.tocsr()[perm, :]
+		B = P.dot(B).dot(P.T)
+
+		B = B.tocsr()
+		multi_graph_w_permutation.append(B)
+		permutation.append(P)
+		B = A.copy()
+
+	return multi_graph_w_permutation, permutation
+
+
+
 # Load original graph from edge file and create multiple synthetic graphs with noise
 # Write sparse matrixes to edge file for later use
-def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', weighted = False, number = 5, noise_level = 0.02, weighted_noise = None, is_perm = True):
+def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', weighted = False, number = 5, edge_noise_only = False, noise_level = 0.02, weighted_noise = None, is_perm = True):
 	path = 'metadata/multigraph/'
 	graph_info = {} # {graph name: sparse adjacency matrix}
 	perm_info = {} # {graph name: permutation} lenth =  number + 1 
@@ -73,7 +103,10 @@ def generate_multi_graph_synthetic(filename = None, graph_type = 'Undirected', w
 		raise RuntimeError("Need an input file")
 	# Remove Isolated nodes in A
 	A, rest_idx = removeIsolatedSparse(A)
-	multi_graph_w_permutation, permutation = permuteMultiSparse(A, number, graph_type, level = noise_level, weighted_noise = weighted_noise, is_perm = is_perm)
+	if edge_noise_only:
+		multi_graph_w_permutation, permutation = permuteEdgeMultiSparse(A, number, graph_type, level = noise_level, is_perm = is_perm)
+	else:
+		multi_graph_w_permutation, permutation = permuteMultiSparse(A, number, graph_type, level = noise_level, weighted_noise = weighted_noise, is_perm = is_perm)
 	writeSparseToFile(path + graph_type + '/M0.edges', A)
 	# writeSparseToFile(path + graph_type + '/M0', A)
 	graph_info['M0'] = A
