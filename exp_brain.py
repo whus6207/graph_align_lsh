@@ -15,7 +15,7 @@ if __name__ == '__main__':
 	for f in folders:
 		for noise_level in noise_levels:
 			preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level
-				, weighted_noise = 1.0)
+				, weighted_noise = 1.0, weighted = True)
 			final_runner = PureFinal(fname)
 			for lsh in LSHs:
 				for t in thresholds:
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 				for t in thresholds:
 					netalign_runner.run(f,lsh,t)
 
-			preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level)
+			#preprocessing(edge_dir = 'Data/'+f+'.edges', save_dir = f, number = num_graph-1, noise_level = noise_level)
 			hashalign_runner = HashAlign(fname)
 			hashalign_runner.run(folders = [f], band_numbers = band_numbers[f], cos_num_plane = cos_num_planes[f]
 					, LSHs = LSHs, thresholds = thresholds, compute_netalign = True)

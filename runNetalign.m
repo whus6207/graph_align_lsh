@@ -7,11 +7,13 @@ x = netalignbp(S,w,0,1,li,lj);
 [ma, mb, ~, ~, ~] = mwmround(x,S,w,li,lj);
 
 [m, n] = size(Pa);
-M1 = zeros(m, 1);
+M1 = zeros(n, 1);
 for i = ma
 	M1(i) = 1;
 end
-M2 = -1 * ones(m, 1);
+
+[m_, n_] = size(Pb);
+M2 = -1 * ones(n_, 1);
 for j = mb
 	M2(j) = 1;
 end
