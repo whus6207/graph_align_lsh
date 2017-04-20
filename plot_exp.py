@@ -37,10 +37,13 @@ def plot_exp(exp_path, filename, name, exp_type):
 	# print x2
 	# print df1['rank_score']
 	# ax1.plot(x1, df1['rank_score'], '--', label = '0.001')
-	line1 = ax1.plot(df2_s[x], df2_s['rank_score'],  'g--', marker='x', label = 'Rank score')
+	line1 = ax1.plot(df2_s[x], df2_s['rank_score'], '-', color = 'b', linewidth=2.0,  
+		markeredgewidth=1.5, markersize=10, marker='x', label = 'Rank score')
 	
-	ax1.legend(handles=line1, loc=2)
+	# ax1.legend(handles=line1, loc=2)
+	ax1.legend(handles = line1, bbox_to_anchor=(0.25, 1.15), prop={'size':20}, loc='upper center', columnspacing = 0.5, shadow = True)
 	ax1.set_ylim([0, 1.0])
+	ax1.tick_params(labelsize=18)
 	# ax1.legend(loc='best')
 	# ax1.tick_params('y', colors='b')
 
@@ -50,17 +53,21 @@ def plot_exp(exp_path, filename, name, exp_type):
 	print df2_t
 	# print df1['matching_time']
 	# ax2.plot(x1, df1['matching_time'], '-', label = '0.001')
-	line2 = ax2.plot(df2_t[x], df2_t['matching_time'], '-', marker='o', label = 'Matching time')
+	line2 = ax2.plot(df2_t[x], df2_t['matching_time'], '--', color = 'g', linewidth=2.0, 
+		markeredgecolor = 'g', markeredgewidth=1.5, markersize=10, markerfacecolor='None', marker='o', label = 'Matching time')
 
 	# ax1.set_title(exp_type)
-	ax1.set_xlabel('threshold')
-	ax1.set_ylabel('rank score (1 / position)')
-	ax2.set_ylabel('matching time (sec.)')
+	ax1.set_xlabel('Width of lines', fontsize = 25)
+	ax1.set_ylabel('Rank score (1 / position)', fontsize = 25)
+	ax2.set_ylabel('Matching time (sec.)', fontsize = 25)
 
-	ax2.legend(handles=line2, loc=4)
+	# ax2.legend(handles=line2, loc=4)
+	ax2.legend(handles = line2, bbox_to_anchor=(0.72, 1.15), prop={'size':20}, loc='upper center', columnspacing = 0.5, shadow = True)
+
 	# ax2.legend(loc='best')
 	# ax2.tick_params('y', colors='r')
-	plt.savefig('exp_result/plot/' + name + '.png')
+	ax2.tick_params(labelsize=18)
+	plt.savefig('exp_result/plot/' + name + '.png', bbox_inches='tight')
 	# fig.tight_layout()
 
 if __name__ == '__main__':

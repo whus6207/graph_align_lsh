@@ -220,7 +220,9 @@ class HashAlign:
 			matching_time = end_matching - start_matching		
 			print "matching_time: {}".format(matching_time)
 
-			df = df.append({'filename':filename, 'nodeAttributeFile': metadata['node_dir']\
+			df = df.append({'filename':filename\
+				, 'nodeAttributeFile': metadata['node_dir']\
+				, 'edge_label_dir': metadata['edge_label_dir']\
 				, 'noise_level':metadata['noise_level']\
 				, 'GraphType':metadata['graph_type']\
 				, 'bandNumber':bandNumber\
@@ -241,6 +243,7 @@ class HashAlign:
 				, 'avg_derived_final': avg_derived_final\
 				, 'center_dist': metadata['center_distance']\
 				, 'pairs_computed' : pairs_computed\
+				, 'preprocess_time': metadata['preprocess_time']\
 				, 'matching_time': matching_time\
 				}, ignore_index=True)
 		return df

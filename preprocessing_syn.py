@@ -9,7 +9,7 @@ import scipy.sparse as sparse
 import pickle
 import sys
 
-def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undirected',
+def preprocessing(edge_dir, node_dir = None, edge_label_dir = None, save_dir = "", graph_type = 'Undirected',
 	number = 5, noise_level = 0.01, weighted_noise = 1.0, center_distance = 'canberra', findcenter = 0,
 	attr_only = False, edge_noise_only = False, weighted = False, node_label = True, is_perm = True):
 	#findcenter = 1: find and check that one and original center; 0: check all, -1: original only
@@ -24,6 +24,8 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 	node_num, n = multi_graphs['M0'].get_shape() 
 
 	nodeAttributesValue, nodeAttributesName = [], []
+	edgeAttributessValue, edgeAttributessName = [], []
+
 	# P = sparse.lil_matrix((node_num, n))
 	# for i in range(node_num):
 	# 	P[i, i] = 1
@@ -32,6 +34,8 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 
 	if node_dir:
 		nodeAttributesValue, nodeAttributesName = loadNodeFeature(node_dir)
+	if edge_label_dir:
+		edgeAttributessValue, edgeAttributessName = loadEdgeFeature(edge_label_dir)
 		
 	### get graph attributes
 	attributes = []
@@ -41,16 +45,24 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 			'EgonetDegree', 'AvgNeighborDeg', 'EgonetConnectivity']
 			if weighted_noise:
 				attributes += ['WeightedDegree', 'EgoWeightedDegree', 'AvgWeightedNeighborDeg', 'EgonetWeightedConnectivity']
+		attributes += edgeAttributessName
 
-		attributes += nodeAttributesName
 
 
 		for key in multi_graphs.keys():
 			attributesA = getUndirAttribute(syn_path + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getUndirAttribute(syn_path + '/' + key, node_num)
 			# TODO: handle when permutation possible
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key], noise_level = noise_level)
-			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
+			if key == 'M0':
+				attributesA = addEdgeAttribute(attributesA, edgeAttributessName, edgeAttributessValue, multi_perm[key])
+				attributesA, onehot_nodeAttributeNames = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key])
+			else:
+				attributesA = addEdgeAttribute(attributesA, edgeAttributessName, edgeAttributessValue, multi_perm[key], noise_level = noise_level)
+				attributesA, onehot_nodeAttributeNames = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key], noise_level = noise_level)
+		
+			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes + onehot_nodeAttributeNames]
+
+		attributes += onehot_nodeAttributeNames
 
 	elif graph_type == 'Directed':
 		if not attr_only:
@@ -61,14 +73,23 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 			if weighted_noise:
 				attributes += ['WeightedDegree', 'WeightedInDegree', 'WeightedOutDegree', 'EgoWeightedDegree', 'AvgWeightedNeighborDeg', 'EgonetWeightedConnectivity'\
 				, 'EgoWeightedInDegree', 'EgoWeightedOutDegree', 'AvgWeightedNeighborInDeg', 'AvgWeightedNeighborOutDeg']
+		attributes += edgeAttributessName
 
-		attributes += nodeAttributesName
+		
 
 		for key in multi_graphs.keys():
 			attributesA = getDirAttribute(psyn_pathath + '/' + key +'.edges', node_num, weighted_noise)
 			# attributesA = getDirAttribute(psyn_pathath + '/' + key, node_num)
-			attributesA = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key], noise_level = noise_level)
-			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes]
+			if key == 'M0':
+				attributesA = addEdgeAttribute(attributesA, edgeAttributessName, edgeAttributessValue, multi_perm[key])
+				attributesA, onehot_nodeAttributeNames = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key])
+			else:
+				attributesA = addEdgeAttribute(attributesA, edgeAttributessName, edgeAttributessValue, multi_perm[key], noise_level = noise_level)
+				attributesA, onehot_nodeAttributeNames = addNodeAttribute(attributesA, nodeAttributesName, nodeAttributesValue, multi_perm[key], noise_level = noise_level)
+			
+			graph_attrs[key] = attributesA[['Graph', 'Id']+attributes + onehot_nodeAttributeNames]
+		
+		attributes += onehot_nodeAttributeNames
 
 	with open(path + '/attributes', 'w') as f:
 		for a in attributes:
@@ -100,17 +121,7 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 			f.write(c + '\n')
 		f.close()
 
-	with open(path + '/metadata', 'w') as f:
-		f.write('graph_type' + " " + str(graph_type) + '\n')
-		f.write('noise_level' + " " + str(noise_level) + '\n')
-		f.write('weighted_noise' + " " + str(weighted_noise) + '\n')
-		f.write('found_center' + " " + str(found_center) + '\n')
-		f.write('number' + " " + str(number) + '\n')
-		f.write('node_dir' + " " + str(node_dir) + '\n')
-		f.write('center_distance' + " " + str(center_distance) + '\n')
-		f.write('node_attribute_number' + " " + str(len(nodeAttributesName)) + '\n')
-		f.write('node_label' + " " + str(int(node_label)) + '\n')
-		f.close()
+	
 	# print list(graph_attrs['M1']['Degree'])
 	pickle.dump(multi_graphs, open(path + '/multi_graphs.pkl', 'wb'))
 	pickle.dump(graph_attrs, open(path + '/attributes.pkl', 'wb'))
@@ -125,6 +136,20 @@ def preprocessing(edge_dir, node_dir = None, save_dir = "", graph_type = 'Undire
 
 	end_preprocess = time.time()
 	preprocess_time = end_preprocess - start_preprocess
+
+	with open(path + '/metadata', 'w') as f:
+		f.write('graph_type' + " " + str(graph_type) + '\n')
+		f.write('noise_level' + " " + str(noise_level) + '\n')
+		f.write('weighted_noise' + " " + str(weighted_noise) + '\n')
+		f.write('found_center' + " " + str(found_center) + '\n')
+		f.write('number' + " " + str(number) + '\n')
+		f.write('node_dir' + " " + str(node_dir) + '\n')
+		f.write('edge_label_dir' + " " + str(edge_label_dir) + '\n')
+		f.write('center_distance' + " " + str(center_distance) + '\n')
+		f.write('node_attribute_number' + " " + str(len(onehot_nodeAttributeNames)) + '\n')
+		f.write('node_label' + " " + str(int(node_label)) + '\n')
+		f.write('preprocess_time' + " " + str(preprocess_time) + '\n')
+		f.close()
 	
 	print 'noise level: '+str(noise_level)	
 	print 'Pre-processing time: ' + str(preprocess_time)
@@ -141,8 +166,8 @@ if __name__ == '__main__':
 		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], save_dir = sys.argv[3]
 			, noise_level = float(sys.argv[4]), number = int(sys.argv[5]))
 	elif len(sys.argv) == 7:
-		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], save_dir = sys.argv[3]
-			, noise_level = float(sys.argv[4]), number = int(sys.argv[5]), edge_noise_only = True)
+		preprocessing(edge_dir = sys.argv[1], node_dir = sys.argv[2], edge_label_dir = sys.argv[3], save_dir = sys.argv[4]
+			, noise_level = float(sys.argv[5]), number = int(sys.argv[6]))
 
 
 	

@@ -37,16 +37,19 @@ def plot_exp(exp_path, filename, name, lsh):
 
 	x = 'noise_level'
 
-	plt.plot(df_ha[x], df_ha['correct_score'],  '-', marker='x', label = 'HashAlign')
-	plt.plot(df_ha_n[x], df_ha_n['correct_score'],  '-', marker='o', label = 'HashAlign-NA')
-	plt.plot(df_ha_f[x], df_ha_f['correct_score'],  '-', marker='^', label = 'HashAlign-FN')
-	plt.plot(df_n[x], df_n['netalign_score'],  '-', marker='D', label = 'NetAlign')
-	plt.plot(df_i[x], df_i['isorank_score'],  '-', marker='*', label = 'IsoRank')
-	plt.plot(df_f[x], df_f['final_score'],  '-', marker='p', label = 'FINAL')
+	plt.plot(df_ha[x], df_ha['correct_score'], '-', color = 'b', linewidth=2.0, marker='*',  markersize=10, label = 'HashAlign')
+	plt.plot(df_ha_n[x], df_ha_n['netalign_score'], '-', linewidth=2.0, color = '#040273', marker='o', 
+		markersize=10, label = 'HashAlign-NA')
+	plt.plot(df_ha_f[x], df_ha_f['final_score'], '-', linewidth=2.0, color = '#069af3', markersize=10, marker='d', label = 'HashAlign-FN')
+	plt.plot(df_i[x], df_i['isorank_score'],  '--', linewidth=2.0, color = '#f97306', marker='s', markersize=10, markerfacecolor='None', 
+		markeredgecolor='#f97306', markeredgewidth=1.5, label = 'IsoRank')
+	plt.plot(df_n[x], df_n['netalign_score'],  '--', linewidth=2.0, color = '#40a368', marker='^', markersize=10, markerfacecolor='None',
+	markeredgecolor='#40a368', markeredgewidth=1.5, label = 'NetAlign') # orange
+	plt.plot(df_f[x], df_f['final_score'],  '--', color = 'r', marker='x', markeredgewidth=1.5, markersize=10, label = 'FINAL')
 
-	
-	plt.legend(loc='best')
-	plt.ylim([-0.1, 1.1])
+	plt.legend(bbox_to_anchor=(0.5, 1.25), prop={'size':20}, loc='upper center', columnspacing = 0.5, ncol=3, shadow = True)
+	plt.ylim([-0.05, 1.1])
+
 	# ax1.legend(loc='best')
 	# ax1.tick_params('y', colors='b')
 
@@ -55,14 +58,15 @@ def plot_exp(exp_path, filename, name, lsh):
 	# line2 = ax2.plot(df2_t[x], df2_t['matching_time'], '-', marker='o', label = 'Matching time')
 
 	# ax1.set_title(exp_type)
-	plt.xlabel('noise level')
-	plt.ylabel('accuracy')
+	plt.tick_params(labelsize=20)
+	plt.xlabel('Noise level ', fontsize=25)
+	plt.ylabel('Accuracy', fontsize = 25)
 	# ax2.set_ylabel('matching time (sec.)')
 
 	# ax2.legend(handles=line2, loc=4)
 	# ax2.legend(loc='best')
 	# ax2.tick_params('y', colors='r')
-	plt.savefig('exp_result/plot/' + name + '.png')
+	plt.savefig('exp_result/plot/' + name + '.png', bbox_inches='tight')
 	# fig.tight_layout()
 
 if __name__ == '__main__':

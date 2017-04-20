@@ -230,9 +230,31 @@ def addNodeAttribute(structAttributes, nodeAttributeNames = None, nodeAttributeV
             nodeAttributes = pd.DataFrame(nodeAttributeValues.astype(int), columns = nodeAttributeNames)
         else:
             nodeAttributes = pd.DataFrame(nodeAttributeValues, columns = nodeAttributeNames)
-        structAttributes = pd.concat([structAttributes, nodeAttributes], axis = 1)
-    return structAttributes
+        nodeAttributeNames = []
+        for col in nodeAttributes.columns:
+            onehot = pd.get_dummies(nodeAttributes[col], prefix = col)
+            nodeAttributeNames += list(onehot.columns)
+            structAttributes = pd.concat([structAttributes, onehot], axis = 1)
+    return structAttributes, nodeAttributeNames
 
+def addEdgeAttribute(structAttributes, edgeAttributessName = None, edgeAttributessValue = None, P = None, noise_level = None):
+    if len(edgeAttributessName) > 0 and len(edgeAttributessValue) > 0:
+        if noise_level:
+            visited = set()
+            m, n = np.array(edgeAttributessValue).shape
+            for _ in range(int(m * n * noise_level)):
+                add1, add2 = np.random.choice(m), np.random.choice(n)
+                while ((add1, add2) in visited):
+                    add1, add2 = np.random.choice(m), np.random.choice(n)
+                edgeAttributessValue[add1][add2] = edgeAttributessValue[add1][add2] + np.random.choice([1, 2])
+        if P is not None:
+            edgeAttributessValue = P.dot(np.array(edgeAttributessValue))
+            edgeAttributes = pd.DataFrame(edgeAttributessValue.astype(int), columns = edgeAttributessName)
+        else:
+            edgeAttributes = pd.DataFrame(edgeAttributessValue, columns = edgeAttributessName)
+        
+        structAttributes = pd.concat([structAttributes, edgeAttributes], axis = 1)
+    return structAttributes
 
 
 

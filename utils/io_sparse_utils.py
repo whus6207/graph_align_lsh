@@ -87,6 +87,16 @@ def loadNodeFeature(fname):
 			nodeFeaturesValue.append([int(i) for i in v])
 	return nodeFeaturesValue, nodeFeaturesName
 
+def loadEdgeFeature(fname):
+	edgeFeaturesValue = []
+	edgeFeaturesName =[]	
+	with open(fname) as f:
+		edgeFeaturesName = f.readline().strip().split()
+		for line in f:
+			line = line.strip().split()
+			edgeFeaturesValue.append([int(i) for i in line])
+	return edgeFeaturesValue, edgeFeaturesName
+
 
 
 

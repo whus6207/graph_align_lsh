@@ -8,6 +8,6 @@ def add_node_att(inputfile, outputfile, number, graph_type = 'Undirected'):
 	col = ['a' + str(i) for i in range(number)]
 	df = pd.DataFrame(columns = col)
 	for i, c in enumerate(col):
-		df[c] = [random.randint(i * 4 + 2) for _ in range(m)]
+		df[c] = [random.randint(1, i * 4 + 3) for _ in range(m)]
 	df.to_csv(outputfile, index = False, header = True, sep = ' ')
-add_node_att('Data/dblp/dblp-A.edges', 'Data/dblp-A.nodes', 5)
+add_node_att('Data/email.edges', 'Data/email.nodes', 5)
